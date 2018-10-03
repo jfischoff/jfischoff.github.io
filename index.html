@@ -1,0 +1,1396 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Stock Sentiment</title>
+    <style>
+
+    table {
+        table-layout: fixed;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            
+<div class="col-md-9">
+    <h2 class="sub-header">Highest Volume</h2>
+    <div class="table-responsive">
+        <table class="table ">
+            <thead>
+                <tr>
+                    <th class="col-md-1">Ranking</th>
+                    <th class="col-md-2">Quote</th>
+                   <th class="col-md-3">"24 Hours"</th>
+<th class="col-md-4">"6 Hours"</th>
+<th class="col-md-5">"1 Hour"</th>
+<th class="col-md-6">"30 Minutes"</th>
+<th class="col-md-7">"15 Minutes"</th>
+<th class="col-md-8">"5 Minute"</th>
+<th class="col-md-9">"1 Minute"</th>
+
+                </tr>
+            </thead>
+            <tbody>
+              
+<tr>
+    <td class="col-md-1">1</td>
+    <td class="col-md-2">TSLA</td>
+    
+<td class="col-md-3">4188</td>
+  
+
+<td class="col-md-4">1995</td>
+  
+
+<td class="col-md-5">331</td>
+  
+
+<td class="col-md-6">176</td>
+  
+
+<td class="col-md-7">68</td>
+  
+
+<td class="col-md-8">22</td>
+  
+
+<td class="col-md-9">6</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">2</td>
+    <td class="col-md-2">AMZN</td>
+    
+<td class="col-md-3">1124</td>
+  
+
+<td class="col-md-4">580</td>
+  
+
+<td class="col-md-5">71</td>
+  
+
+<td class="col-md-6">27</td>
+  
+
+<td class="col-md-7">12</td>
+  
+
+<td class="col-md-8">5</td>
+  
+
+<td class="col-md-9">2</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">3</td>
+    <td class="col-md-2">FB</td>
+    
+<td class="col-md-3">900</td>
+  
+
+<td class="col-md-4">493</td>
+  
+
+<td class="col-md-5">71</td>
+  
+
+<td class="col-md-6">45</td>
+  
+
+<td class="col-md-7">28</td>
+  
+
+<td class="col-md-8">8</td>
+  
+
+<td class="col-md-9">2</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">4</td>
+    <td class="col-md-2">TLRY</td>
+    
+<td class="col-md-3">833</td>
+  
+
+<td class="col-md-4">482</td>
+  
+
+<td class="col-md-5">51</td>
+  
+
+<td class="col-md-6">21</td>
+  
+
+<td class="col-md-7">12</td>
+  
+
+<td class="col-md-8">2</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">5</td>
+    <td class="col-md-2">AAPL</td>
+    
+<td class="col-md-3">941</td>
+  
+
+<td class="col-md-4">457</td>
+  
+
+<td class="col-md-5">50</td>
+  
+
+<td class="col-md-6">21</td>
+  
+
+<td class="col-md-7">11</td>
+  
+
+<td class="col-md-8">4</td>
+  
+
+<td class="col-md-9">2</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">6</td>
+    <td class="col-md-2">TWTR</td>
+    
+<td class="col-md-3">340</td>
+  
+
+<td class="col-md-4">155</td>
+  
+
+<td class="col-md-5">36</td>
+  
+
+<td class="col-md-6">27</td>
+  
+
+<td class="col-md-7">20</td>
+  
+
+<td class="col-md-8">4</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">7</td>
+    <td class="col-md-2">NBEV</td>
+    
+<td class="col-md-3">764</td>
+  
+
+<td class="col-md-4">328</td>
+  
+
+<td class="col-md-5">32</td>
+  
+
+<td class="col-md-6">12</td>
+  
+
+<td class="col-md-7">10</td>
+  
+
+<td class="col-md-8">5</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">8</td>
+    <td class="col-md-2">INTC</td>
+    
+<td class="col-md-3">369</td>
+  
+
+<td class="col-md-4">177</td>
+  
+
+<td class="col-md-5">27</td>
+  
+
+<td class="col-md-6">13</td>
+  
+
+<td class="col-md-7">4</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">1</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">9</td>
+    <td class="col-md-2">CGC</td>
+    
+<td class="col-md-3">340</td>
+  
+
+<td class="col-md-4">180</td>
+  
+
+<td class="col-md-5">26</td>
+  
+
+<td class="col-md-6">11</td>
+  
+
+<td class="col-md-7">4</td>
+  
+
+<td class="col-md-8">3</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">10</td>
+    <td class="col-md-2">AMRN</td>
+    
+<td class="col-md-3">307</td>
+  
+
+<td class="col-md-4">157</td>
+  
+
+<td class="col-md-5">22</td>
+  
+
+<td class="col-md-6">9</td>
+  
+
+<td class="col-md-7">3</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">1</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">11</td>
+    <td class="col-md-2">W</td>
+    
+<td class="col-md-3">537</td>
+  
+
+<td class="col-md-4">236</td>
+  
+
+<td class="col-md-5">22</td>
+  
+
+<td class="col-md-6">12</td>
+  
+
+<td class="col-md-7">6</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">12</td>
+    <td class="col-md-2">QQQ</td>
+    
+<td class="col-md-3">522</td>
+  
+
+<td class="col-md-4">283</td>
+  
+
+<td class="col-md-5">21</td>
+  
+
+<td class="col-md-6">13</td>
+  
+
+<td class="col-md-7">3</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">13</td>
+    <td class="col-md-2">GOOG</td>
+    
+<td class="col-md-3">348</td>
+  
+
+<td class="col-md-4">158</td>
+  
+
+<td class="col-md-5">19</td>
+  
+
+<td class="col-md-6">7</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">14</td>
+    <td class="col-md-2">MSFT</td>
+    
+<td class="col-md-3">222</td>
+  
+
+<td class="col-md-4">110</td>
+  
+
+<td class="col-md-5">17</td>
+  
+
+<td class="col-md-6">7</td>
+  
+
+<td class="col-md-7">2</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">1</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">15</td>
+    <td class="col-md-2">NFLX</td>
+    
+<td class="col-md-3">419</td>
+  
+
+<td class="col-md-4">148</td>
+  
+
+<td class="col-md-5">14</td>
+  
+
+<td class="col-md-6">4</td>
+  
+
+<td class="col-md-7">3</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">1</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">16</td>
+    <td class="col-md-2">NVDA</td>
+    
+<td class="col-md-3">324</td>
+  
+
+<td class="col-md-4">120</td>
+  
+
+<td class="col-md-5">12</td>
+  
+
+<td class="col-md-6">8</td>
+  
+
+<td class="col-md-7">2</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">17</td>
+    <td class="col-md-2">BABA</td>
+    
+<td class="col-md-3">192</td>
+  
+
+<td class="col-md-4">91</td>
+  
+
+<td class="col-md-5">10</td>
+  
+
+<td class="col-md-6">5</td>
+  
+
+<td class="col-md-7">3</td>
+  
+
+<td class="col-md-8">2</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">18</td>
+    <td class="col-md-2">CRON</td>
+    
+<td class="col-md-3">269</td>
+  
+
+<td class="col-md-4">143</td>
+  
+
+<td class="col-md-5">9</td>
+  
+
+<td class="col-md-6">3</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">19</td>
+    <td class="col-md-2">MU</td>
+    
+<td class="col-md-3">155</td>
+  
+
+<td class="col-md-4">52</td>
+  
+
+<td class="col-md-5">9</td>
+  
+
+<td class="col-md-6">4</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">20</td>
+    <td class="col-md-2">SQ</td>
+    
+<td class="col-md-3">171</td>
+  
+
+<td class="col-md-4">82</td>
+  
+
+<td class="col-md-5">9</td>
+  
+
+<td class="col-md-6">2</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">1</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">21</td>
+    <td class="col-md-2">TLT</td>
+    
+<td class="col-md-3">129</td>
+  
+
+<td class="col-md-4">67</td>
+  
+
+<td class="col-md-5">9</td>
+  
+
+<td class="col-md-6">3</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">22</td>
+    <td class="col-md-2">WMT</td>
+    
+<td class="col-md-3">201</td>
+  
+
+<td class="col-md-4">87</td>
+  
+
+<td class="col-md-5">8</td>
+  
+
+<td class="col-md-6">5</td>
+  
+
+<td class="col-md-7">3</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">23</td>
+    <td class="col-md-2">SNAP</td>
+    
+<td class="col-md-3">151</td>
+  
+
+<td class="col-md-4">85</td>
+  
+
+<td class="col-md-5">6</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">1</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">24</td>
+    <td class="col-md-2">BBBY</td>
+    
+<td class="col-md-3">37</td>
+  
+
+<td class="col-md-4">20</td>
+  
+
+<td class="col-md-5">5</td>
+  
+
+<td class="col-md-6">3</td>
+  
+
+<td class="col-md-7">3</td>
+  
+
+<td class="col-md-8">2</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">25</td>
+    <td class="col-md-2">MDXG</td>
+    
+<td class="col-md-3">108</td>
+  
+
+<td class="col-md-4">57</td>
+  
+
+<td class="col-md-5">5</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">26</td>
+    <td class="col-md-2">OSTK</td>
+    
+<td class="col-md-3">56</td>
+  
+
+<td class="col-md-4">20</td>
+  
+
+<td class="col-md-5">5</td>
+  
+
+<td class="col-md-6">2</td>
+  
+
+<td class="col-md-7">2</td>
+  
+
+<td class="col-md-8">1</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">27</td>
+    <td class="col-md-2">CMCSA</td>
+    
+<td class="col-md-3">60</td>
+  
+
+<td class="col-md-4">33</td>
+  
+
+<td class="col-md-5">4</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">28</td>
+    <td class="col-md-2">ALT</td>
+    
+<td class="col-md-3">89</td>
+  
+
+<td class="col-md-4">32</td>
+  
+
+<td class="col-md-5">3</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">29</td>
+    <td class="col-md-2">WWE</td>
+    
+<td class="col-md-3">47</td>
+  
+
+<td class="col-md-4">20</td>
+  
+
+<td class="col-md-5">3</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">30</td>
+    <td class="col-md-2">CSCO</td>
+    
+<td class="col-md-3">52</td>
+  
+
+<td class="col-md-4">21</td>
+  
+
+<td class="col-md-5">2</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">31</td>
+    <td class="col-md-2">MRVL</td>
+    
+<td class="col-md-3">11</td>
+  
+
+<td class="col-md-4">5</td>
+  
+
+<td class="col-md-5">2</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">32</td>
+    <td class="col-md-2">NIO</td>
+    
+<td class="col-md-3">154</td>
+  
+
+<td class="col-md-4">82</td>
+  
+
+<td class="col-md-5">2</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">33</td>
+    <td class="col-md-2">CMTA</td>
+    
+<td class="col-md-3">6</td>
+  
+
+<td class="col-md-4">5</td>
+  
+
+<td class="col-md-5">1</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">1</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">34</td>
+    <td class="col-md-2">HBAN</td>
+    
+<td class="col-md-3">10</td>
+  
+
+<td class="col-md-4">4</td>
+  
+
+<td class="col-md-5">1</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">35</td>
+    <td class="col-md-2">SIRI</td>
+    
+<td class="col-md-3">44</td>
+  
+
+<td class="col-md-4">7</td>
+  
+
+<td class="col-md-5">1</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">36</td>
+    <td class="col-md-2">XON</td>
+    
+<td class="col-md-3">30</td>
+  
+
+<td class="col-md-4">17</td>
+  
+
+<td class="col-md-5">1</td>
+  
+
+<td class="col-md-6">1</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">37</td>
+    <td class="col-md-2">AAOI</td>
+    
+<td class="col-md-3">13</td>
+  
+
+<td class="col-md-4">6</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">38</td>
+    <td class="col-md-2">AMAT</td>
+    
+<td class="col-md-3">18</td>
+  
+
+<td class="col-md-4">7</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">39</td>
+    <td class="col-md-2">BIG</td>
+    
+<td class="col-md-3">6</td>
+  
+
+<td class="col-md-4">2</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">40</td>
+    <td class="col-md-2">CBMG</td>
+    
+<td class="col-md-3">1</td>
+  
+
+<td class="col-md-4">0</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">41</td>
+    <td class="col-md-2">COOL</td>
+    
+<td class="col-md-3">31</td>
+  
+
+<td class="col-md-4">0</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">42</td>
+    <td class="col-md-2">JD</td>
+    
+<td class="col-md-3">70</td>
+  
+
+<td class="col-md-4">29</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">43</td>
+    <td class="col-md-2">LASR</td>
+    
+<td class="col-md-3">5</td>
+  
+
+<td class="col-md-4">1</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">44</td>
+    <td class="col-md-2">PRGS</td>
+    
+<td class="col-md-3">9</td>
+  
+
+<td class="col-md-4">7</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">45</td>
+    <td class="col-md-2">QCOM</td>
+    
+<td class="col-md-3">28</td>
+  
+
+<td class="col-md-4">15</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+<tr>
+    <td class="col-md-1">46</td>
+    <td class="col-md-2">SQQQ</td>
+    
+<td class="col-md-3">18</td>
+  
+
+<td class="col-md-4">11</td>
+  
+
+<td class="col-md-5">0</td>
+  
+
+<td class="col-md-6">0</td>
+  
+
+<td class="col-md-7">0</td>
+  
+
+<td class="col-md-8">0</td>
+  
+
+<td class="col-md-9">0</td>
+  
+s
+</tr>
+
+  
+
+            </tbody>
+        </table>
+    </div>
+</div>
+  
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+
+</html>
+  
