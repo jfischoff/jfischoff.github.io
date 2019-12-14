@@ -132,29 +132,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 <p><em>published 12/14/19</em></p>
 <p><a href="http://hackage.haskell.org/package/tmp-postgres"><code>tmp-postgres</code></a> has hit 1.0.0.0 … more like blown past 1.0.0.0. The latest version is 1.31.0.0 as I write this.</p>
-<p><code>tmp-postgres</code> is a easy and fast way to make a temporary postgres database. Here is an example using <a href="http://hackage.haskell.org/package/tmp-postgres-1.31.0.0/docs/Database-Postgres-Temp.html#v:with"><code>with</code></a></p>
+<p><code>tmp-postgres</code> is an easy and fast way to make a temporary postgres database. Here is an example using [<code>with</code>]:(http://hackage.haskell.org/package/tmp-postgres-1.31.0.0/docs/Database-Postgres-Temp.html#v:with)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a>with <span class="op">$</span> \db <span class="ot">-&gt;</span> bracket</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  (connectPostgreSQL (toConnectionString db))</span>
 <span id="cb1-3"><a href="#cb1-3"></a>  close <span class="op">$</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a>  \conn <span class="ot">-&gt;</span> execute_ conn <span class="st">&quot;CREATE TABLE foo (id int)&quot;</span></span></code></pre></div>
-<p>The latest version brings with it a host of improvements. It is faster, more configurable and has a better API. It is a small simple package but I have lot to say about it. Performance improvements are the most fun so let’s start there.</p>
+<p>The latest version brings with it a host of improvements. It is faster, more configurable and has a better API. It is a small, simple package but I have a lot to say about it. Performance improvements are the most fun, so let’s start there.</p>
 <h2 id="the-baseline">The Baseline</h2>
-<p><code>tmp-postgres</code> 0.3.0.1 is last “old” version before the rewrite that led to 1.0.0.0. It’s way of starting and stopping postgres is our baseline.</p>
+<p><code>tmp-postgres</code> 0.3.0.1 is the last “old” version before the rewrite that led to 1.0.0.0. Its way of starting and stopping postgres is our baseline.</p>
 <pre><code>Baseline ~ 1.44 sec on macOS (0.608 sec on a Ubuntu guest with macOS host)</code></pre>
 <h2 id="doing-less-is-faster">Doing Less is Faster</h2>
-<p><code>tmp-postgres</code> was based heavily on <a href="http://eradman.com/ephemeralpg/"><code>pg_tmp</code></a>. Like <code>pg_tmp</code> it would create a <code>test</code> database using <code>createdb</code> by default. However for most purposes this is not necessary. <code>initdb</code> creates a <code>postgres</code> database we can use for testing.</p>
+<p><code>tmp-postgres</code> was based heavily on <a href="http://eradman.com/ephemeralpg/"><code>pg_tmp</code></a>. Like <code>pg_tmp</code> it created a <code>test</code> database using <code>createdb</code> by default. However for most purposes this is not necessary. <code>initdb</code> creates a <code>postgres</code> database we can use for testing.</p>
 <pre><code>Creating a test database ~ 1.44 (0.608) sec
 No createdb step         ~ 1.11 (0.546) sec</code></pre>
 <h2 id="faster-setup-with-initdb-caching">Faster Setup with <code>initdb</code> caching</h2>
-<p>Before a ephemeral postgres process can start a temporary database cluster needs to be created. This means creating a temp directory and calling <code>initdb</code> with the appriopiate arguments. This is the slowest part of naive <code>tmp-postgres</code> startup.</p>
+<p>Before an ephemeral postgres process can start a temporary database a cluster needs to be created. This means creating a temp directory and calling <code>initdb</code> with the appriopiate arguments. This is the slowest part of a naive <code>tmp-postgres</code> startup.</p>
 <p>However for a given <code>initdb</code> version and inputs the execution is referentially transparent so we can cache the output of <code>initdb</code>. This works great in practice because the input to <code>initdb</code> rarely changes so the data cached is small.</p>
 <pre><code>No caching   ~ 1.11  (0.546) sec
 With caching ~ 0.353 (0.100) sec</code></pre>
-<h2 id="cow-is-faster">Cow is Faster</h2>
+<h2 id="cow-is-faster">COW is Faster</h2>
 <p>The start up time is now mostly copying the cached cluster. Many of the files in the cluster are not modified during the duration of a test. On newer operating systems we can use “copy on write” to make the copy faster.</p>
 <pre><code>No cow ~ 0.353 (0.100) sec
 cow    ~ 0.248 (0.092) sec</code></pre>
-<p>Of the remaining time it around 80% the copy and 20% shutting down postgres.</p>
+<p>Of the remaining time, around 80% is the copy and 20% shutting down postgres.</p>
 <h2 id="final-results">Final Results</h2>
 <table>
 <thead>
@@ -181,8 +181,8 @@ cow    ~ 0.248 (0.092) sec</code></pre>
 </tbody>
 </table>
 <p>I’ve found the improved performance is large enough to be felt in real projects. I saw a 2x improvement in test time when porting <a href="http://hackage.haskell.org/package/postgresql-simple-queue"><code>postgresql-simple-queue</code></a> to the latest <code>tmp-postgres</code> version.</p>
-<h2 id="but-wait-theres-more">But Wait, There’s more!</h2>
-<p>The new <code>tmp-postgres</code> is over 5x faster on macOS and linux but the story doesn’t end here. In part 2 and 3 of this blog post series I’ll show how to use additionally features of <code>tmp-postgres</code> to keep database testing fast as the size of your project grows.</p>
+<h2 id="but-wait-theres-more">But Wait, There’s More!</h2>
+<p>The new <code>tmp-postgres</code> is over 5x faster on macOS and linux but the story doesn’t end here. In parts 2 and 3 of this blog post series I’ll show how to use additional features of <code>tmp-postgres</code> to keep database testing fast as the size of your project grows.</p>
 <p><a href="../index.html">Home</a></p>
 </article>
 </body>
