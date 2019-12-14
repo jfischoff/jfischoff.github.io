@@ -132,7 +132,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 <p><em>published 12/14/19</em></p>
 <p><a href="http://hackage.haskell.org/package/tmp-postgres"><code>tmp-postgres</code></a> has hit 1.0.0.0 … more like blown past 1.0.0.0. The latest version is 1.31.0.0 as I write this.</p>
-<p><code>tmp-postgres</code> is an easy and fast way to make a temporary postgres database. Here is an example using [<code>with</code>]:(http://hackage.haskell.org/package/tmp-postgres-1.31.0.0/docs/Database-Postgres-Temp.html#v:with)</p>
+<p><code>tmp-postgres</code> is an easy and fast way to make a temporary postgres database. Here is an example using <a href="http://hackage.haskell.org/package/tmp-postgres-1.31.0.0/docs/Database-Postgres-Temp.html#v:with"><code>with</code></a>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a>with <span class="op">$</span> \db <span class="ot">-&gt;</span> bracket</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  (connectPostgreSQL (toConnectionString db))</span>
 <span id="cb1-3"><a href="#cb1-3"></a>  close <span class="op">$</span></span>
