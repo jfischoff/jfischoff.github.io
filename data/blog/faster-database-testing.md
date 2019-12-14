@@ -13,22 +13,16 @@ with $ \db -> bracket
 
 The latest version brings with it a host of improvements. It is faster, more configurable and has a better API. It is a small, simple package but I have a lot to say about it. Performance improvements are the most fun, so let's start there.
 
-## The Baseline
+## Doing Less is Faster
 
 `tmp-postgres` 0.3.0.1 is the last "old" version before the rewrite that led to 1.0.0.0. Its way of starting and stopping postgres is our baseline.
 
-```
-Baseline ~ 1.44 sec on macOS (0.608 sec on a Ubuntu guest with macOS host)
-```
-
-## Doing Less is Faster
-
 `tmp-postgres` was based heavily on [`pg_tmp`](http://eradman.com/ephemeralpg/). Like `pg_tmp` it created a `test` database using `createdb` by default. However for most purposes this is not necessary. `initdb` creates a `postgres` database we can use for testing.
 
-```
-Creating a test database ~ 1.44 (0.608) sec
-No createdb step         ~ 1.11 (0.546) sec
-```
+||Baseline (sec) |No `createdb` step (sec) |
+|-|-|-|
+macOS | 1.44 | 1.11|
+Ubuntu guest| 0.608 | 0.546|
 
 ## Faster Setup with `initdb` caching
 
@@ -36,25 +30,25 @@ Before an ephemeral postgres process can start a temporary database a cluster ne
 
 However for a given `initdb` version and inputs the execution is referentially transparent so we can cache the output of `initdb`. This works great in practice because the input to `initdb` rarely changes so the data cached is small.
 
-```
-No caching   ~ 1.11  (0.546) sec
-With caching ~ 0.353 (0.100) sec
-```
+||No caching (sec)|With `initdb` caching (sec)|
+|-|-|-|
+macOS | 1.11 | 0.353 |
+Ubuntu guest| 0.546 | 0.100 |
 
 ## COW is Faster
 
 The start up time is now mostly copying the cached cluster. Many of the files in the cluster are not modified during the duration of a test. On newer operating systems we can use "copy on write" to make the copy faster.
 
-```
-No cow ~ 0.353 (0.100) sec
-cow    ~ 0.248 (0.092) sec
-```
+||No COW (sec) | COW (sec) |
+|-|-|-|
+macOS | 0.353 | 0.248 |
+Ubuntu guest| 0.100 | 0.092 |
 
 Of the remaining time, around 80% is the copy and 20% shutting down postgres.
 
 ## Final Results
 
-| | start (sec) | end (sec)| improvement |
+| | Start (sec) | End (sec)| Improvement |
 |-|-------------|----------| ------------|
 | macOS | 1.44 | 0.248 | **5.8x** |
 | Ubuntu guest | 0.608 | 0.092 | **6.6x**
