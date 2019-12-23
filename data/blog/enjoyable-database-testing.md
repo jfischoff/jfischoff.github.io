@@ -79,30 +79,7 @@ this is still pretty time consuming compared to our queries which will be in the
 
 To limit the overhead starting a database, incures it is best to create the minimal number of database clusters.
 
-`hspec` is missing an `aroundAll` function. Here is one that I use:
-
-```haskell
-aroundAll :: forall a. ((a -> IO ()) -> IO ()) -> SpecWith a -> Spec
-aroundAll withFunc specWith = do
-  (var, stopper, asyncer) <- runIO $
-    (,,) <$> newEmptyMVar <*> newEmptyMVar <*> newIORef Nothing
-  let theStart :: IO a
-      theStart = do
-        thread <- async $ withFunc $ \x -> do
-          putMVar var x
-          takeMVar stopper
-
-        writeIORef asyncer $ Just thread
-
-        takeMVar var
-
-      theStop :: a -> IO ()
-      theStop _ = do
-        putMVar stopper ()
-        traverse_ wait =<< readIORef asyncer
-
-  beforeAll theStart $ afterAll theStop $ specWith
-```
+`hspec` is missing an `aroundAll` function. Here is one that I use: [aroundAll](https://gist.github.com/jfischoff/5cf62b82e1dd7d03c8a610ef7fd933ff)
 
 We can use it to replace the `around` in our previous example:
 
@@ -121,29 +98,91 @@ aroundAll withSetup $ describe "list/add/delete" $ do
 
 ## The Rub
 
-Using `aroundAll` will speed up our testing but it our test sweet is now broken. The problem is the second test leaves behind
+Using `aroundAll` will speed up our testing but our test sweet is now broken. The problem is the second test leaves behind
 an entry which breaks the third test.
 
 We could make the third test more robust by getting the existing entries at the start of the test and ensure we return to the initial state, but this has other problems and in more complex real world examples it might not be clear how to make the test robust against unexpected situations, which will lead to flaky tests.
 
 One way we can regain the isolation is by using some of the databases mechanisms for query isolation. I speak of transactions and savepoints.
 
-
-I typically start with a single temporary database and add more if it makes sense (will cover the reasons you might want to do this later in the post).
+To faciliate this here is an example `rollback` function:
 
 ```haskell
-withConn :: Temp.DB -> (Connection -> IO a) -> IO a
-withConn db f =
-  bracket (connectPostgreSQL $ toConnectionString db) close f
+-- TODO I guess this also wraps things in a transaction
+rollback :: (Connection -> IO a) -> Connection -> IO a
+rollback = undefined
 ```
 
+We can now prefix our tests with rollback and they will not interfer with each other
+
+```haskell
+aroundAll withSetup $ describe "list/add/delete" $ do
+  it "return [] initially" $ withPool $ rollback $ \conn ->
+    list conn `shouldReturn` []
+  it "returns the created elements" $ withPool $ rollback $ \conn ->
+    theId <- add conn 1
+    list conn `shouldReturn` [theId]
+  it "deletes what is created" $ withPool $ rollback $ \conn ->
+    theId <- add conn 2
+    delete conn theId
+    list conn `shouldReturn` []
 ```
-withSetup :: (Connection -> IO ()) -> IO ()
-withSetup f = either throwIO pure <=< withDbCache $ \dbCache -> do
-  migratedConfig <- either throwIO pure =<<
-      cacheAction
-        migrationHash
-        (flip withConn (migrate schemaName))
-        (defaultConfig <> cacheConfig dbCache)
-  withConfig migratedConfig $ withConn
+
+It is worth pointing out that not every sql statement can be run in a transaction. Additionally statements like `TRUNCATE` cannot be rolled back. That said the fast majority of queries are meant to be run in a transaction and `rollback` will be sufficent to return the database to a clean state.
+
+## The Pleasure and Pain of `parallel`
+
+Database queries are meant to be run in parallel with other queries. We can take advantage of this by running our tests in parallel to improve performance.
+
+We can change our test to run in parallel by adding the `parallel` combinator:
+
+```haskell
+aroundAll withSetup $ describe "list/add/delete" $ parallel $ do
+  it "return [] initially" $ withPool $ rollback $ \conn ->
+    list conn `shouldReturn` []
+  it "returns the created elements" $ withPool $ rollback $ \conn ->
+    theId <- add conn 1
+    list conn `shouldReturn` [theId]
+  it "deletes what is created" $ withPool $ rollback $ \conn ->
+    theId <- add conn 2
+    delete conn theId
+    list conn `shouldReturn` []
 ```
+
+Unfortunately if we run our tests again we will notice failures.
+
+The problem is our `rollback` function is wrapping everything in a `READ_COMMITTED` isolation level. This is equivalent to each statement receiving it's own snapshot of the database but we need the entire transaction to have a single consistent snapshot of the database so we need to use either `REPEATABLE_READ` or `SERIALIZABLE` isolation.
+
+In our particular example the solution is to use the higher isolation and retry on serializable errors. However this is not always possible.
+
+For instance some postgres statements do not work well in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database (the main example I know of is `SKIP LOCKED` but there might be others).
+
+This is the case with `postgresql-simple-queue` however I was still able utilize `parallel` to improve performance by starting separate `postgres` instances.
+
+The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be over around 2 seconds for this approach to be helpful.
+
+Here is what it would look like in our example ... although admittantly not necessary:
+
+```haskell
+describe "list/add/delete" $ parallel $ do
+  aroundAll withSetup $ do
+    it "return [] initially" $ withPool $ rollback $ \conn ->
+      list conn `shouldReturn` []
+    it "returns the created elements" $ withPool $ rollback $ \conn ->
+      theId <- add conn 1
+      list conn `shouldReturn` [theId]
+
+  aroundAll withSetup $ do
+    it "deletes what is created" $ withPool $ rollback $ \conn ->
+      theId <- add conn 2
+      delete conn theId
+      list conn `shouldReturn` []
+```
+
+Starting a separate `postgres` instance is a big hammer. It is a heavy weight operation but can surprisingly help performance in some situations and provides the highest level of isolation in tests which can improve reliability.
+
+# Recap
+
+When testing with `tmp-postgres` using `cacheAction`, `rollback` and separate `postgres` instances can help keep test suites fast even as the projects grow larger.
+
+In the next blog post in the series I'll show how to use `tmp-postgres` to diagnosis and fix performance problems in the queries under test.
