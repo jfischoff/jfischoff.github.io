@@ -25,7 +25,7 @@ To faciliate this `tmp-postgres` provides the [`cacheAction`](https://hackage.ha
 cacheAction :: FilePath -> (DB -> IO ()) -> Config -> IO (Either StartError Config)
 ```
 
-If the passed in database cluster folder (the first argument) does not exist, the passed in continuation (second argument) will run. The third argument is to configure the temporary database that is to make cluster. `cacheAction` returns a Config that can be used to start a database using the cached database cluster referred to in the first argument.
+If the passed in database cluster folder (the first argument) does not exist, the passed in continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. `cacheAction` returns a Config that can be used to start a database using the cached database cluster referred to in the first argument.
 
 Long story short you should hash your migrations and use them for cache path and use a migration action for the second argument. If you do this you won't have to run you migrations every time you run your tests.
 
@@ -44,7 +44,7 @@ withSetup f = do
       f =<< createPool (connectPostgreSQL $ toConnectionString db) close 2 60 10
 ```
 
-Let's recap what this function does
+Let's recap what this function does:
 - Create a persistent `initdb` cache with `withDbCache`.
 - Caches the `migration` action by storing a premigrated database cluster at `"~/.tmp-postgres/" <> hash`.
 - Starts a postgres instance with the migrated database cluster.
