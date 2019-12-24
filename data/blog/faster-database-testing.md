@@ -1,6 +1,6 @@
-*published 12/14/19*
+*updated 12/23/19*
 
-[`tmp-postgres`](http://hackage.haskell.org/package/tmp-postgres) has hit 1.0.0.0 ... more like blown past 1.0.0.0. The latest version is 1.31.0.0 as I write this.
+[`tmp-postgres`](http://hackage.haskell.org/package/tmp-postgres) has hit 1.0.0.0 ... more like blown past 1.0.0.0. The latest version is 1.34.0.0 as I write this.
 
 `tmp-postgres` is an easy and fast way to make a temporary postgres database. Here is an example using [`with`](http://hackage.haskell.org/package/tmp-postgres-1.31.0.0/docs/Database-Postgres-Temp.html#v:with):
 
