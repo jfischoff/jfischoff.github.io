@@ -26,7 +26,7 @@ Ubuntu guest| 0.608 | 0.546|
 
 ## Faster Setup with `initdb` caching
 
-Before an ephemeral postgres process can start a temporary database a cluster needs to be created. This means creating a temp directory and calling `initdb` with the appriopiate arguments. This is the slowest part of a naive `tmp-postgres` startup.
+Before an ephemeral postgres process can start a temporary database a cluster needs to be created. This means creating a temp directory and calling `initdb` with the appropriate arguments. This is the slowest part of a naive `tmp-postgres` startup.
 
 However for a given `initdb` version and inputs the execution is referentially transparent so we can cache the output of `initdb`. This works great in practice because the input to `initdb` rarely changes so the data cached is small.
 
