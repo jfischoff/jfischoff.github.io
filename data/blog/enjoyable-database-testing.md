@@ -16,20 +16,18 @@ We need to create a fast `tmp-postgres` setup function.
 First will utilize `initdb` caching by using `withDbCache`. As I discussed [previously](/faster-database-testing.html)
 this gives a 3-4x performance boost. However in "real" projects the overhead in database testing tends to come from the time it takes to create a migrated database.
 
-Running a complete set of database migration can easily take 10 seconds on mature project.
+Running a complete set of database migration can easily take 10 seconds on mature project ... or probably longer.
 To speed up this process we need a way to cache a database cluster after the migrations have been run.
 
-To faciliate this `tmp-postgres` provides the [`cacheAction`](https://hackage.haskell.org/package/tmp-postgres-1.31.0.1/docs/Database-Postgres-Temp.html#v:cacheAction) function. Here is the type signature:
+To faciliate this `tmp-postgres` provides the [`cacheAction`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:cacheAction) function. Here is the type signature:
 
 ```haskell
 cacheAction :: FilePath -> (DB -> IO ()) -> Config -> IO (Either StartError Config)
 ```
 
-`cacheAction` will conditionally start a database cluster using the provided `Config` (third argument), if folder specified the first argument does not exist. After starting the database it will call the second argument and pass the `DB` handle. It will then shutdown the database and cache the database cluster to the location specified by the first argument.
+If the passed in database cluster folder (the first argument) does not exist, the passed in continuation (second argument) will run. The third argument is to configure the temporary database that is to make cluster. `cacheAction` returns a Config that can be used to start a database using the cached database cluster referred to in the first argument.
 
-Finally it will unconditionally return a `Config` that uses the database cluster at the location specified by the first argument.
-
-Long story short you should hash your migrations and use them for cache path and use a migration action for the second argument.
+Long story short you should hash your migrations and use them for cache path and use a migration action for the second argument. If you do this you won't have to run you migrations every time you run your tests.
 
 Here is an example `tmp-postgres` setup function that does all the right things:
 
@@ -74,7 +72,7 @@ around withSetup $ describe "list/add/delete" $ do
 
 The example above is a valid way to test queries but it is unlikely to be the optimal way.
 
-The problem is `around` creates a isolated postgres cluster for every test. Even with all of our fancy caching
+The problem is [`around`]() creates a isolated postgres cluster for every test. Even with all of our fancy caching
 this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.
 
 To limit the overhead starting a database, incures it is best to create the minimal number of database clusters.
