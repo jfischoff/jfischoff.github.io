@@ -27,7 +27,7 @@ cacheAction :: FilePath -> (DB -> IO ()) -> Config -> IO (Either StartError Conf
 
 If database cluster folder (the first argument) does not exist, the continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. `cacheAction` returns a Config that can be used to start a database initialize with the cached database cluster referred to in the first argument.
 
-Long story short you should hash your migrations and use them for cache path and use a migration action for the second argument. If you do this you won't have to run your migrations every time you run your tests.
+Long story short you should use `cacheAction` to store a database cluster at the state after the migration has been run stored at a location based on the hash of the migration query. If you do this you won't have to run your migrations every time you run your tests.
 
 Here is an example `tmp-postgres` setup function that does all the right things:
 
