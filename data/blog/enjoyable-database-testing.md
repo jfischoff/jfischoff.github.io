@@ -178,6 +178,32 @@ describe "list/add/delete" $ parallel $ do
 
 Starting a separate `postgres` instance is a big hammer. It is a heavy weight operation but can surprisingly help performance in some situations and provides the highest level of isolation in tests.
 
+
+## Reuse setup with `rollback`
+
+`abort` is great for rollback all the changes of test but sometimes we would like to only rollback some changes in a test.
+
+This situation arises when we would like to reuse some setup to run a few different assertions.
+
+```haskell
+it "returns [] after all removal operations" $ withPool $ abort $ \conn -> do
+  complexSetup conn
+  forM_ allRemovalOperations $ \op -> rollback $ op conn >> list `shouldReturn` []
+```
+
+Unlike `abort` `rollback` can be nested and does not abort the entire transaction.
+
+We can implement `rollback` with savepoints like:
+
+```haskell
+rollback :: Connection -> IO a -> IO a
+rollback conn actionToRollback = mask $ \restore -> do
+  sp <- savepoint conn
+  restore actionToRollback `finally` rollbackToAndReleaseSavepoint conn sp
+```
+
+Since `rollback` uses savepoints the performance is not as good as rolling back the entire transaction for `abort` still has value.
+
 ## Clean Up
 
 Our tests are fast. That's important. Slow tests die.
@@ -228,6 +254,8 @@ I use [`pg-transact`](https://hackage.haskell.org/package/pg-transact) for this 
 
 # Recap
 
-When testing with `tmp-postgres` using `cacheAction`, `abort` and separate `postgres` instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad can make the tests look cleaner.
+When testing with `tmp-postgres` using `cacheAction`, `abort`, `rollback` and separate `postgres` instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad can make the tests look cleaner.
 
 In the next blog post in the series I'll show how to use `tmp-postgres` to diagnosis and fix performance problems in the queries under test.
+
+A major pain of database testing I have not addressed is how to build test data that has foreign key references when you don't care about the closure or connected relations. I'll have to come back to this after showing off `tmp-postgres`.
