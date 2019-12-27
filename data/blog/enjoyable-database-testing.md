@@ -205,7 +205,7 @@ rollback conn actionToRollback = mask $ \restore -> do
   restore actionToRollback `finally` rollbackToAndReleaseSavepoint conn sp
 ```
 
-Since `rollback` uses savepoints the performance is not as good as rolling back the entire transaction for `abort` still has value.
+Since `rollback` uses savepoints the performance is not as good  as `abort` which is twice as fast. However they are both sub-millisecond operations so I am not sure choosing one or the other matters.
 
 ## Clean Up
 
@@ -253,7 +253,7 @@ describe "list/add/delete" $ parallel $ do
       list `shouldReturn` []
 ```
 
-I use [`pg-transact`](https://hackage.haskell.org/package/pg-transact) for this but you could use any transaction monad like [`postgresql-transactional`](https://hackage.haskell.org/package/postgresql-transactional).
+I use [`pg-transact`](https://hackage.haskell.org/package/pg-transact) for this but you could use any transaction monad like [`postgresql-transactional`](https://hackage.haskell.org/package/postgresql-transactional) or you can roll your own ... they're not terrible complicated.
 
 # Recap
 
