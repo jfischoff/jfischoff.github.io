@@ -24,6 +24,7 @@ dependencies:
 - tmp-postgres
 - postgresql-simple
 - resource-pool
+- hspec
 
 library:
   source-dirs: src
