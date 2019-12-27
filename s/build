@@ -2,3 +2,4 @@
 pandoc --template=GitHub.html5 data/index.md -o index.html --metadata title="Jonathan Fischoff's Personal Site"
 pandoc --template=GitHub.html5 data/blog/faster-database-testing.md -o blog/faster-database-testing.html --metadata title='Faster Database Testing with the New `tmp-postgres`'
 pandoc --template=GitHub.html5 data/blog/development-notes-12-25-19.md -o blog/development-notes-12-25-19.html --metadata title='Development Notes: Decemember 25th 2019'
+pandoc --template=GitHub.html5 data/blog/development-notes-12-26-19.md -o blog/development-notes-12-26-19.html --metadata title='Development Notes: Decemember 26th 2019'
