@@ -107,7 +107,10 @@ To faciliate this here is an example `abort` function:
 
 ```haskell
 abort :: (Connection -> IO a) -> Connection -> IO a
-abort f conn = query_ conn "BEGIN" >> f conn >> query_ conn "ROLLBACK"
+abort f conn = bracket_
+  (execute_ conn "BEGIN")
+  (execute_ conn "ROLLBACK")
+  (f conn)
 ```
 
 We can now prefix our tests with abort and they will not interfer with each other

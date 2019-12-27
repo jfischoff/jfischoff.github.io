@@ -25,6 +25,11 @@ dependencies:
 - postgresql-simple
 - resource-pool
 - hspec
+- async
+
+default-extensions:
+- ScopedTypeVariables
+- OverloadedStrings
 
 library:
   source-dirs: src
