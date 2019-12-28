@@ -8,26 +8,25 @@ You can try to find various libraries to limit what needs to be tested but at so
 
 `tmp-postgres` can help you write reliable tests. There are a lot of ways you could utilize `tmp-postgres` to write your tests but I'll show you what I find works best for me.
 
+The blog post also shows general database tests good practices that are not tied to using `tmp-postgres` or `postgresql-simple`.
 
 ## Starting `postgres` Quickly
 
 We need to create a fast `tmp-postgres` setup function.
 
-First will utilize `initdb` caching by using `withDbCache`. As I discussed [previously](/faster-database-testing.html)
-this gives a 3-4x performance boost. However in "real" projects the overhead in database testing tends to come from the time it takes to create a migrated database.
-mature proje
-Running a complete set of database migration can easily take 10 seconds.
+First will utilize `initdb` caching by using [`withDbCache`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:withDbCache). As I discussed [previously](/faster-database-testing.html)
+this gives a 3-4x performance boost. However in "real" projects the overhead in database testing tends to come from the time it takes to create a migrated database. Running a complete set of database migration can easily take 10 seconds.
 To speed up this process we need a way to cache a database cluster after the migrations have run.
 
-To faciliate this `tmp-postgres` provides the [`cacheAction`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:cacheAction) function. Here is the type signature:
+`tmp-postgres` provides the [`cacheAction`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:cacheAction) function to cache migrated database clusters. Here is the type signature:
 
 ```haskell
 cacheAction :: FilePath -> (DB -> IO ()) -> Config -> IO (Either StartError Config)
 ```
 
-If database cluster folder (the first argument) does not exist, the continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. `cacheAction` returns a Config that can be used to start a database initialize with the cached database cluster referred to in the first argument.
+If database cluster folder (the first argument) does not exist, the continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. `cacheAction` returns a Config that can be used to start a database initialized with the cached database cluster referred to in the first argument.
 
-Long story short you should use `cacheAction` to store a database cluster at the state after the migration has been run stored at a location based on the hash of the migration query. If you do this you won't have to run your migrations every time you run your tests.
+Long story short you should use `cacheAction` to store a database cluster at the state after the migration has been run stored at a location based on the hash of the migration query and (any other previous hashes ... if you wanted to cache every migration for instance). If you do this you won't have to run your migrations every time you run your tests.
 
 Here is an example `tmp-postgres` setup function that does all the right things:
 
@@ -46,9 +45,9 @@ withSetup f = do
 
 Let's recap what this function does:
 - Create a persistent `initdb` cache with `withDbCache`.
-- Caches the `migration` action by storing a premigrated database cluster at `"~/.tmp-postgres/" <> hash`.
+- Caches the `migration` action by storing a premigrated database cluster at the folder given by `"~/.tmp-postgres/" <> hash`.
 - Starts a postgres instance with the migrated database cluster.
-- Creates a pool of database connections for tests to use for connecting to temporary database.
+- Creates a pool of database connections for tests to use for connecting to the ephemeral database.
 
 For these examples I'm going to assume that `postgresql-simple` is the database
 library the queries are written in. However the same techniques could be used for other database libraries.
@@ -57,12 +56,12 @@ We can now use this function to provide a `Pool Connection` for our tests with t
 
 ```haskell
 around withSetup $ describe "list/add/delete" $ do
-  it "return [] initially" $ withPool $ \conn ->
+  it "return [] initially" $ withPool $ \conn -> do
     list conn `shouldReturn` []
-  it "returns the created elements" $ withPool $ \conn ->
+  it "returns the created elements" $ withPool $ \conn -> do
     theId <- add conn 1
     list conn `shouldReturn` [theId]
-  it "deletes what is created" $ withPool $ \conn ->
+  it "deletes what is created" $ withPool $ \conn -> do
     theId <- add conn 2
     delete conn theId
     list conn `shouldReturn` []
@@ -75,7 +74,7 @@ The example above is a valid way to test queries but it is unlikely to be the op
 The problem is [`around`](http://hackage.haskell.org/package/hspec-2.7.1/docs/Test-Hspec.html#v:around) creates a isolated postgres cluster for every test. Even with all of our fancy caching
 this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.
 
-To limit the overhead starting a database, incures it is best to create the minimal number of database clusters.
+To limit the overhead starting a ephemeral database it is best to create the minimal number of database clusters.
 
 `hspec` is missing an `aroundAll` function. Here is one that I use: [aroundAll](https://gist.github.com/jfischoff/5cf62b82e1dd7d03c8a610ef7fd933ff)
 
@@ -83,12 +82,12 @@ We can use it to replace the `around` in our previous example:
 
 ```haskell
 aroundAll withSetup $ describe "list/add/delete" $ do
-  it "return [] initially" $ withPool $ \conn ->
+  it "return [] initially" $ withPool $ \conn -> do
     list conn `shouldReturn` []
-  it "returns the created elements" $ withPool $ \conn ->
+  it "returns the created elements" $ withPool $ \conn -> do
     theId <- add conn 1
     list conn `shouldReturn` [theId]
-  it "deletes what is created" $ withPool $ \conn ->
+  it "deletes what is created" $ withPool $ \conn -> do
     theId <- add conn 2
     delete conn theId
     list conn `shouldReturn` []
@@ -99,11 +98,24 @@ aroundAll withSetup $ describe "list/add/delete" $ do
 Using `aroundAll` will speed up our testing but our test suite is now broken. The problem is the second test leaves behind
 an entry breaking the third test.
 
-We could make the third test more robust by caching the state at the start of the test and ensuring we return to the initial state, but this has other problems and in more complex real world examples it might not be clear how to make the test robust against unexpected situations, which will lead to flaky tests.
+We could make the third test more robust by caching the state at the start of the test and ensuring we return to the initial state:
 
-One way we can regain the isolation is by using some of the databases mechanisms for query isolation. I speak of transactions and savepoints.
+```haskell
+  it "deletes what is created" $ withPool $ \conn -> do
+    before <- list conn
 
-To faciliate this here is an example `abort` function:
+    theId <- add conn 2
+    delete conn theId
+    list conn `shouldReturn` before
+```
+
+There are still potential problems with this modification.
+
+At the end of the day it might not be clear how to make the test robust.
+
+One way we can regain the isolation of separate database clusters and `postgres` instances is by using the databases mechanisms for query isolation.
+
+To faciliate query isolation we'll write an function to wrap a list of statements in a transaction that we rollback instead of committing:
 
 ```haskell
 abort :: (Connection -> IO a) -> Connection -> IO a
@@ -117,18 +129,18 @@ We can now prefix our tests with abort and they will not interfer with each othe
 
 ```haskell
 aroundAll withSetup $ describe "list/add/delete" $ do
-  it "return [] initially" $ withPool $ abort $ \conn ->
+  it "return [] initially" $ withPool $ abort $ \conn -> do
     list conn `shouldReturn` []
-  it "returns the created elements" $ withPool $ abort $ \conn ->
+  it "returns the created elements" $ withPool $ abort $ \conn -> do
     theId <- add conn 1
     list conn `shouldReturn` [theId]
-  it "deletes what is created" $ withPool $ abort $ \conn ->
+  it "deletes what is created" $ withPool $ abort $ \conn -> do
     theId <- add conn 2
     delete conn theId
     list conn `shouldReturn` []
 ```
 
-It is worth pointing out that not every sql statement can be run in a transaction. Additionally statements like `TRUNCATE` cannot be rolled back. That said the fast majority of queries are meant to be run in a transaction and `abort` will be sufficent to return the database to a clean state.
+It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally there is no isolation level that can bring the database to the same state the way starting at a cluster snapshot can. Things like series are incremented and not decrememented on rollback among other MVCC infidelities. That said the fast majority of queries are perfectly isolated using  transaction and `abort` will be sufficent to return the database to a original state (for all intensive purposes).
 
 ## The Pleasure and Pain of `parallel`
 
@@ -138,12 +150,12 @@ We can change our test to run in parallel by adding the `parallel` combinator:
 
 ```haskell
 aroundAll withSetup $ describe "list/add/delete" $ parallel $ do
-  it "return [] initially" $ withPool $ abort $ \conn ->
+  it "return [] initially" $ withPool $ abort $ \conn -> do
     list conn `shouldReturn` []
-  it "returns the created elements" $ withPool $ abort $ \conn ->
+  it "returns the created elements" $ withPool $ abort $ \conn -> do
     theId <- add conn 1
     list conn `shouldReturn` [theId]
-  it "deletes what is created" $ withPool $ abort $ \conn ->
+  it "deletes what is created" $ withPool $ abort $ \conn -> do
     theId <- add conn 2
     delete conn theId
     list conn `shouldReturn` []
@@ -159,21 +171,21 @@ For instance some postgres statements do not work well in more consistent isolat
 
 This is the case with `postgresql-simple-queue` however I was still able utilize `parallel` to improve performance by starting separate `postgres` instances.
 
-The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be over around 0.5 seconds for this approach to be helpful.
+The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be atleast 0.5 seconds for this approach to be helpful.
 
 Here is what it would look like in our example ... although admittantly not necessary:
 
 ```haskell
 describe "list/add/delete" $ parallel $ do
   aroundAll withSetup $ do
-    it "return [] initially" $ withPool $ abort $ \conn ->
+    it "return [] initially" $ withPool $ abort $ \conn -> do
       list conn `shouldReturn` []
-    it "returns the created elements" $ withPool $ abort $ \conn ->
+    it "returns the created elements" $ withPool $ abort $ \conn -> do
       theId <- add conn 1
       list conn `shouldReturn` [theId]
 
   aroundAll withSetup $ do
-    it "deletes what is created" $ withPool $ abort $ \conn ->
+    it "deletes what is created" $ withPool $ abort $ \conn -> do
       theId <- add conn 2
       delete conn theId
       list conn `shouldReturn` []
@@ -181,10 +193,9 @@ describe "list/add/delete" $ parallel $ do
 
 Starting a separate `postgres` instance is a big hammer. It is a heavy weight operation but can surprisingly help performance in some situations and provides the highest level of isolation in tests.
 
-
 ## Reuse setup with `rollback`
 
-`abort` is great for rollback all the changes of test but sometimes we would like to only rollback some changes in a test.
+`abort` is great for rolling back all the changes of test but sometimes we would like to only rollback some changes in a test.
 
 This situation arises when we would like to reuse some setup to run a few different assertions.
 
@@ -215,14 +226,14 @@ We can now make them prettier.
 
 ### Using a Connection Monad
 
-This tests are fast but they are kinda of ugly because all of the `conn` threading. We can use a `ReaderT Connection IO` monad or something morally similar to it to implicitly pass the `conn` `Connection` parameter.
+This tests are fast but they are kinda of ugly because all of the `conn` threading. We can use a `ReaderT Connection IO` monad or something morally similar to it to implicitly pass the `conn` `Connection` parameter (yes ... we could use `ImplicitParams`).
 
 Here is our cleaned up example:
 
 ```haskell
 describe "list/add/delete" $ parallel $ do
   aroundAll withSetup $ do
-    it "return [] initially" $ withPool $ abort $
+    it "return [] initially" $ withPool $ abort $ do
       list `shouldReturn` []
     it "returns the created elements" $ withPool $ abort $ do
       theId <- add 1
@@ -235,29 +246,31 @@ describe "list/add/delete" $ parallel $ do
       list `shouldReturn` []
 ```
 
-### Fold `abort` into `withPool`
+### Fold `abort` and `withPool` into `it`
 
 ```haskell
 describe "list/add/delete" $ parallel $ do
+  let wit msg = it msg . withPool . abort
+
   aroundAll withSetup $ do
-    it "return [] initially" $ withPool $
+    wit "return [] initially" $ do
       list `shouldReturn` []
-    it "returns the created elements" $ withPool $ do
+    wit "returns the created elements" $ do
       theId <- add 1
       list `shouldReturn` [theId]
 
   aroundAll withSetup $ do
-    it "deletes what is created" $ withPool $ do
+    wit "deletes what is created" $ do
       theId <- add 2
       delete theId
       list `shouldReturn` []
 ```
 
-I use [`pg-transact`](https://hackage.haskell.org/package/pg-transact) for this but you could use any transaction monad like [`postgresql-transactional`](https://hackage.haskell.org/package/postgresql-transactional) or you can roll your own ... they're not terrible complicated.
+Alright good enough.
 
 # Recap
 
-When testing with `tmp-postgres` using `cacheAction`, `abort`, `rollback` and separate `postgres` instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad can make the tests look cleaner.
+When testing with `tmp-postgres` using `cacheAction`, `abort`, `rollback` and separate `postgres` instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad or similar can make the tests look cleaner.
 
 In the next blog post in the series I'll show how to use `tmp-postgres` to diagnosis and fix performance problems in the queries under test.
 
