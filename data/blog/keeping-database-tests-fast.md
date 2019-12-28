@@ -28,7 +28,7 @@ cacheAction :: FilePath -> (DB -> IO ()) -> Config -> IO (Either StartError Conf
 
 If the database cluster folder (the first argument) does not exist, the continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. `cacheAction` returns a `Config` that can be used to start a database initialized with the cached database cluster referred to in the first argument.
 
-Long story short, you should use `cacheAction` to store a database cluster at the state after the migration has been run, and stored at a location based on the hash of the migration query (and any other previous hashes ... if you wanted to cache every migration for instance). If you do this you won't have to run your migrations every time you run your tests.
+Long story short, you should use `cacheAction` to store a database cluster at the state after the migration has been run, and stored at a location based on the hash of the migration query (and any other previous hashes ... if you wanted to cache every migration for instance). If you do this, you won't have to run your migrations every time you run your tests.
 
 Here is an example `tmp-postgres` setup function that does all the right things:
 
@@ -70,10 +70,9 @@ around withSetup $ describe "list/add/delete" $ do
 
 The example above is a valid way to test queries but it is unlikely to be the optimal way.
 
-The problem is [`around`](http://hackage.haskell.org/package/hspec-2.7.1/docs/Test-Hspec.html#v:around) creates an isolated postgres cluster for every test. Even with all of our fancy caching
-this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.
+The problem is [`around`](http://hackage.haskell.org/package/hspec-2.7.1/docs/Test-Hspec.html#v:around) creates an isolated postgres cluster for every test. Even with all of our fancy caching, this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.
 
-To limit the overhead of starting a ephemeral database it is best to create the minimal number of database clusters.
+To limit the overhead of starting an ephemeral database it is best to create the minimal number of database clusters.
 
 `hspec` is missing an `aroundAll` function. Here is one that I use: [aroundAll](https://gist.github.com/jfischoff/5cf62b82e1dd7d03c8a610ef7fd933ff)
 
@@ -110,11 +109,11 @@ We could make the third test more robust by caching the state at the start of th
 
 There are still potential problems with this modification.
 
-At the end of the day it might not be clear how to make a given test robust.
+At the end of the day, it might not be clear how to make a given test robust.
 
 One way we can regain the isolation of separate database clusters and `postgres` instances is by using the database's mechanisms for query isolation.
 
-To faciliate query isolation we'll write a function to wrap a list of statements in a transaction that we rollback instead of committing:
+To faciliate query isolation, we'll write a function to wrap a list of statements in a transaction that we roll back instead of committing:
 
 ```haskell
 abort :: (Connection -> IO a) -> Connection -> IO a
@@ -124,7 +123,7 @@ abort f conn = bracket_
   (f conn)
 ```
 
-We can now prefix our tests with `abort` and they will not interfer with each other:
+We can now prefix our tests with `abort` and they will not interfere with each other:
 
 ```haskell
 aroundAll withSetup $ describe "list/add/delete" $ do
@@ -139,7 +138,7 @@ aroundAll withSetup $ describe "list/add/delete" $ do
     list conn `shouldReturn` []
 ```
 
-It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally there is no isolation level that can bring the database to the same state the way starting at a cluster snapshot can. Things like series are incremented and not decrememented on rollback among other MVCC infidelities. That said abort is a perfectly sensible solution for testing most queries.
+It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally, there is no isolation level that can bring the database to the same state, the way starting at a cluster snapshot can. Things like series are incremented and not decremented on rollback among other MVCC infidelities. That said, `abort` is a perfectly sensible solution for testing most queries.
 
 ## The Pleasure and Pain of `parallel`
 
@@ -162,15 +161,15 @@ aroundAll withSetup $ describe "list/add/delete" $ parallel $ do
 
 Unfortunately if we run our tests again we will notice failures.
 
-The problem is our `abort` function is wrapping everything in a `READ_COMMITTED` isolation level. This is equivalent to each statement receiving it's own snapshot of the database; but we need the entire transaction to have a single consistent snapshot of the database. We need to use either `REPEATABLE_READ` or `SERIALIZABLE` isolation.
+The problem is our `abort` function is wrapping everything in a `READ_COMMITTED` isolation level. This is equivalent to each statement receiving its own snapshot of the database; but we need the entire transaction to have a single consistent snapshot of the database. We need to use either `REPEATABLE_READ` or `SERIALIZABLE` isolation.
 
-In our particular example modifying `abort` to use `SERIALIZABLE` would solve our parallel test issues, however this is not always possible.
+In our particular example, modifying `abort` to use `SERIALIZABLE` would solve our parallel test issues. However, this is not always possible.
 
-For instance some postgres statements, like `SKIP LOCKED`, do not run performantly in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database.
+For instance, some postgres statements, like `SKIP LOCKED`, do not run performantly in more consistent isolation levels because they provide an intrinsically inconsistent picture of the database.
 
 This made using `SERIALIZABLE` unusable in testing `postgresql-simple-queue`. However, I was still able utilize `parallel` to improve performance, while maintaining isolation through separate `postgres` instances.
 
-The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be at least 0.6 seconds but probabaly closer to 2.0 seconds for this approach to be meaningfully helpful.
+The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux, so your tests will need to be at least 0.6 seconds but probabaly closer to 2.0 seconds for this approach to be meaningfully helpful.
 
 Here is what it would look like in our example:
 
@@ -215,7 +214,7 @@ rollback conn actionToRollback = mask $ \restore -> do
   restore actionToRollback `finally` rollbackToAndReleaseSavepoint conn sp
 ```
 
-Since `rollback` uses savepoints the performance is not as good  as `abort` which is twice as fast. However they are both sub-millisecond operations so I am not sure choosing one or the other matters.
+Since `rollback` uses savepoints, the performance is not as good as `abort`, which is twice as fast. However they are both sub-millisecond operations so I am not sure choosing one or the other matters.
 
 ## Clean Up
 
@@ -269,9 +268,9 @@ Alright good enough.
 
 # Recap
 
-When testing with `tmp-postgres`, using `cacheAction`, `abort`, `rollback` and separate `postgres` instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad or similar can make the tests look cleaner.
+When testing with `tmp-postgres`, using `cacheAction`, `abort`, `rollback` and separate `postgres` instances can help keep test suites fast even as the project grows larger. Additionally, a connection monad can make the tests look cleaner.
 
-In the next blog post in this series I'll show how to use `tmp-postgres` to diagnosis and fix performance problems in the queries under test.
+In the next blog post in this series I'll show how to use `tmp-postgres` to diagnose and fix performance problems in the queries under test.
 
 A major pain of database testing I have not addressed is how to build test data that has foreign key references. I'll have to come back to this after showing off `tmp-postgres`.
 
