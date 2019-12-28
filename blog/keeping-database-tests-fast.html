@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+           "GitHub HTML5 Pandoc Template" v2.1 — by Tristano Ajmone           
+==============================================================================
+Copyright © Tristano Ajmone, 2017, MIT License (MIT). Project's home:
+
+- https://github.com/tajmone/pandoc-goodies
+
+The CSS in this template reuses source code taken from the following projects:
+
+- GitHub Markdown CSS: Copyright © Sindre Sorhus, MIT License (MIT):
+  https://github.com/sindresorhus/github-markdown-css
+
+- Primer CSS: Copyright © 2016-2017 GitHub Inc., MIT License (MIT):
+  http://primercss.io/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The MIT License 
+
+Copyright (c) Tristano Ajmone, 2017 (github.com/tajmone/pandoc-goodies)
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+Copyright (c) 2017 GitHub Inc.
+
+"GitHub Pandoc HTML5 Template" is Copyright (c) Tristano Ajmone, 2017, released
+under the MIT License (MIT); it contains readaptations of substantial portions
+of the following third party softwares:
+
+(1) "GitHub Markdown CSS", Copyright (c) Sindre Sorhus, MIT License (MIT).
+(2) "Primer CSS", Copyright (c) 2016 GitHub Inc., MIT License (MIT).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+==============================================================================-->
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Keeping Database Tests Fast with `tmp-postgres`</title>
+  <style type="text/css">
+@charset "UTF-8";.markdown-body{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;color:#24292e;font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:16px;line-height:1.5;word-wrap:break-word;box-sizing:border-box;min-width:200px;max-width:980px;margin:0 auto;padding:45px}.markdown-body a{color:#0366d6;background-color:transparent;text-decoration:none;-webkit-text-decoration-skip:objects}.markdown-body a:active,.markdown-body a:hover{outline-width:0}.markdown-body a:hover{text-decoration:underline}.markdown-body a:not([href]){color:inherit;text-decoration:none}.markdown-body strong{font-weight:600}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em;margin:.67em 0;padding-bottom:.3em;border-bottom:1px solid #eaecef}.markdown-body h2{padding-bottom:.3em;font-size:1.5em;border-bottom:1px solid #eaecef}.markdown-body h3{font-size:1.25em}.markdown-body h4{font-size:1em}.markdown-body h5{font-size:.875em}.markdown-body h6{font-size:.85em;color:#6a737d}.markdown-body img{border-style:none}.markdown-body svg:not(:root){overflow:hidden}.markdown-body hr{box-sizing:content-box;height:.25em;margin:24px 0;padding:0;overflow:hidden;background-color:#e1e4e8;border:0}.markdown-body hr::before{display:table;content:""}.markdown-body hr::after{display:table;clear:both;content:""}.markdown-body input{margin:0;overflow:visible;font:inherit;font-family:inherit;font-size:inherit;line-height:inherit}.markdown-body [type=checkbox]{box-sizing:border-box;padding:0}.markdown-body *{box-sizing:border-box}.markdown-body blockquote{margin:0}.markdown-body ol,.markdown-body ul{padding-left:2em}.markdown-body ol ol,.markdown-body ul ol{list-style-type:lower-roman}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:0;margin-bottom:0}.markdown-body ol ol ol,.markdown-body ol ul ol,.markdown-body ul ol ol,.markdown-body ul ul ol{list-style-type:lower-alpha}.markdown-body li>p{margin-top:16px}.markdown-body li+li{margin-top:.25em}.markdown-body dd{margin-left:0}.markdown-body dl{padding:0}.markdown-body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:600}.markdown-body dl dd{padding:0 16px;margin-bottom:16px}.markdown-body code{font-family:SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace}.markdown-body pre{font:12px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;word-wrap:normal}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin-top:0;margin-bottom:16px}.markdown-body blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}.markdown-body blockquote>:first-child{margin-top:0}.markdown-body blockquote>:last-child{margin-bottom:0}.markdown-body table{display:block;width:100%;overflow:auto;border-spacing:0;border-collapse:collapse}.markdown-body table th{font-weight:600}.markdown-body table td,.markdown-body table th{padding:6px 13px;border:1px solid #dfe2e5}.markdown-body table tr{background-color:#fff;border-top:1px solid #c6cbd1}.markdown-body table tr:nth-child(2n){background-color:#f6f8fa}.markdown-body img{max-width:100%;box-sizing:content-box;background-color:#fff}.markdown-body code{padding:.2em 0;margin:0;font-size:85%;background-color:rgba(27,31,35,.05);border-radius:3px}.markdown-body code::after,.markdown-body code::before{letter-spacing:-.2em;content:" "}.markdown-body pre>code{padding:0;margin:0;font-size:100%;word-break:normal;white-space:pre;background:0 0;border:0}.markdown-body .highlight{margin-bottom:16px}.markdown-body .highlight pre{margin-bottom:0;word-break:normal}.markdown-body .highlight pre,.markdown-body pre{padding:16px;overflow:auto;font-size:85%;line-height:1.45;background-color:#f6f8fa;border-radius:3px}.markdown-body pre code{display:inline;max-width:auto;padding:0;margin:0;overflow:visible;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}.markdown-body pre code::after,.markdown-body pre code::before{content:normal}.markdown-body .full-commit .btn-outline:not(:disabled):hover{color:#005cc5;border-color:#005cc5}.markdown-body kbd{box-shadow:inset 0 -1px 0 #959da5;display:inline-block;padding:3px 5px;font:11px/10px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;color:#444d56;vertical-align:middle;background-color:#fcfcfc;border:1px solid #c6cbd1;border-bottom-color:#959da5;border-radius:3px;box-shadow:inset 0 -1px 0 #959da5}.markdown-body :checked+.radio-label{position:relative;z-index:1;border-color:#0366d6}.markdown-body .task-list-item{list-style-type:none}.markdown-body .task-list-item+.task-list-item{margin-top:3px}.markdown-body .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}.markdown-body::before{display:table;content:""}.markdown-body::after{display:table;clear:both;content:""}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.Alert,.Error,.Note,.Success,.Warning{padding:11px;margin-bottom:24px;border-style:solid;border-width:1px;border-radius:4px}.Alert p,.Error p,.Note p,.Success p,.Warning p{margin-top:0}.Alert p:last-child,.Error p:last-child,.Note p:last-child,.Success p:last-child,.Warning p:last-child{margin-bottom:0}.Alert{color:#246;background-color:#e2eef9;border-color:#bac6d3}.Warning{color:#4c4a42;background-color:#fff9ea;border-color:#dfd8c2}.Error{color:#911;background-color:#fcdede;border-color:#d2b2b2}.Success{color:#22662c;background-color:#e2f9e5;border-color:#bad3be}.Note{color:#2f363d;background-color:#f6f8fa;border-color:#d5d8da}.Alert h1,.Alert h2,.Alert h3,.Alert h4,.Alert h5,.Alert h6{color:#246;margin-bottom:0}.Warning h1,.Warning h2,.Warning h3,.Warning h4,.Warning h5,.Warning h6{color:#4c4a42;margin-bottom:0}.Error h1,.Error h2,.Error h3,.Error h4,.Error h5,.Error h6{color:#911;margin-bottom:0}.Success h1,.Success h2,.Success h3,.Success h4,.Success h5,.Success h6{color:#22662c;margin-bottom:0}.Note h1,.Note h2,.Note h3,.Note h4,.Note h5,.Note h6{color:#2f363d;margin-bottom:0}.Alert h1:first-child,.Alert h2:first-child,.Alert h3:first-child,.Alert h4:first-child,.Alert h5:first-child,.Alert h6:first-child,.Error h1:first-child,.Error h2:first-child,.Error h3:first-child,.Error h4:first-child,.Error h5:first-child,.Error h6:first-child,.Note h1:first-child,.Note h2:first-child,.Note h3:first-child,.Note h4:first-child,.Note h5:first-child,.Note h6:first-child,.Success h1:first-child,.Success h2:first-child,.Success h3:first-child,.Success h4:first-child,.Success h5:first-child,.Success h6:first-child,.Warning h1:first-child,.Warning h2:first-child,.Warning h3:first-child,.Warning h4:first-child,.Warning h5:first-child,.Warning h6:first-child{margin-top:0}h1.title,p.subtitle{text-align:center}h1.title.followed-by-subtitle{margin-bottom:0}p.subtitle{font-size:1.5em;font-weight:600;line-height:1.25;margin-top:0;margin-bottom:16px;padding-bottom:.3em}div.line-block{white-space:pre-line}
+  </style>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<article class="markdown-body">
+<header>
+<h1 class="title">Keeping Database Tests Fast with `tmp-postgres`</h1>
+</header>
+<p><em>updated 12/28/19</em></p>
+<p>You’ve written some Haskell code and it compiles…so it works?</p>
+<p>Hahahahahahahaha ha…sigh…<em>[muffled sobbing]</em>.</p>
+<p>Turns out this is not the case - not the case in general and definitely not the case if you are writing database queries.</p>
+<p>You can try to find various libraries to limit what needs to be tested but at some point you are going to want to test your database code.</p>
+<p><code>tmp-postgres</code> can help you write reliable tests. There are a lot of ways you could utilize <code>tmp-postgres</code> to write your tests but I’ll show you what I find works best for me.</p>
+<p>This blog post also shows general database test good practices that are not tied to using <code>tmp-postgres</code> or <code>postgresql-simple</code>.</p>
+<h2 id="starting-postgres-quickly">Starting <code>postgres</code> Quickly</h2>
+<p>We need to create a fast <code>tmp-postgres</code> setup function.</p>
+<p>First, we will utilize <code>initdb</code> caching by using <a href="https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:withDbCache"><code>withDbCache</code></a>. As I discussed <a href="/faster-database-testing.html">previously</a> this gives a 3-4x performance boost. However in “real” projects the overhead in database testing tends to come from the time it takes to create a migrated database. Running a complete set of database migrations can easily take 10 seconds. To speed up this process we need a way to cache a database cluster after the migrations have run.</p>
+<p><code>tmp-postgres</code> provides the <a href="https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:cacheAction"><code>cacheAction</code></a> function to cache migrated database clusters. Here is the type signature:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">cacheAction ::</span> <span class="dt">FilePath</span> <span class="ot">-&gt;</span> (<span class="dt">DB</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Either</span> <span class="dt">StartError</span> <span class="dt">Config</span>)</span></code></pre></div>
+<p>If the database cluster folder (the first argument) does not exist, the continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. <code>cacheAction</code> returns a <code>Config</code> that can be used to start a database initialized with the cached database cluster referred to in the first argument.</p>
+<p>Long story short, you should use <code>cacheAction</code> to store a database cluster at the state after the migration has been run, and stored at a location based on the hash of the migration query (and any other previous hashes … if you wanted to cache every migration for instance). If you do this you won’t have to run your migrations every time you run your tests.</p>
+<p>Here is an example <code>tmp-postgres</code> setup function that does all the right things:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a><span class="ot">withSetup ::</span> (<span class="dt">Pool</span> <span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-2"><a href="#cb2-2"></a>withSetup f <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="co">-- Helper to throw exceptions</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="kw">let</span> throwE x <span class="ot">=</span> <span class="fu">either</span> throwIO <span class="fu">pure</span> <span class="op">=&lt;&lt;</span> x</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  throwE <span class="op">$</span> withDbCache <span class="op">$</span> \dbCache <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="kw">let</span> combinedConfig <span class="ot">=</span> defaultConfig <span class="op">&lt;&gt;</span> cacheConfig dbCache</span>
+<span id="cb2-8"><a href="#cb2-8"></a>    migratedConfig <span class="ot">&lt;-</span> throwE <span class="op">$</span> cacheAction (<span class="st">&quot;~/.tmp-postgres/&quot;</span> <span class="op">&lt;&gt;</span> hash) migrate combinedConfig</span>
+<span id="cb2-9"><a href="#cb2-9"></a>    withConfig migratedConfig <span class="op">$</span> \db <span class="ot">-&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>      f <span class="op">=&lt;&lt;</span> createPool (connectPostgreSQL <span class="op">$</span> toConnectionString db) close <span class="dv">2</span> <span class="dv">60</span> <span class="dv">10</span></span></code></pre></div>
+<p>Let’s recap what this function does: - Creates a persistent <code>initdb</code> cache with <code>withDbCache</code>. - Caches the <code>migration</code> action by storing a premigrated database cluster at the folder given by <code>"~/.tmp-postgres/" &lt;&gt; hash</code>. - Starts a postgres instance with the migrated database cluster. - Creates a pool of database connections for tests to use for connecting to the ephemeral database.</p>
+<p>We can now use this function to provide a <code>Pool Connection</code> for our tests with the some resource helpers.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1"></a>around withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>  it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>    list conn <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  it <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">1</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>    list conn <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb3-7"><a href="#cb3-7"></a>  it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>    delete conn theId</span>
+<span id="cb3-10"><a href="#cb3-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<h2 id="minimize-the-creation-of-database-clusters">Minimize the Creation of Database Clusters</h2>
+<p>The example above is a valid way to test queries but it is unlikely to be the optimal way.</p>
+<p>The problem is <a href="http://hackage.haskell.org/package/hspec-2.7.1/docs/Test-Hspec.html#v:around"><code>around</code></a> creates an isolated postgres cluster for every test. Even with all of our fancy caching this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.</p>
+<p>To limit the overhead of starting a ephemeral database it is best to create the minimal number of database clusters.</p>
+<p><code>hspec</code> is missing an <code>aroundAll</code> function. Here is one that I use: <a href="https://gist.github.com/jfischoff/5cf62b82e1dd7d03c8a610ef7fd933ff">aroundAll</a></p>
+<p>We can use it to replace the <code>around</code> in our previous example:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1"></a>aroundAll withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>    list conn <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  it <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">1</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>    list conn <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>    delete conn theId</span>
+<span id="cb4-10"><a href="#cb4-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<h2 id="the-rub">The Rub</h2>
+<p>Using <code>aroundAll</code> will speed up our testing but our test suite is now broken. The problem is the second test leaves behind an entry breaking the third test.</p>
+<p>We could make the third test more robust by caching the state at the start of the test and ensuring we return to the initial state:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1"></a>  it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>    before <span class="ot">&lt;-</span> list conn</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>    delete conn theId</span>
+<span id="cb5-6"><a href="#cb5-6"></a>    list conn <span class="ot">`shouldReturn`</span> before</span></code></pre></div>
+<p>There are still potential problems with this modification.</p>
+<p>At the end of the day it might not be clear how to make a given test robust.</p>
+<p>One way we can regain the isolation of separate database clusters and <code>postgres</code> instances is by using the database’s mechanisms for query isolation.</p>
+<p>To faciliate query isolation we’ll write a function to wrap a list of statements in a transaction that we rollback instead of committing:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1"></a><span class="ot">abort ::</span> (<span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb6-2"><a href="#cb6-2"></a>abort f conn <span class="ot">=</span> bracket_</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  (execute_ conn <span class="st">&quot;BEGIN&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>  (execute_ conn <span class="st">&quot;ROLLBACK&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5"></a>  (f conn)</span></code></pre></div>
+<p>We can now prefix our tests with <code>abort</code> and they will not interfer with each other:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1"></a>aroundAll withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>  it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>    list conn <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  it <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">1</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>    list conn <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb7-7"><a href="#cb7-7"></a>  it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>    delete conn theId</span>
+<span id="cb7-10"><a href="#cb7-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<p>It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally there is no isolation level that can bring the database to the same state the way starting at a cluster snapshot can. Things like series are incremented and not decrememented on rollback among other MVCC infidelities. That said abort is a perfectly sensible solution for testing most queries.</p>
+<h2 id="the-pleasure-and-pain-of-parallel">The Pleasure and Pain of <code>parallel</code></h2>
+<p>Database queries are meant to be run in parallel with other queries. We can take advantage of this by running our tests in parallel to improve performance.</p>
+<p>We can change our tests to run in parallel by adding the <code>parallel</code> combinator:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1"></a>aroundAll withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> parallel <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>  it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>    list conn <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb8-4"><a href="#cb8-4"></a>  it <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">1</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>    list conn <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb8-7"><a href="#cb8-7"></a>  it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a>    delete conn theId</span>
+<span id="cb8-10"><a href="#cb8-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<p>Unfortunately if we run our tests again we will notice failures.</p>
+<p>The problem is our <code>abort</code> function is wrapping everything in a <code>READ_COMMITTED</code> isolation level. This is equivalent to each statement receiving it’s own snapshot of the database; but we need the entire transaction to have a single consistent snapshot of the database. We need to use either <code>REPEATABLE_READ</code> or <code>SERIALIZABLE</code> isolation.</p>
+<p>In our particular example modifying <code>abort</code> to use <code>SERIALIZABLE</code> would solve our parallel test issues, however this is not always possible.</p>
+<p>For instance some postgres statements, like <code>SKIP LOCKED</code>, do not run performantly in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database.</p>
+<p>This made using <code>SERIALIZABLE</code> unusable in testing <code>postgresql-simple-queue</code>. However, I was still able utilize <code>parallel</code> to improve performance, while maintaining isolation through separate <code>postgres</code> instances.</p>
+<p>The startup cost of <code>tmp-postgres</code> is around 250 ms on Mac or 90 ms on Linux so your tests will need to be at least 0.6 seconds but probabaly closer to 2.0 seconds for this approach to be meaningfully helpful.</p>
+<p>Here is what it would look like in our example:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1"></a>describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> parallel <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>    it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>      list conn <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    it <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a>      theId <span class="ot">&lt;-</span> add conn <span class="dv">1</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>      list conn <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb9-8"><a href="#cb9-8"></a></span>
+<span id="cb9-9"><a href="#cb9-9"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>    it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>      theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a>      delete conn theId</span>
+<span id="cb9-13"><a href="#cb9-13"></a>      list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<p>Starting a separate <code>postgres</code> instance is a big hammer. It is a heavyweight operation but can surprisingly help performance in some situations and provides the highest level of isolation. However typically <code>abort</code> is optimal.</p>
+<h2 id="reuse-setup-with-rollback">Reuse setup with <code>rollback</code></h2>
+<p><code>abort</code> is great for rolling back all the changes of a test but sometimes we would like to only rollback some changes in a test.</p>
+<p>This situation arises when we would like to reuse some setup to run a few different assertions.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1"></a>it <span class="st">&quot;returns [] after all removal operations&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>  complexSetup conn</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  forM_ allRemovalOperations <span class="op">$</span> \op <span class="ot">-&gt;</span> rollback <span class="op">$</span> op conn <span class="op">&gt;&gt;</span> list <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<p>Unlike <code>abort</code>, <code>rollback</code> can be nested and does not abort the entire transaction.</p>
+<p>We can implement <code>rollback</code> with savepoints like:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1"></a><span class="ot">rollback ::</span> <span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb11-2"><a href="#cb11-2"></a>rollback conn actionToRollback <span class="ot">=</span> mask <span class="op">$</span> \restore <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>  sp <span class="ot">&lt;-</span> savepoint conn</span>
+<span id="cb11-4"><a href="#cb11-4"></a>  restore actionToRollback <span class="ot">`finally`</span> rollbackToAndReleaseSavepoint conn sp</span></code></pre></div>
+<p>Since <code>rollback</code> uses savepoints the performance is not as good as <code>abort</code> which is twice as fast. However they are both sub-millisecond operations so I am not sure choosing one or the other matters.</p>
+<h2 id="clean-up">Clean Up</h2>
+<p>Our tests are fast. That’s important. Slow tests die.</p>
+<p>We can now make them prettier.</p>
+<h3 id="using-a-connection-monad">Using a Connection Monad</h3>
+<p>These tests are fast but they are kind of ugly because all of the <code>conn</code> threading. We can use a <code>ReaderT Connection IO</code> monad or something morally similar to it to implicitly pass the <code>conn</code> <code>Connection</code> parameter.</p>
+<p>Here is our cleaned up example:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1"></a>describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> parallel <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>    it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>      list <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb12-5"><a href="#cb12-5"></a>    it <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>      theId <span class="ot">&lt;-</span> add <span class="dv">1</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a>      list <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb12-8"><a href="#cb12-8"></a></span>
+<span id="cb12-9"><a href="#cb12-9"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a>    it <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a>      theId <span class="ot">&lt;-</span> add <span class="dv">2</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a>      delete theId</span>
+<span id="cb12-13"><a href="#cb12-13"></a>      list <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<h3 id="fold-abort-and-withpool-into-it">Fold <code>abort</code> and <code>withPool</code> into <code>it</code></h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1"></a>describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> parallel <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="kw">let</span> wit msg <span class="ot">=</span> it msg <span class="op">.</span> withPool <span class="op">.</span> abort</span>
+<span id="cb13-3"><a href="#cb13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>    wit <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>      list <span class="ot">`shouldReturn`</span> []</span>
+<span id="cb13-7"><a href="#cb13-7"></a>    wit <span class="st">&quot;returns the created elements&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>      theId <span class="ot">&lt;-</span> add <span class="dv">1</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a>      list <span class="ot">`shouldReturn`</span> [theId]</span>
+<span id="cb13-10"><a href="#cb13-10"></a></span>
+<span id="cb13-11"><a href="#cb13-11"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a>    wit <span class="st">&quot;deletes what is created&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a>      theId <span class="ot">&lt;-</span> add <span class="dv">2</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a>      delete theId</span>
+<span id="cb13-15"><a href="#cb13-15"></a>      list <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
+<p>Alright good enough.</p>
+<h1 id="recap">Recap</h1>
+<p>When testing with <code>tmp-postgres</code>, using <code>cacheAction</code>, <code>abort</code>, <code>rollback</code> and separate <code>postgres</code> instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad or similar can make the tests look cleaner.</p>
+<p>In the next blog post in this series I’ll show how to use <code>tmp-postgres</code> to diagnosis and fix performance problems in the queries under test.</p>
+<p>A major pain of database testing I have not addressed is how to build test data that has foreign key references. I’ll have to come back to this after showing off <code>tmp-postgres</code>.</p>
+<p><a href="../index.html">Home</a> | <a href="../faster-database-testing.html">Part 1</a></p>
+</article>
+</body>
+</html>

@@ -1,4 +1,4 @@
-*updated 12/23/19*
+*updated 12/28/19*
 
 [`tmp-postgres`](http://hackage.haskell.org/package/tmp-postgres) has hit 1.0.0.0 ... more like blown past 1.0.0.0. The latest version is 1.34.0.0 as I write this.
 
@@ -58,6 +58,6 @@ I've found the improved performance is large enough to be felt in real projects.
 
 ## But Wait, There's More!
 
-The new `tmp-postgres` is over 5x faster on macOS and linux but the story doesn't end here. In parts 2 and 3 of this blog post series I'll show how to use additional features of `tmp-postgres` to keep database testing fast as the size of your project grows.
+The new `tmp-postgres` is over 5x faster on macOS and linux but the story doesn't end here. In parts [2](../keeping-database-tests-fast.html) and 3 of this blog post series I'll show how to use additional features of `tmp-postgres` to keep database testing fast as the size of your project grows.
 
-[Home](../index.html)
+[Home](../index.html) | [Part 2](../keeping-database-tests-fast.html)
