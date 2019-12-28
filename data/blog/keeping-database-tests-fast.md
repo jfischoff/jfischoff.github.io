@@ -8,7 +8,7 @@ Turns out this is not the case - not the case in general and definitely not the 
 
 You can try to find various libraries to limit what needs to be tested but at some point you are going to want to test your database code.
 
-`tmp-postgres` can help you write reliable tests. There are a lot of ways you could utilize `tmp-postgres` to write your tests but I'll show you what I find works best for me.
+[`tmp-postgres`](https://hackage.haskell.org/package/tmp-postgres) can help you write reliable tests. There are a lot of ways you could utilize `tmp-postgres` to write your tests but I'll show you what I find works best for me.
 
 This blog post also shows general database test good practices that are not tied to using `tmp-postgres` or `postgresql-simple`.
 
@@ -16,11 +16,11 @@ This blog post also shows general database test good practices that are not tied
 
 We need to create a fast `tmp-postgres` setup function.
 
-First, we will utilize `initdb` caching by using [`withDbCache`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:withDbCache). As I discussed [previously](/faster-database-testing.html)
+First, we will utilize `initdb` caching by using [`withDbCache`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.1/docs/Database-Postgres-Temp.html#v:withDbCache). As I discussed [previously](/faster-database-testing.html)
 this gives a 3-4x performance boost. However in "real" projects the overhead in database testing tends to come from the time it takes to create a migrated database. Running a complete set of database migrations can easily take 10 seconds.
 To speed up this process we need a way to cache a database cluster after the migrations have run.
 
-`tmp-postgres` provides the [`cacheAction`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.0/docs/Database-Postgres-Temp.html#v:cacheAction) function to cache migrated database clusters. Here is the type signature:
+`tmp-postgres` provides the [`cacheAction`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.1/docs/Database-Postgres-Temp.html#v:cacheAction) function to cache migrated database clusters. Here is the type signature:
 
 ```haskell
 cacheAction :: FilePath -> (DB -> IO ()) -> Config -> IO (Either StartError Config)
