@@ -274,4 +274,4 @@ When testing with `tmp-postgres` using `cacheAction`, `abort`, `rollback` and se
 
 In the next blog post in the series I'll show how to use `tmp-postgres` to diagnosis and fix performance problems in the queries under test.
 
-A major pain of database testing I have not addressed is how to build test data that has foreign key references when you don't care about the closure or connected relations. I'll have to come back to this after showing off `tmp-postgres`.
+A major pain of database testing I have not addressed is how to build test data that has foreign key references. I'll have to come back to this after showing off `tmp-postgres`.
