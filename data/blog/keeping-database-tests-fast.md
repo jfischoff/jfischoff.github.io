@@ -275,4 +275,4 @@ In the next blog post in this series I'll show how to use `tmp-postgres` to diag
 
 A major pain of database testing I have not addressed is how to build test data that has foreign key references. I'll have to come back to this after showing off `tmp-postgres`.
 
-[Home](../index.html) | [Part 1](../faster-database-testing.html)
+[Home](../index.html) | [Part 1](./faster-database-testing.html)
