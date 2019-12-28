@@ -226,7 +226,7 @@ We can now make them prettier.
 
 ### Using a Connection Monad
 
-These tests are fast but they are kinda of ugly because all of the `conn` threading. We can use a `ReaderT Connection IO` monad or something morally similar to it to implicitly pass the `conn` `Connection` parameter (yes ... we could use `ImplicitParams`).
+These tests are fast but they are kinda of ugly because all of the `conn` threading. We can use a `ReaderT Connection IO` monad or something morally similar to it to implicitly pass the `conn` `Connection` parameter.
 
 Here is our cleaned up example:
 
