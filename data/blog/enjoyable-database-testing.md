@@ -167,13 +167,13 @@ The problem is our `abort` function is wrapping everything in a `READ_COMMITTED`
 
 In our particular example the solution is to use the higher isolation and retry on serializable errors. However this is not always possible.
 
-For instance some postgres statements do not work well in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database (the main example I know of is `SKIP LOCKED` but there might be others).
+For instance some postgres statements run performantly in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database (the main example I know of is `SKIP LOCKED` but there might be others).
 
 This is the case with `postgresql-simple-queue` however I was still able utilize `parallel` to improve performance by starting separate `postgres` instances.
 
 The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be atleast 0.5 seconds for this approach to be helpful.
 
-Here is what it would look like in our example ... although admittantly not necessary:
+Here is what it would look like in our example:
 
 ```haskell
 describe "list/add/delete" $ parallel $ do
@@ -191,7 +191,7 @@ describe "list/add/delete" $ parallel $ do
       list conn `shouldReturn` []
 ```
 
-Starting a separate `postgres` instance is a big hammer. It is a heavy weight operation but can surprisingly help performance in some situations and provides the highest level of isolation in tests.
+Starting a separate `postgres` instance is a big hammer. It is a heavyweight operation but can surprisingly help performance in some situations and provides the highest level of isolation in tests.
 
 ## Reuse setup with `rollback`
 
@@ -226,7 +226,7 @@ We can now make them prettier.
 
 ### Using a Connection Monad
 
-This tests are fast but they are kinda of ugly because all of the `conn` threading. We can use a `ReaderT Connection IO` monad or something morally similar to it to implicitly pass the `conn` `Connection` parameter (yes ... we could use `ImplicitParams`).
+These tests are fast but they are kinda of ugly because all of the `conn` threading. We can use a `ReaderT Connection IO` monad or something morally similar to it to implicitly pass the `conn` `Connection` parameter (yes ... we could use `ImplicitParams`).
 
 Here is our cleaned up example:
 
