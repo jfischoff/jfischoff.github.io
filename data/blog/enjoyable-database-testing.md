@@ -167,11 +167,11 @@ The problem is our `abort` function is wrapping everything in a `READ_COMMITTED`
 
 In our particular example the solution is to use the higher isolation and retry on serializable errors. However this is not always possible.
 
-For instance some postgres statements run performantly in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database (the main example I know of is `SKIP LOCKED` but there might be others).
+For instance some postgres statements, like `SKIP LOCKED`, do not run performantly in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database.
 
-This is the case with `postgresql-simple-queue` however I was still able utilize `parallel` to improve performance by starting separate `postgres` instances.
+This made using `SERIALIZABLE` unusable in testing `postgresql-simple-queue` however I was still able utilize `parallel` to improve performance, while maintaining isolation through separate `postgres` instances.
 
-The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be atleast 0.5 seconds for this approach to be helpful.
+The startup cost of `tmp-postgres` is around 250 ms on Mac or 90 ms on Linux so your tests will need to be atleast 0.6 seconds but probabaly closer to 2.0 seconds for this approach to be meaningfully helpful.
 
 Here is what it would look like in our example:
 
@@ -191,7 +191,7 @@ describe "list/add/delete" $ parallel $ do
       list conn `shouldReturn` []
 ```
 
-Starting a separate `postgres` instance is a big hammer. It is a heavyweight operation but can surprisingly help performance in some situations and provides the highest level of isolation in tests.
+Starting a separate `postgres` instance is a big hammer. It is a heavyweight operation but can surprisingly help performance in some situations and provides the highest level of isolation. However typically `abort` is optimal.
 
 ## Reuse setup with `rollback`
 
