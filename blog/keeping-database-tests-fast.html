@@ -155,7 +155,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-8"><a href="#cb2-8"></a>    migratedConfig <span class="ot">&lt;-</span> throwE <span class="op">$</span> cacheAction (<span class="st">&quot;~/.tmp-postgres/&quot;</span> <span class="op">&lt;&gt;</span> hash) migrate combinedConfig</span>
 <span id="cb2-9"><a href="#cb2-9"></a>    withConfig migratedConfig <span class="op">$</span> \db <span class="ot">-&gt;</span></span>
 <span id="cb2-10"><a href="#cb2-10"></a>      f <span class="op">=&lt;&lt;</span> createPool (connectPostgreSQL <span class="op">$</span> toConnectionString db) close <span class="dv">2</span> <span class="dv">60</span> <span class="dv">10</span></span></code></pre></div>
-<p>Let’s recap what this function does: - Creates a persistent <code>initdb</code> cache with <code>withDbCache</code>. - Caches the <code>migration</code> action by storing a premigrated database cluster at the folder given by <code>"~/.tmp-postgres/" &lt;&gt; hash</code>. - Starts a postgres instance with the migrated database cluster. - Creates a pool of database connections for tests to use for connecting to the ephemeral database.</p>
+<p>Let’s recap what this function does:</p>
+<ul>
+<li>Creates a persistent <code>initdb</code> cache with <code>withDbCache</code>.</li>
+<li>Caches the <code>migration</code> action by storing a premigrated database cluster at the folder given by <code>"~/.tmp-postgres/" &lt;&gt; hash</code>.</li>
+<li>Starts a postgres instance with the migrated database cluster.</li>
+<li>Creates a pool of database connections for tests to use for connecting to the ephemeral database.</li>
+</ul>
 <p>We can now use this function to provide a <code>Pool Connection</code> for our tests with the some resource helpers.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1"></a>around withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>  it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>

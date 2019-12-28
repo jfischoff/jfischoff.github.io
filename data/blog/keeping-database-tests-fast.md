@@ -46,6 +46,7 @@ withSetup f = do
 ```
 
 Let's recap what this function does:
+
 - Creates a persistent `initdb` cache with `withDbCache`.
 - Caches the `migration` action by storing a premigrated database cluster at the folder given by `"~/.tmp-postgres/" <> hash`.
 - Starts a postgres instance with the migrated database cluster.
