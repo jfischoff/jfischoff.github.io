@@ -143,7 +143,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><code>tmp-postgres</code> provides the <a href="https://hackage.haskell.org/package/tmp-postgres-1.34.0.1/docs/Database-Postgres-Temp.html#v:cacheAction"><code>cacheAction</code></a> function to cache migrated database clusters. Here is the type signature:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">cacheAction ::</span> <span class="dt">FilePath</span> <span class="ot">-&gt;</span> (<span class="dt">DB</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">Config</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Either</span> <span class="dt">StartError</span> <span class="dt">Config</span>)</span></code></pre></div>
 <p>If the database cluster folder (the first argument) does not exist, the continuation (second argument) will run. The third argument is to configure the temporary database which makes the cluster. <code>cacheAction</code> returns a <code>Config</code> that can be used to start a database initialized with the cached database cluster referred to in the first argument.</p>
-<p>Long story short, you should use <code>cacheAction</code> to store a database cluster at the state after the migration has been run, and stored at a location based on the hash of the migration query (and any other previous hashes … if you wanted to cache every migration for instance). If you do this you won’t have to run your migrations every time you run your tests.</p>
+<p>Long story short, you should use <code>cacheAction</code> to store a database cluster at the state after the migration has been run, and stored at a location based on the hash of the migration query (and any other previous hashes … if you wanted to cache every migration for instance). If you do this, you won’t have to run your migrations every time you run your tests.</p>
 <p>Here is an example <code>tmp-postgres</code> setup function that does all the right things:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a><span class="ot">withSetup ::</span> (<span class="dt">Pool</span> <span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()) <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
 <span id="cb2-2"><a href="#cb2-2"></a>withSetup f <span class="ot">=</span> <span class="kw">do</span></span>
@@ -175,8 +175,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-10"><a href="#cb3-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
 <h2 id="minimize-the-creation-of-database-clusters">Minimize the Creation of Database Clusters</h2>
 <p>The example above is a valid way to test queries but it is unlikely to be the optimal way.</p>
-<p>The problem is <a href="http://hackage.haskell.org/package/hspec-2.7.1/docs/Test-Hspec.html#v:around"><code>around</code></a> creates an isolated postgres cluster for every test. Even with all of our fancy caching this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.</p>
-<p>To limit the overhead of starting a ephemeral database it is best to create the minimal number of database clusters.</p>
+<p>The problem is <a href="http://hackage.haskell.org/package/hspec-2.7.1/docs/Test-Hspec.html#v:around"><code>around</code></a> creates an isolated postgres cluster for every test. Even with all of our fancy caching, this is still pretty time consuming compared to our queries which will be in the low single digit millisecond range.</p>
+<p>To limit the overhead of starting an ephemeral database it is best to create the minimal number of database clusters.</p>
 <p><code>hspec</code> is missing an <code>aroundAll</code> function. Here is one that I use: <a href="https://gist.github.com/jfischoff/5cf62b82e1dd7d03c8a610ef7fd933ff">aroundAll</a></p>
 <p>We can use it to replace the <code>around</code> in our previous example:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1"></a>aroundAll withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
@@ -199,15 +199,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-5"><a href="#cb5-5"></a>    delete conn theId</span>
 <span id="cb5-6"><a href="#cb5-6"></a>    list conn <span class="ot">`shouldReturn`</span> before</span></code></pre></div>
 <p>There are still potential problems with this modification.</p>
-<p>At the end of the day it might not be clear how to make a given test robust.</p>
+<p>At the end of the day, it might not be clear how to make a given test robust.</p>
 <p>One way we can regain the isolation of separate database clusters and <code>postgres</code> instances is by using the database’s mechanisms for query isolation.</p>
-<p>To faciliate query isolation we’ll write a function to wrap a list of statements in a transaction that we rollback instead of committing:</p>
+<p>To faciliate query isolation, we’ll write a function to wrap a list of statements in a transaction that we roll back instead of committing:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1"></a><span class="ot">abort ::</span> (<span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> a) <span class="ot">-&gt;</span> <span class="dt">Connection</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
 <span id="cb6-2"><a href="#cb6-2"></a>abort f conn <span class="ot">=</span> bracket_</span>
 <span id="cb6-3"><a href="#cb6-3"></a>  (execute_ conn <span class="st">&quot;BEGIN&quot;</span>)</span>
 <span id="cb6-4"><a href="#cb6-4"></a>  (execute_ conn <span class="st">&quot;ROLLBACK&quot;</span>)</span>
 <span id="cb6-5"><a href="#cb6-5"></a>  (f conn)</span></code></pre></div>
-<p>We can now prefix our tests with <code>abort</code> and they will not interfer with each other:</p>
+<p>We can now prefix our tests with <code>abort</code> and they will not interfere with each other:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1"></a>aroundAll withSetup <span class="op">$</span> describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> <span class="kw">do</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>  it <span class="st">&quot;return [] initially&quot;</span> <span class="op">$</span> withPool <span class="op">$</span> abort <span class="op">$</span> \conn <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a>    list conn <span class="ot">`shouldReturn`</span> []</span>
@@ -218,7 +218,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-8"><a href="#cb7-8"></a>    theId <span class="ot">&lt;-</span> add conn <span class="dv">2</span></span>
 <span id="cb7-9"><a href="#cb7-9"></a>    delete conn theId</span>
 <span id="cb7-10"><a href="#cb7-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
-<p>It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally there is no isolation level that can bring the database to the same state the way starting at a cluster snapshot can. Things like series are incremented and not decrememented on rollback among other MVCC infidelities. That said abort is a perfectly sensible solution for testing most queries.</p>
+<p>It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally, there is no isolation level that can bring the database to the same state, the way starting at a cluster snapshot can. Things like series are incremented and not decremented on rollback among other MVCC infidelities. That said, <code>abort</code> is a perfectly sensible solution for testing most queries.</p>
 <h2 id="the-pleasure-and-pain-of-parallel">The Pleasure and Pain of <code>parallel</code></h2>
 <p>Database queries are meant to be run in parallel with other queries. We can take advantage of this by running our tests in parallel to improve performance.</p>
 <p>We can change our tests to run in parallel by adding the <code>parallel</code> combinator:</p>
@@ -233,11 +233,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-9"><a href="#cb8-9"></a>    delete conn theId</span>
 <span id="cb8-10"><a href="#cb8-10"></a>    list conn <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
 <p>Unfortunately if we run our tests again we will notice failures.</p>
-<p>The problem is our <code>abort</code> function is wrapping everything in a <code>READ_COMMITTED</code> isolation level. This is equivalent to each statement receiving it’s own snapshot of the database; but we need the entire transaction to have a single consistent snapshot of the database. We need to use either <code>REPEATABLE_READ</code> or <code>SERIALIZABLE</code> isolation.</p>
-<p>In our particular example modifying <code>abort</code> to use <code>SERIALIZABLE</code> would solve our parallel test issues, however this is not always possible.</p>
-<p>For instance some postgres statements, like <code>SKIP LOCKED</code>, do not run performantly in more consistent isolation levels because they provide an intrisitically inconsistent picture of the database.</p>
+<p>The problem is our <code>abort</code> function is wrapping everything in a <code>READ_COMMITTED</code> isolation level. This is equivalent to each statement receiving its own snapshot of the database; but we need the entire transaction to have a single consistent snapshot of the database. We need to use either <code>REPEATABLE_READ</code> or <code>SERIALIZABLE</code> isolation.</p>
+<p>In our particular example, modifying <code>abort</code> to use <code>SERIALIZABLE</code> would solve our parallel test issues. However, this is not always possible.</p>
+<p>For instance, some postgres statements, like <code>SKIP LOCKED</code>, do not run performantly in more consistent isolation levels because they provide an intrinsically inconsistent picture of the database.</p>
 <p>This made using <code>SERIALIZABLE</code> unusable in testing <code>postgresql-simple-queue</code>. However, I was still able utilize <code>parallel</code> to improve performance, while maintaining isolation through separate <code>postgres</code> instances.</p>
-<p>The startup cost of <code>tmp-postgres</code> is around 250 ms on Mac or 90 ms on Linux so your tests will need to be at least 0.6 seconds but probabaly closer to 2.0 seconds for this approach to be meaningfully helpful.</p>
+<p>The startup cost of <code>tmp-postgres</code> is around 250 ms on Mac or 90 ms on Linux, so your tests will need to be at least 0.6 seconds but probabaly closer to 2.0 seconds for this approach to be meaningfully helpful.</p>
 <p>Here is what it would look like in our example:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1"></a>describe <span class="st">&quot;list/add/delete&quot;</span> <span class="op">$</span> parallel <span class="op">$</span> <span class="kw">do</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>  aroundAll withSetup <span class="op">$</span> <span class="kw">do</span></span>
@@ -265,7 +265,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb11-2"><a href="#cb11-2"></a>rollback conn actionToRollback <span class="ot">=</span> mask <span class="op">$</span> \restore <span class="ot">-&gt;</span> <span class="kw">do</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a>  sp <span class="ot">&lt;-</span> savepoint conn</span>
 <span id="cb11-4"><a href="#cb11-4"></a>  restore actionToRollback <span class="ot">`finally`</span> rollbackToAndReleaseSavepoint conn sp</span></code></pre></div>
-<p>Since <code>rollback</code> uses savepoints the performance is not as good as <code>abort</code> which is twice as fast. However they are both sub-millisecond operations so I am not sure choosing one or the other matters.</p>
+<p>Since <code>rollback</code> uses savepoints, the performance is not as good as <code>abort</code>, which is twice as fast. However they are both sub-millisecond operations so I am not sure choosing one or the other matters.</p>
 <h2 id="clean-up">Clean Up</h2>
 <p>Our tests are fast. That’s important. Slow tests die.</p>
 <p>We can now make them prettier.</p>
@@ -303,8 +303,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb13-15"><a href="#cb13-15"></a>      list <span class="ot">`shouldReturn`</span> []</span></code></pre></div>
 <p>Alright good enough.</p>
 <h1 id="recap">Recap</h1>
-<p>When testing with <code>tmp-postgres</code>, using <code>cacheAction</code>, <code>abort</code>, <code>rollback</code> and separate <code>postgres</code> instances can help keep test suites fast even as the projects grow larger. Additionally a connection monad or similar can make the tests look cleaner.</p>
-<p>In the next blog post in this series I’ll show how to use <code>tmp-postgres</code> to diagnosis and fix performance problems in the queries under test.</p>
+<p>When testing with <code>tmp-postgres</code>, using <code>cacheAction</code>, <code>abort</code>, <code>rollback</code> and separate <code>postgres</code> instances can help keep test suites fast even as the project grows larger. Additionally, a connection monad can make the tests look cleaner.</p>
+<p>In the next blog post in this series I’ll show how to use <code>tmp-postgres</code> to diagnose and fix performance problems in the queries under test.</p>
 <p>A major pain of database testing I have not addressed is how to build test data that has foreign key references. I’ll have to come back to this after showing off <code>tmp-postgres</code>.</p>
 <p><a href="../index.html">Home</a> | <a href="./faster-database-testing.html">Part 1</a></p>
 </article>
