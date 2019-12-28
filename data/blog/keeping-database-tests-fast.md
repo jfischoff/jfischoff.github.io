@@ -139,7 +139,7 @@ aroundAll withSetup $ describe "list/add/delete" $ do
     list conn `shouldReturn` []
 ```
 
-It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally, there is no isolation level that can bring the database to the same state, the way starting at a cluster snapshot can. Things like series are incremented and not decremented on rollback among other MVCC infidelities. That said, `abort` is a perfectly sensible solution for testing most queries.
+It is worth pointing out that not every PostgreSQL sql statement can run in a transaction. Additionally, there is no isolation level that can bring the database to the same state, the way starting at a cluster snapshot can. Things like sequences are incremented and not decremented on rollback among other MVCC infidelities. That said, `abort` is a perfectly sensible solution for testing most queries.
 
 ## The Pleasure and Pain of `parallel`
 
