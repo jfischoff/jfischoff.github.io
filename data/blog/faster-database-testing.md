@@ -60,4 +60,4 @@ I've found the improved performance is large enough to be felt in real projects.
 
 The new `tmp-postgres` is over 5x faster on macOS and linux but the story doesn't end here. In parts 2 and 3 of this blog post series I'll show how to use additional features of `tmp-postgres` to keep database testing fast as the size of your project grows.
 
-[Home](../index.html)
+[Home](../index.html) | [Part 2](../keeping-database-tests-fast.html)
