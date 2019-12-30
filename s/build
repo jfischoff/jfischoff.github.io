@@ -6,3 +6,4 @@ pandoc --template=GitHub.html5 data/blog/development-notes-12-26-19.md -o blog/d
 pandoc --template=GitHub.html5 data/blog/development-notes-12-27-19.md -o blog/development-notes-12-27-19.html --metadata title='Development Notes: Decemember 27th 2019'
 pandoc --template=GitHub.html5 data/blog/keeping-database-tests-fast.md -o blog/keeping-database-tests-fast.html --metadata title='Keeping Database Tests Fast with `tmp-postgres`'
 pandoc --template=GitHub.html5 data/blog/development-notes-12-28-19.md -o blog/development-notes-12-28-19.html --metadata title='Development Notes: Decemember 28th 2019'
+pandoc --template=GitHub.html5 data/blog/development-notes-12-29-19.md -o blog/development-notes-12-29-19.html --metadata title='Development Notes: Decemember 29th 2019'
