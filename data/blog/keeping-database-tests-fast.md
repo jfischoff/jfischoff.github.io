@@ -16,7 +16,7 @@ This blog post also shows general database test good practices that are not tied
 
 We need to create a fast `tmp-postgres` setup function.
 
-First, we will utilize `initdb` caching by using [`withDbCache`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.1/docs/Database-Postgres-Temp.html#v:withDbCache). As I discussed [previously](/faster-database-testing.html)
+First, we will utilize `initdb` caching by using [`withDbCache`](https://hackage.haskell.org/package/tmp-postgres-1.34.0.1/docs/Database-Postgres-Temp.html#v:withDbCache). As I discussed [previously](./faster-database-testing.html)
 this gives a 3-4x performance boost. However in "real" projects the overhead in database testing tends to come from the time it takes to create a migrated database. Running a complete set of database migrations can easily take 10 seconds.
 To speed up this process we need a way to cache a database cluster after the migrations have run.
 
