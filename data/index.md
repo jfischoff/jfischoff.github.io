@@ -1,5 +1,6 @@
 # Blog Entries
 
+- [Development Notes: Decemember 30th 2019](blog/development-notes-12-30-19.html)
 - [Development Notes: Decemember 29th 2019](blog/development-notes-12-29-19.html)
 - [Development Notes: Decemember 28th 2019](blog/development-notes-12-28-19.html)
 - [Keeping Database Tests Fast with `tmp-postgres`](blog/keeping-database-tests-fast.html)
