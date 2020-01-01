@@ -74,13 +74,12 @@ SOFTWARE.
 <li>Hopingfully I can modify <code>trek</code> to not depend on <code>postgresql-simple-opts &gt;= 0.5.0.1</code>.</li>
 <li>I still can’t believe I named the package “opts” instead of “options”. I spelled out “postgresql-simple” but “options” was too much … smh.</li>
 <li>I might be able to fix it by adjusting the dependencies.</li>
-<li><code>therewebe</code> is using <code>postgresql-simple-opts &gt;= 0.5.0.1</code>. I must of already fixed it and bumped the version.</li>
+<li><del><code>therewebe</code> is using <code>postgresql-simple-opts &gt;= 0.5.0.1</code></del> not true. It has the source as a git remote. <del>I must of already fixed it and bumped the version.</del> nope</li>
 <li>I fixed it for <code>postgres-options-0.1.0.1</code>. It is broken against 0.2.0.0. I just need to fix it.</li>
 <li>The readme I am copying around could be very wrong.</li>
 <li>Fixed the <code>postgresql-simple-opts</code> version issues. Now onto a <code>tmp-postgres</code> error.</li>
 <li>Commenting out Database.Trek.ToInterfaceImpl.hashConflicts because I don’t remember what I was doing.</li>
-<li>The whole code is built around <code>SpecState</code> that is a db runner and shutdown function. Instead I should</li>
-<li>use <code>aroundAll</code> and the whole thing should just need a “with” interface of <code>(forall a. DB a -&gt; IO a)</code>.</li>
+<li>The whole code is built around <code>SpecState</code> that is a db runner and shutdown function. Instead I should use <code>aroundAll</code> and the whole thing should just need a “with” interface of <code>(forall a. DB a -&gt; IO a)</code>.</li>
 </ul>
 <h1 id="postgresql-simple-opts"><a href="https://github.com/jfischoff/postgresql-simple-opts"><code>postgresql-simple-opts</code></a></h1>
 <ul>
