@@ -8,3 +8,4 @@ pandoc --template=GitHub.html5 data/blog/keeping-database-tests-fast.md -o blog/
 pandoc --template=GitHub.html5 data/blog/development-notes-12-28-19.md -o blog/development-notes-12-28-19.html --metadata title='Development Notes: Decemember 28th 2019'
 pandoc --template=GitHub.html5 data/blog/development-notes-12-29-19.md -o blog/development-notes-12-29-19.html --metadata title='Development Notes: Decemember 29th 2019'
 pandoc --template=GitHub.html5 data/blog/development-notes-12-30-19.md -o blog/development-notes-12-30-19.html --metadata title='Development Notes: Decemember 30th 2019'
+pandoc --template=GitHub.html5 data/blog/development-notes-12-31-19.md -o blog/development-notes-12-31-19.html --metadata title='Development Notes: Decemember 31th 2019'
