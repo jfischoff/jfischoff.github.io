@@ -13,7 +13,7 @@
 - Commenting out Database.Trek.ToInterfaceImpl.hashConflicts because I don't remember what I was
   doing.
 - The whole code is built around `SpecState` that is a db runner and shutdown function. Instead I should
-- use `aroundAll` and the whole thing should just need a "with" interface of `(forall a. DB a -> IO a)`.
+  use `aroundAll` and the whole thing should just need a "with" interface of `(forall a. DB a -> IO a)`.
 
 # [`postgresql-simple-opts`](https://github.com/jfischoff/postgresql-simple-opts)
 
