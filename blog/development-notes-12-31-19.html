@@ -70,11 +70,11 @@ SOFTWARE.
 <ul>
 <li>CI is now compiling as much as I am locally. So time to get local compiling. I think I might have quit working on this when I hit a point where <code>with</code> would be useful in <code>tmp-postgres</code>.</li>
 <li>Scratch that getting an error from <code>PartialOptions</code> locally that do not get in CI.</li>
-<li><code>postgresql-postgresql-simple-opts &gt;= 0.6.0.0</code> is busted. I was kinda of hoping I would not have to fix that right away. This is the problem and value of dog fooding I guess.</li>
-<li>Hopingfully I can modify <code>trek</code> to not depend on <code>postgresql-postgresql-simple-opts &gt;= 0.6.0.0</code>.</li>
+<li><code>postgresql-simple-opts &gt;= 0.5.0.1</code> is busted. I was kinda of hoping I would not have to fix that right away. This is the problem and value of dog fooding I guess.</li>
+<li>Hopingfully I can modify <code>trek</code> to not depend on <code>postgresql-simple-opts &gt;= 0.5.0.1</code>.</li>
 <li>I still can’t believe I named the package “opts” instead of “options”. I spelled out “postgresql-simple” but “options” was too much … smh.</li>
 <li>I might be able to fix it by adjusting the dependencies.</li>
-<li><code>therewebe</code> is using <code>postgresql-postgresql-simple-opts &gt;= 0.6.0.0</code>. I must of already fixed it and bumped the version.</li>
+<li><code>therewebe</code> is using <code>postgresql-simple-opts &gt;= 0.5.0.1</code>. I must of already fixed it and bumped the version.</li>
 <li>I fixed it for <code>postgres-options-0.1.0.1</code>. It is broken against 0.2.0.0. I just need to fix it.</li>
 <li>The readme I am copying around could be very wrong.</li>
 <li>Fixed the <code>postgresql-simple-opts</code> version issues. Now onto a <code>tmp-postgres</code> error.</li>
