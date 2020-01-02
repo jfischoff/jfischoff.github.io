@@ -1,10 +1,10 @@
 # [`trek`](https://github.com/jfischoff/trek)
 
-I started remember where I had left `trek` and felt that it would be a good idea to write design documents. As I started to document the current behavior I realized I could simplify it in the name of a MVP.
+I started to remember where I had left `trek` and felt that it would be a good idea to write design documents. As I started to document the current behavior I realized I could simplify it in the name of a MVP.
 
 I wrote up a [README.md](https://github.com/jfischoff/trek/blob/75ffe84a6c9a94fda18986a96b20c13204d0e1a8/README.md) for what I thought `trek` should do for a 1.0.0.0 release.
 
-# `trek`
+# Aspirational README. WIP. Does **not** compile.
 
 `trek` is a simple database migrator. It has two commands: `create` and `apply`.
 
