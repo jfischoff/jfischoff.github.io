@@ -159,7 +159,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-13"><a href="#cb2-13"></a><span class="kw">}</span></span></code></pre></div>
 <h3 id="description-1">Description</h3>
 <p><code>apply</code> applies the migrations in the <code>DIRPATH</code>.</p>
-<p>If <code>DIRPATH</code> is not in the proper format <code>apply</code> will fail.</p>
+<p>If <code>DIRPATH</code> is not in the proper format <code>apply</code> will fail:</p>
 <ul>
 <li>if <code>DIRPATH</code> contains zero <code>*.sql</code> files <code>apply</code> returns a exit code of <code>1</code>.</li>
 <li>if any <code>*.sql</code> files cannot be parsed in the <code>NAME-VERSION.sql</code> format <code>apply</code> will return exit code <code>2</code>.</li>
