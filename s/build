@@ -9,3 +9,4 @@ pandoc --template=GitHub.html5 data/blog/development-notes-12-28-19.md -o blog/d
 pandoc --template=GitHub.html5 data/blog/development-notes-12-29-19.md -o blog/development-notes-12-29-19.html --metadata title='Development Notes: Decemember 29th 2019'
 pandoc --template=GitHub.html5 data/blog/development-notes-12-30-19.md -o blog/development-notes-12-30-19.html --metadata title='Development Notes: Decemember 30th 2019'
 pandoc --template=GitHub.html5 data/blog/development-notes-12-31-19.md -o blog/development-notes-12-31-19.html --metadata title='Development Notes: Decemember 31th 2019'
+pandoc --template=GitHub.html5 data/blog/development-notes-01-01-20.md -o blog/development-notes-01-01-20.html --metadata title='Development Notes: January 1st 2020'
