@@ -45,7 +45,7 @@ $ trek apply DIRPATH
 
 `apply` applies the migrations in the `DIRPATH`.
 
-If `DIRPATH` is not in the proper format `apply` will fail.
+If `DIRPATH` is not in the proper format `apply` will fail:
 
 - if `DIRPATH` contains zero `*.sql` files `apply` returns a exit code of `1`.
 - if any `*.sql` files cannot be parsed in the `NAME-VERSION.sql` format `apply` will return exit code `2`.
