@@ -139,8 +139,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 id="example">Example</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a>$ <span class="ex">trek</span> create NAME</span></code></pre></div>
 <h3 id="description">Description</h3>
-<p><code>create</code> uses current date time to make a sql file in the proper format for <code>apply</code>.</p>
-<p><code>create NAME</code> will make a <code>NAME-VERSION.sql</code> file in the path pointed at by <code>NAME</code>.</p>
+<h4 id="successful-behavior">Successful Behavior</h4>
+<p><code>create NAME</code> will make a <code>NAME-VERSION.sql</code> file in the path pointed at by <code>NAME</code> using the current date time as ISO8601 <code>VERSION</code>.</p>
+<h4 id="errors">Errors</h4>
 <p><code>create</code> will return a exit code of <code>1</code> if the file creation fails for any reason.</p>
 <h2 id="trek-apply"><code>trek apply</code></h2>
 <h3 id="example-1">Example</h3>
@@ -158,15 +159,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-12"><a href="#cb2-12"></a>    ]</span>
 <span id="cb2-13"><a href="#cb2-13"></a><span class="kw">}</span></span></code></pre></div>
 <h3 id="description-1">Description</h3>
-<p><code>apply</code> applies the migrations in the <code>DIRPATH</code>.</p>
-<p>If <code>DIRPATH</code> is not in the proper format <code>apply</code> will fail:</p>
+<h4 id="successful-behavior-1">Successful Behavior</h4>
+<p><code>apply</code> executes the the non-applied migrations in <code>DIRPATH</code> together in a single <code>SERIALIZABLE</code> transaction.</p>
+<p><code>apply</code> returns a JSON list of migrations entries as seen in the example above. <em>The formatting of <code>trek</code> JSON is not shown</em>.</p>
+<h4 id="errors-1">Errors</h4>
 <ul>
-<li>if <code>DIRPATH</code> contains zero <code>*.sql</code> files <code>apply</code> returns a exit code of <code>1</code>.</li>
-<li>if any <code>*.sql</code> files cannot be parsed in the <code>NAME-VERSION.sql</code> format <code>apply</code> will return exit code <code>2</code>.</li>
+<li>If any of the sql files fail the transaction will be aborted and <code>trek</code> will return an exit code of <code>1</code>.</li>
+<li>if <code>DIRPATH</code> contains zero <code>*.sql</code> files <code>apply</code> returns a exit code of <code>2</code>.</li>
+<li>if any <code>*.sql</code> files cannot be parsed in the <code>NAME-VERSION.sql</code> format <code>apply</code> will return exit code <code>3</code>.</li>
 </ul>
-<p>Otherwise <code>apply</code> will execute the non-applied queries in <code>DIRPATH</code> together in a single <code>SERIALIZABLE</code> transaction.</p>
-<p>If any of the sql files fail the transaction will be aborted and <code>trek</code> will return an exit code of <code>3</code>.</p>
-<p><code>apply</code> returns a JSON list of migrations entries if the exit code is <code>0</code> as seen in the example above. <em>The formatting of <code>trek</code> JSON is not shown</em>.</p>
 </article>
 </body>
 </html>
