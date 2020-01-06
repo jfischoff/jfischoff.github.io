@@ -13,3 +13,4 @@ pandoc --template=GitHub.html5 data/blog/development-notes-01-01-20.md -o blog/d
 pandoc --template=GitHub.html5 data/blog/development-notes-01-02-20.md -o blog/development-notes-01-02-20.html --metadata title='Development Notes: January 2nd 2020'
 pandoc --template=GitHub.html5 data/blog/development-notes-01-03-20.md -o blog/development-notes-01-03-20.html --metadata title='Development Notes: January 3rd 2020'
 pandoc --template=GitHub.html5 data/blog/development-notes-01-04-20.md -o blog/development-notes-01-04-20.html --metadata title='Development Notes: January 4th 2020'
+pandoc --template=GitHub.html5 data/blog/development-notes-01-05-20.md -o blog/development-notes-01-05-20.html --metadata title='Development Notes: January 5th 2020'
