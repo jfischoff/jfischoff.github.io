@@ -1,5 +1,7 @@
 # Blog Entries
 
+- [Development Notes: January 11th 2020](blog/development-notes-01-11-20.html)
+- [Development Notes: January 10th 2020](blog/development-notes-01-10-20.html)
 - [Development Notes: January 6th 2020](blog/development-notes-01-06-20.html)
 - [Development Notes: January 5th 2020](blog/development-notes-01-05-20.html)
 - [Development Notes: January 4th 2020](blog/development-notes-01-04-20.html)
