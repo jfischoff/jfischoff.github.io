@@ -64,7 +64,7 @@ This behavior occurs on both Linux and MacOS. I know why it happens on Linux and
 
 # The Subtle Semantics of `epoll_wait`
 
-On Linux `threadWaitReadSTM` is implemented by ultilizing `epoll_wait` to register interest in file descriptor ready events.
+On Linux `threadWaitReadSTM` is implemented by ultilizing [`epoll_wait`](https://www.man7.org/linux/man-pages/man2/epoll_wait.2.html) to register interest in file descriptor ready events.
 
 The Linux documentation has the following to say about `epoll_wait`:
 
@@ -78,7 +78,7 @@ The Linux documentation has the following to say about `epoll_wait`:
  · the timeout expires.
 ```
 
-This line is
+This line is:
 > a file descriptor delivers an event
 
 glosses over some important details.
@@ -87,13 +87,13 @@ Event notification is a two step process. In the case of sockets, when new data 
 
 `tcp_poll` checks various properities of socket to determine if there are any ready events. To determine if there is data available for reading it calls [`tcp_stream_is_readable`](https://github.com/torvalds/linux/blob/a5ad5742f671de906adbf29fbedf0a04705cebad/net/ipv4/tcp.c#L476) which checks if there is any data in the recieve buffer to read.
 
-A consquence of this two step wake up and check process; if between the time of waking and checking, the data is read from the socket by another thread, `ep_poll` will determine there are no events to return and go back to sleep. Thus `epoll_wait` might not return even if the socket recieves new data.
+A consquence of this two step wake up and check process; if between the time of waking and checking the data is read from the socket by another thread, `ep_poll` will determine there are no events to return and go back to sleep. Thus `epoll_wait` might not return even if the socket recieves new data.
 
 This is exactly what occurs in the example `server`. Sometimes `recv` happens after data is on the socket but before `tcp_poll` is executed. When this occures the `threadWaitReadSTM` action (`waiter`) never returns.
 
 ## How I figured this out
 
-I discovered this tidbit of Linux trivia while trying to understanding this bug with [`hasql-notifications`](https://github.com/cocreature/hasql-notifications) which I need to write [`hasql-queue`](https://github.com/jfischoff/hasql-queue) my PostgreSQL queue library.
+I discovered this tidbit of Linux trivia while trying to understanding this bug with [`hasql-notifications`](https://github.com/cocreature/hasql-notifications) which while adding notification support to [`hasql-queue`](https://github.com/jfischoff/hasql-queue), my PostgreSQL queue library.
 
 ![issues](./hardest-wont-fix/issues.png)
 
@@ -119,18 +119,19 @@ So I opted for [`bpftrace`](https://github.com/iovisor/bpftrace) instead.
 
 `bpftrace` is part of a suite of new Linux observability tools built off the [`ebpf`](https://lwn.net/Articles/740157/) virtual machine and Linux probe technologies.
 
-I wrote the following `bpftrace` script:
+I wrote the [following `bpftrace` script](./hardest-wont-fix/epoll_wait_debugger.bt):
 
 ```c
 tracepoint:syscalls:sys_enter_recvfrom
 {
-    printf("%s sys_enter_recvfrom tid %d fd %d\n", comm, tid, args->fd);
+    printf("%s sys_enter_recvfrom tid: %d fd=%d\n", comm, tid, args->fd);
     @sys_enter_recvfrom[tid] = args->ubuf
 }
 
 tracepoint:syscalls:sys_exit_recvfrom
 {
-  printf("%s sys_enter_recvfrom tid %d message %r return value %d\n", comm, tid, buf(@sys_enter_recvfrom[tid], args->ret), args->ret);
+  printf("%s sys_enter_recvfrom tid: %d message %r return value: %d\n",
+    comm, tid, buf(@sys_enter_recvfrom[tid], args->ret), args->ret);
 }
 ```
 
@@ -168,8 +169,8 @@ Running the test and the `sudo bpftrace epoll_wait_debugger.bt` I get the follow
 
 ```
 ...
-tester:w tracepoint:syscalls:sys_enter_recvfrom tid 3692 fd 13
-tester:w tracepoint:syscalls:sys_exit_recvfrom tid 3692 message C\x00\x00\x00\x0bNOTIFY\x00A\x00\x00\x00\x14\x00\x00\x0e~channel\x00hi!\x00Z\x00\x00\x00\x05I return value 39
+tester:w tracepoint:syscalls:sys_enter_recvfrom tid: 3692 fd=13
+tester:w tracepoint:syscalls:sys_exit_recvfrom tid: 3692 message= C\x00\x00\x00\x0bNOTIFY\x00A\x00\x00\x00\x14\x00\x00\x0e~channel\x00hi!\x00Z\x00\x00\x00\x05I return value 39
 ...
 ```
 
@@ -181,7 +182,7 @@ It is interesting to reread the bug's thread with the power of hindsight. `cocre
 
 If I had payed closer attention, I would have realized that libpq was recieving and parsing the notification.
 
-Anyway, if we are recieving the notification so why doesn't `epoll_wait` get notified?
+Anyway, I was recieving the notification so why didn't `epoll_wait` get notified?
 
 I researched the mechanism sockets use for alerting `epoll_wait` of new data and determined I should trace the `socket_def_readable` call.
 
@@ -195,7 +196,7 @@ kprobe:sock_def_readable
 {
   $inet_sock = (struct inet_sock *)arg0;
   $dport = (($inet_sock->inet_dport & 0xFF) << 8) | ($inet_sock->inet_dport >> 8);
-  printf("%s sock_def_readable enter tid %d port %d\n", comm, tid, $dport);
+  printf("%s sock_def_readable enter tid: %d port=%d\n", comm, tid, $dport);
 }
 
 kretprobe:sock_def_readable
@@ -204,24 +205,24 @@ kretprobe:sock_def_readable
 }
 ```
 
-There isn't a tracepoint for `sock_def_readable` but since it is a kernel function, and we can trace almost any kernel with a [`kprobe`](https://lwn.net/Articles/132196/). Unlike tracepoints there isn't a format file. The arguments are all positional, hence the `arg0` for the first argument. To learn the arguments one must look at the linux source.
+There isn't a tracepoint for `sock_def_readable` but since it is a kernel function, and we can trace almost any kernel with a [`kprobe`](https://lwn.net/Articles/132196/). Unlike tracepoints there isn't a format file. The arguments are all positional, hence the `arg0` for the first argument. To learn the arguments one must look at the Linux source.
 
 The first argument to `socket_def_readable` is a [`sock*`](https://github.com/torvalds/linux/blob/master/include/net/sock.h#L346) but we can also cast it a [`inet_sock*`](https://github.com/torvalds/linux/blob/master/include/net/inet_sock.h#L195) (for some reason I find this works better to get the destination port. Also you can get the source port this way).
 
 By using `#include` to bring into scope definition of structs one can cast arguments in kprobes and then inspect the fields of the structs.
 
-I had to convert the port from big to little endian. That is what the bit shifting is about. At the time of writing this blog these operators were still undocumented.
+I had to convert the port from big to little endian. That is what the bit shifting is about. At the time of writing this blog these `bpftrace` operators are still undocumented.
 
-Anwyay running  `bpftrace epoll_wait_debugger.bt` I get:
+Running  `sudo bpftrace epoll_wait_debugger.bt` gave:
 
 ```
-tester:w sock_def_readable enter tid 4505 port 2222
-tester:w sock_def_readable exit tid 4505
+tester:w sock_def_readable enter tid: 4505 port=2222
+tester:w sock_def_readable exit tid: 4505
 ```
 
 Okay so the socket fired it's notification to wake up `epoll_wait` but did it work? Did `epoll_wait` actually return but somehow the GHC runtime did properly handle the event?
 
-I extend the script with probes for `epoll_wait`.
+I extended the script with probes for `epoll_wait`.
 
 ```c
 tracepoint:syscalls:sys_enter_epoll_wait
@@ -237,16 +238,16 @@ tracepoint:syscalls:sys_exit_epoll_wait
 }
 ```
 
-The `EventManager` runs a on a [bound thread](https://github.com/ghc/ghc/blob/6c59cc71dc20f26d5a6650b16a82faeae72f2065/libraries/base/GHC/Event/Thread.hs#L268) with a [specific name](https://github.com/ghc/ghc/blob/64ef4d7fb131f04769c6cab331af335bd87103ec/rts/Task.c#L482) so I filter `epoll_wait` calls using the name of the `EventManager` thread.
+The `EventManager` runs a on a [bound thread](https://github.com/ghc/ghc/blob/6c59cc71dc20f26d5a6650b16a82faeae72f2065/libraries/base/GHC/Event/Thread.hs#L268) with a [specific name](https://github.com/ghc/ghc/blob/64ef4d7fb131f04769c6cab331af335bd87103ec/rts/Task.c#L482) so I filtered `epoll_wait` calls using the name of the `EventManager` thread.
 
 I run everything again and get:
 
-```c
-tester:w sys_enter_epoll_wait tid 4760 fd=3
-tester:w sys_exit_epoll_wait tid 4760
-tester:w sys_enter_epoll_wait tid 4760 fd=3
-tester:w sys_exit_epoll_wait tid 4760
-tester:w sys_enter_epoll_wait tid 4760 fd=3
+```
+tester:w sys_enter_epoll_wait tid: 4760 fd=3
+tester:w sys_exit_epoll_wait tid: 4760
+tester:w sys_enter_epoll_wait tid: 4760 fd=3
+tester:w sys_exit_epoll_wait tid: 4760
+tester:w sys_enter_epoll_wait tid: 4760 fd=3
 ```
 
 The triple calls to `epoll_wait` are a [small optimization (hopefully)](https://github.com/ghc/ghc/blob/01b15b835a7555c501df862b4dc8cc8eaff86afc/libraries/base/GHC/Event/Manager.hs#L281) of the `EventManager` implementation to conserve OS threads. It's not important. The important piece is that we call `epoll_wait` but it never returns.
@@ -258,50 +259,50 @@ tracepoint:syscalls:sys_enter_epoll_ctl
 /comm == "tester:w"/
 {
   $event = (struct epoll_event*)args->event;
-  printf("sys_enter_epoll_ctl tid %d op=%d, fd=%d event_fd %d\n", tid, args->op, args->fd, $event->data);
+  printf("sys_enter_epoll_ctl tid: %d op=%d, fd=%d event_fd=%d\n", tid, args->op, args->fd, $event->data);
 }
 
 tracepoint:syscalls:sys_exit_epoll_ctl
 /comm == "tester:w"/
 {
-  printf("sys_exit_epoll_ctl tid %d return value %d\n", tid, args->ret);
+  printf("sys_exit_epoll_ctl tid: %d return value: %d\n", tid, args->ret);
 }
 
 ```
 
-Which gives:
+Which gave:
 
-```c
-sys_enter_epoll_ctl tid 5111 op=3, fd=13 event_fd 13
-sys_exit_epoll_ctl tid 5111 return value -2
-sys_enter_epoll_ctl tid 5111 op=1, fd=13 event_fd 13
-sys_exit_epoll_ctl tid 5111 return value 0
+```
+sys_enter_epoll_ctl tid: 5111 op=3, fd=13 event_fd=13
+sys_exit_epoll_ctl tid: 5111 return value: -2
+sys_enter_epoll_ctl tid: 5111 op=1, fd=13 event_fd=13
+sys_exit_epoll_ctl tid: 5111 return value: 0
 ```
 
-This is the expected sequence. The `epoll_ctl` successfully added a callback after modifying an existed one failed because it didn't exist.
+This is the [expected sequence](https://github.com/ghc/ghc/blob/1c2c2d3dfd4c36884b22163872feb87122b4528d/libraries/base/GHC/Event/EPoll.hsc#L93). The `epoll_ctl` successfully added a callback after failing to modify the callback because it didn't exist.
 
 There goes that theory.
 
-Not sure what was going I started to read the `epoll_wait` source. Not sure which code paths were executed I started to add more kprobes to see what `epoll_wait` was doing.
+Some what lost I started to read the `epoll_wait` source. To help understand which code paths were executed I added more kprobes to see what `epoll_wait` was doing.
 
 This when I noticed the following sequence:
 
 ```
-tester:w sock_def_readable enter tid 5902 port 2222
-tester:w sock_def_readable exit tid 5902
-tester:w sys_enter_recvfrom tid 5902 fd 13
-tester:w sys_exit_recvfrom tid 5902 message C\x00\x00\x00\x0bNOTIFY\x00A\x00\x00\x00\x14\x00\x00\x17 channel\x00hi!\x00Z\x00\x00\x00\x05I ret 39
-tester:w kprobe:ep_send_events_proc tid 5900
-tester:w kprobe:ep_item_poll.isra.0 tid 5900
-tester:w kretprobe:ep_item_poll.isra.0 tid 5900
-tester:w kretprobe:ep_send_events_proc tid 5900
+tester:w sock_def_readable enter tid: 5902 port=2222
+tester:w sock_def_readable exit tid: 5902
+tester:w sys_enter_recvfrom tid: 5902 fd=13
+tester:w sys_exit_recvfrom tid: 5902 message=C\x00\x00\x00\x0bNOTIFY\x00A\x00\x00\x00\x14\x00\x00\x17 channel\x00hi!\x00Z\x00\x00\x00\x05I return value: 39
+tester:w kprobe:ep_send_events_proc tid: 5900
+tester:w kprobe:ep_item_poll.isra.0 tid: 5900
+tester:w kretprobe:ep_item_poll.isra.0 tid: 5900
+tester:w kretprobe:ep_send_events_proc tid: 5900
 ```
 
 > Notice the funny name for the kprobe `ep_item_poll.isra.0`. I don't know what this is about but a technique to discover what name I should use for some kernel functions that at first fail is to use a wildcard. So I used the probe name `ep_item_pol*`. Now that I know the name I can just use `ep_item_poll.isra.0`
 
 When the test would pass the sequeuence was similar but would end with `epoll_wait` returning.
 
-[Looking at the code](https://github.com/torvalds/linux/blob/65759097d804d2a9ad2b687db436319704ba7019/fs/eventpoll.c#L1944) it seemed like the `epoll_wait` thread woke up and check to see what the events were and then went back to sleep.
+[Looking at the code](https://github.com/torvalds/linux/blob/65759097d804d2a9ad2b687db436319704ba7019/fs/eventpoll.c#L1944) it seemed like the `epoll_wait` thread would wake up and check to see what the events were available and then go back to sleep if it could not find one.
 
 What can clear out events? Closing a file descriptor could.
 
@@ -341,24 +342,28 @@ At which point `epoll_wait` would not return because the socket was not ready fo
 
 # All Lies
 
-This is cleaned version of the steps I took. It's not really in order. In reality, I started by ignoring the problem and convincing myself it couldn't affect me. Then I tried to use DTrace and failed. DTrace never seems to work well on Macs. So I moved to Linux and recompiled GHC and added tracing to the `EventManager` and dumped the eventlog.
+This is cleaned up version of the steps I took. It's not really in order. In reality, I started by ignoring the problem and convincing myself it couldn't affect me. Then I tried to use DTrace and failed. DTrace never seems to work well on Macs. So I moved to Linux and recompiled GHC and added tracing to the `EventManager` and dumped the eventlog.
 
-I decided this was an oppurtunity to read ["BPF Performance Tools"](http://www.brendangregg.com/bpf-performance-tools-book.html) and it was helpful. I starting to dive through the Linux network stack using the `bpftrace`'s `kstack` call to understand the sequences of functions for sending and recieving data on localhost. I learned a lot. It was very interesting. It was an inefficent way to solve this bug.
+I decided this was an opportunity to read ["BPF Performance Tools"](http://www.brendangregg.com/bpf-performance-tools-book.html) and it was helpful. I wandered through the Linux network stack using the `bpftrace`'s `kstack` call to understand the sequences of functions for sending and recieving data on localhost. I learned a lot. It was very interesting. It was an inefficent way to solve this bug.
 
-I made a bunch of wrong turns but steps above are what ulimately helped after I tried many things that didn't.
+I made a bunch of wrong turns but steps above are what ulimately helped after I tried many things that didn't. I got lucky finding `tcp_poll`. In the retrospect debugging with kernel symbols might have been a better approach. Something to try next time.
 
-# Finally Words on PostgreSQL Notifications.
+# Final Words on PostgreSQL Notifications.
 
-Back the bug that started this all.
+Back to the bug that started this all.
 
 Now that I understand the mechanics of the issue can the bug be fixed?
 
-There are two ways to avoid the bug that I see.
+I see two ways to avoid the bug `hasql-notification` has.
 
-One is two use a simpler implementation of waiting for a PostgreSQL notification, which assumes the connection used for waiting will not be used for anything else. This is the approach I took with [`libpq-postgresql-notify`](https://hackage.haskell.org/package/postgresql-libpq-notify).
+One is two use a simpler implementation which assumes the connection used for waiting will not be used for anything else. This is the approach I took with [`libpq-postgresql-notify`](https://hackage.haskell.org/package/postgresql-libpq-notify).
 
 `lpsmith`'s original notification design is very clever. It is written in a way where it, in theory, can wait for a notification while freeing the connection up for other operations.
 
-However due to the semantics of `threadWaitRead`, we have to be very careful no calls to `recvfrom` are made without `epoll_wait` returning first. It might be possible to do this using the approach `cocreature` developed where a `threadWaitRead` is placed between calls to `sendQuery` and `getResult`. However care will have to be taken to do the same with `consumeInput` or anythiing else that can call `recvfrom` on the connection anywhere inside the `libpq` codebase. I don't have enough `libpq` mastery to know for sure this approach will succeed but I'm hopeful.
+However due to the semantics of `threadWaitRead` we have to be very careful no calls to `recvfrom` are made without `epoll_wait` returning first. It might be possible to do this using the a similar approach to one `cocreature` developed.
 
-Now, back to releasing `hasql-queue`.
+I think one would need to call `threadWaitReadSTM` *before* a call to `sendQuery` and then *wait* on it after the `sendQuery` call and before a call to `getResult`. I'm not positive this eliminates all races between the query thread and the notification, but otherwise one might block before `getResult` forever. Also care will have to be taken to do the same with `consumeInput` or anythiing else that can call `recvfrom` on the connection anywhere inside the `libpq` codebase.
+
+This solution seems possible but easy to mess up.
+
+Something to think about more in the future, back to releasing `hasql-queue`.
