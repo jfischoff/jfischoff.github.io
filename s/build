@@ -17,3 +17,4 @@ pandoc --template=GitHub.html5 data/blog/development-notes-01-05-20.md -o blog/d
 pandoc --template=GitHub.html5 data/blog/development-notes-01-06-20.md -o blog/development-notes-01-06-20.html --metadata title='Development Notes: January 6th 2020'
 pandoc --template=GitHub.html5 data/blog/development-notes-01-10-20.md -o blog/development-notes-01-10-20.html --metadata title='Development Notes: January 10th 2020'
 pandoc --template=GitHub.html5 data/blog/development-notes-01-11-20.md -o blog/development-notes-01-11-20.html --metadata title='Development Notes: January 11th 2020'
+pandoc --template=GitHub.html5 data/blog/when-threadwaitread-doesnt.md -o blog/when-threadwaitread-doesnt.html --metadata title="When threadWaitRead Doesn't or the Subtle Semantics of epoll_wait"
