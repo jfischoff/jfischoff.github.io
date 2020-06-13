@@ -205,7 +205,9 @@ kretprobe:sock_def_readable
 }
 ```
 
-There isn't a tracepoint for `sock_def_readable` but since it is a kernel function, and we can trace almost any kernel with a [`kprobe`](https://lwn.net/Articles/132196/). Unlike tracepoints there isn't a format file. The arguments are all positional, hence the `arg0` for the first argument. To learn the arguments one must look at the Linux source.
+There isn't a tracepoint for `sock_def_readable` but since it is a kernel function, and we can trace almost any kernel with a [`kprobe`](https://lwn.net/Articles/132196/). Unlike `tracepoint`s there isn't a format file. The arguments are all positional, hence the `arg0` for the first argument. To learn the arguments one must look at the Linux source.
+
+One advantage of `kprobe`s I've found is some complex function arguments of `tracepoint`s cannot be inspected (I don't know if this is a bug in `bpftrace` or what) but I can inspect the arguments of the `kprobe` counterparts.
 
 The first argument to `socket_def_readable` is a [`sock*`](https://github.com/torvalds/linux/blob/master/include/net/sock.h#L346) but we can also cast it a [`inet_sock*`](https://github.com/torvalds/linux/blob/master/include/net/inet_sock.h#L195) (for some reason I find this works better to get the destination port. Also you can get the source port this way).
 
@@ -298,7 +300,7 @@ tester:w kretprobe:ep_item_poll.isra.0 tid: 5900
 tester:w kretprobe:ep_send_events_proc tid: 5900
 ```
 
-> Notice the funny name for the kprobe `ep_item_poll.isra.0`. I don't know what this is about but a technique to discover what name I should use for some kernel functions that at first fail is to use a wildcard. So I used the probe name `ep_item_pol*`. Now that I know the name I can just use `ep_item_poll.isra.0`
+> Notice the funny name for the kprobe `ep_item_poll.isra.0`? I don't know what this is about but a technique I use to discover the real name of kernel functions that at first fail is to use a wildcard. So I used the probe name `ep_item_pol*`. Now that I know the name I can just use `ep_item_poll.isra.0`
 
 When the test would pass the sequeuence was similar but would end with `epoll_wait` returning.
 
