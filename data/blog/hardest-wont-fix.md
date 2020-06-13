@@ -211,7 +211,7 @@ One advantage of `kprobe`s I've found is some complex function arguments of `tra
 
 The first argument to `socket_def_readable` is a [`sock*`](https://github.com/torvalds/linux/blob/master/include/net/sock.h#L346) but we can also cast it a [`inet_sock*`](https://github.com/torvalds/linux/blob/master/include/net/inet_sock.h#L195) (for some reason I find this works better to get the destination port. Also you can get the source port this way).
 
-By using `#include` to bring into scope definition of structs one can cast arguments in kprobes and then inspect the fields of the structs.
+By using `#include` to bring into scope definition of structs one can cast arguments in `kprobe`s and then inspect the fields of the structs.
 
 I had to convert the port from big to little endian. That is what the bit shifting is about. At the time of writing this blog these `bpftrace` operators are still undocumented.
 
@@ -254,7 +254,7 @@ tester:w sys_enter_epoll_wait tid: 4760 fd=3
 
 The triple calls to `epoll_wait` are a [small optimization (hopefully)](https://github.com/ghc/ghc/blob/01b15b835a7555c501df862b4dc8cc8eaff86afc/libraries/base/GHC/Event/Manager.hs#L281) of the `EventManager` implementation to conserve OS threads. It's not important. The important piece is that we call `epoll_wait` but it never returns.
 
-Okay so time to verify some assumptions. Was the file descriptor ready event actually registered? The registeration requires a call to [`epoll_ctl`](https://man7.org/linux/man-pages/man2/epoll_ctl.2.html). Time for more probes:
+Okay so time to verify some assumptions. Was the file descriptor ready event actually registered? The registeration requires a call to [`epoll_ctl`](https://man7.org/linux/man-pages/man2/epoll_ctl.2.html). I was time for more probes:
 
 ```c
 tracepoint:syscalls:sys_enter_epoll_ctl
@@ -366,6 +366,6 @@ However due to the semantics of `threadWaitRead` we have to be very careful no c
 
 I think one would need to call `threadWaitReadSTM` *before* a call to `sendQuery` and then *wait* on it after the `sendQuery` call and before a call to `getResult`. I'm not positive this eliminates all races between the query thread and the notification, but otherwise one might block before `getResult` forever. Also care will have to be taken to do the same with `consumeInput` or anythiing else that can call `recvfrom` on the connection anywhere inside the `libpq` codebase.
 
-This solution seems possible but easy to mess up.
+The advantage of this solution is it is able to use connection resources more efficently. This solution seems possible but easy to mess up.
 
 Something to think about more in the future, back to releasing `hasql-queue`.
