@@ -283,7 +283,7 @@ This is the [expected sequence](https://github.com/ghc/ghc/blob/1c2c2d3dfd4c3688
 
 There goes that theory.
 
-Some what lost I started to read the `epoll_wait` source. To help understand which code paths were executed I added more kprobes to see what `epoll_wait` was doing.
+Somewhat lost I started to read the `epoll_wait` source. To help understand which code paths were executed I added more kprobes to see what `epoll_wait` was doing.
 
 This when I noticed the following sequence:
 
