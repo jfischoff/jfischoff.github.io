@@ -83,17 +83,17 @@ This line is:
 
 glosses over some important details.
 
-Event notification is a two step process. In the case of sockets, when new data is available the function [`socket_def_readable`](https://github.com/torvalds/linux/blob/cb8e59cc87201af93dfbb6c3dccc8fcad72a09c2/net/core/sock.c#L2900) is called. This causes the thread [`ep_poll`](https://github.com/torvalds/linux/blob/decd6167bf4f6bec1284006d0522381b44660df3/fs/eventpoll.c#L1820) was running on to wake up and [poll the socket](https://github.com/torvalds/linux/blob/decd6167bf4f6bec1284006d0522381b44660df3/fs/eventpoll.c#L887) to see what sort of events have occured. It does this by calling [`tcp_poll`](https://github.com/torvalds/linux/blob/a5ad5742f671de906adbf29fbedf0a04705cebad/net/ipv4/tcp.c#L499).
+Event notification is a two step process. In the case of sockets, when new data is available the function [`socket_def_readable`](https://github.com/torvalds/linux/blob/cb8e59cc87201af93dfbb6c3dccc8fcad72a09c2/net/core/sock.c#L2900) is called. This causes the thread [`ep_poll`](https://github.com/torvalds/linux/blob/decd6167bf4f6bec1284006d0522381b44660df3/fs/eventpoll.c#L1820) was running on to wake up and [polls the socket](https://github.com/torvalds/linux/blob/decd6167bf4f6bec1284006d0522381b44660df3/fs/eventpoll.c#L887) to see what sort of events have occured. It does this by calling [`tcp_poll`](https://github.com/torvalds/linux/blob/a5ad5742f671de906adbf29fbedf0a04705cebad/net/ipv4/tcp.c#L499).
 
 `tcp_poll` checks various properities of socket to determine if there are any ready events. To determine if there is data available for reading it calls [`tcp_stream_is_readable`](https://github.com/torvalds/linux/blob/a5ad5742f671de906adbf29fbedf0a04705cebad/net/ipv4/tcp.c#L476) which checks if there is any data in the recieve buffer to read.
 
 A consquence of this two step wake up and check process; if between the time of waking and checking the data is read from the socket by another thread, `ep_poll` will determine there are no events to return and go back to sleep. Thus `epoll_wait` might not return even if the socket recieves new data.
 
-This is exactly what occurs in the example `server`. Sometimes `recv` happens after data is on the socket but before `tcp_poll` is executed. When this occures the `threadWaitReadSTM` action (`waiter`) never returns.
+This is exactly what occurs in the example `server`. Sometimes `recv` happens after data is on the socket but before `tcp_poll` is executed via the `epoll_wait` path. When this occures the `threadWaitReadSTM` action (`waiter`) never returns.
 
 ## How I figured this out
 
-I discovered this tidbit of Linux trivia while trying to understanding this bug with [`hasql-notifications`](https://github.com/cocreature/hasql-notifications) which while adding notification support to [`hasql-queue`](https://github.com/jfischoff/hasql-queue), my PostgreSQL queue library.
+I discovered this tidbit of Linux trivia while trying to understanding this bug with [`hasql-notifications`](https://github.com/cocreature/hasql-notifications) while adding notification support to [`hasql-queue`](https://github.com/jfischoff/hasql-queue), my PostgreSQL queue library.
 
 ![issues](./hardest-wont-fix/issues.png)
 
