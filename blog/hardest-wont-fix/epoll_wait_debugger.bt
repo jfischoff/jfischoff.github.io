@@ -1,0 +1,123 @@
+#include <net/inet_sock.h>
+#include <net/sock.h>
+
+kprobe:sock_def_readable
+{
+  $inet_sock = (struct inet_sock *)arg0;
+  $dport = (($inet_sock->inet_dport & 0xFF) << 8) | ($inet_sock->inet_dport >> 8);
+  printf("%s sock_def_readable enter tid: %d port=%d\n", comm, tid, $dport);
+}
+
+kretprobe:sock_def_readable
+{
+   printf("%s sock_def_readable exit tid: %d\n", comm, tid);
+}
+
+tracepoint:syscalls:sys_enter_recvfrom
+{
+    printf("%s sys_enter_recvfrom tid: %d fd=%d\n", comm, tid, args->fd);
+    @sys_enter_recvfrom[tid] = args->ubuf
+}
+
+tracepoint:syscalls:sys_exit_recvfrom
+{
+  printf("%s sys_enter_recvfrom tid: %d message=%r return value: %d\n", comm, tid, buf(@sys_enter_recvfrom[tid], args->ret), args->ret);
+}
+
+tracepoint:syscalls:sys_enter_epoll_wait
+/comm == "tester:w"/
+{
+  printf("tester:w sys_enter_epoll_wait tid: %d fd=%d\n", tid, args->epfd);
+}
+
+tracepoint:syscalls:sys_exit_epoll_wait
+/comm == "tester:w"/
+{
+  printf("tester:w sys_exit_epoll_wait tid: %d\n", tid);
+}
+
+tracepoint:syscalls:sys_enter_epoll_ctl
+/comm == "tester:w"/
+{
+  $event = (struct epoll_event*)args->event;
+  printf("tester:w sys_enter_epoll_ctl tid: %d op=%d, fd=%d event_fd=%d\n", tid, args->op, args->fd, $event->data);
+}
+
+tracepoint:syscalls:sys_exit_epoll_ctl
+/comm == "tester:w"/
+{
+  printf("tester:w sys_exit_epoll_ctl tid: %d return value: %d\n", tid, args->ret);
+}
+
+kprobe:do_epoll_wait
+/comm == "tester:w"/
+{
+  @do_epoll_wait[tid] = (struct epoll_event*)arg1;
+  printf("tester:w do_epoll_wait tid: %d\n", tid);
+}
+
+kretprobe:do_epoll_wait
+/comm == "tester:w"/
+{
+  $events = (struct epoll_event*)@do_epoll_wait[tid];
+
+  printf("tester:w do_epoll_wait return tid: %d\n", tid);
+  $i=0;
+  unroll(2)
+  {
+    printf("event%d flags=%d fd=%d\n", $i,  ((struct epoll_event*)(((int64)$events)+(12*$i)))->events,
+      ((struct epoll_event*)(((int64)$events)+(12*$i)))->data);
+    $i = $i + 1;
+  }
+}
+
+kprobe:ep_item_pol*
+/comm == "tester:w"/
+{
+  printf("tester:w %s tid: %d\n", probe, tid);
+}
+kretprobe:ep_item_pol*
+/comm == "tester:w"/
+{
+  printf("tester:w %s tid: %d\n", probe, tid);
+}
+
+kprobe:ep_poll
+/comm == "tester:w"/
+{
+  printf("tester:w ep_poll tid: %d \n", tid);
+}
+kretprobe:ep_poll
+/comm == "tester:w"/
+{
+  printf("%s tid: %d \n", probe, tid);
+}
+
+kprobe:ep_send_event*
+/comm == "tester:w"/
+{
+  printf("%s tid: %d \n", probe, tid);
+}
+kretprobe:ep_send_event*
+/comm == "tester:w"/
+{
+  printf("%s\n tid: %d \n", probe, tid);
+}
+
+kprobe:tcp_poll
+/comm == "tester:w"/
+{
+  printf("tcp_poll tid: %d \n", tid);
+}
+
+kretprobe:tcp_poll
+/comm == "tester:w"/
+{
+  printf("tcp_poll tid: %d mask=%d \n", tid, retval);
+}
+
+END
+{
+  clear(@do_epoll_wait);
+  clear(@sys_enter_recvfrom);
+}
