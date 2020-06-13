@@ -1,6 +1,6 @@
 # Blog Entries
 
-- [When threadWaitRead Doesn't](blog/when-threadWaitRead-doesnt.html)
+- [When threadWaitRead Doesn't](blog/when-threadwaitread-doesnt.html)
 - [Development Notes: January 11th 2020](blog/development-notes-01-11-20.html)
 - [Development Notes: January 10th 2020](blog/development-notes-01-10-20.html)
 - [Development Notes: January 6th 2020](blog/development-notes-01-06-20.html)
