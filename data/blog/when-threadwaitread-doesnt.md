@@ -357,9 +357,10 @@ One is two use a simpler implementation which assumes the connection used for wa
 
 `lpsmith`'s original notification design is very clever. It is written in a way where it, in theory, can wait for a notification while freeing the connection up for other operations.
 
-However due to the semantics of `threadWaitRead` we have to be very careful no calls to `recvfrom` are made without `epoll_wait` returning first. It might be possible to do this using a similar approach to one `cocreature` developed.
+However due to the semantics of `threadWaitRead` we have to be very careful no calls to `recvfrom` are made without `epoll_wait` returning first. It might be possible to do this using a similar approach to one `cocreature` developed (which I know realize is how `postgresql-simple` works as well).
 
-I think one would need to call `threadWaitReadSTM` *before* a call to `sendQuery` and then *wait* on it after the `sendQuery` call and before a call to `getResult`. I'm not positive this eliminates all races between the query thread and the notification thread. Otherwise one might block before `getResult` forever. Also care will have to be taken to do the same with `consumeInput` or anythiing else that can call `recvfrom` on the connection anywhere inside the `libpq` codebase.
+Update:
+I think calling `threadWaitRead` between `sendQuery` and `getResult` the way `postgresql-simple` does will solve the issue, assuming connection a lock is held for the duration of both calls.
 
 The advantage of this solution is it is able to use connection resources more efficiently. This solution seems possible but easy to mess up.
 
