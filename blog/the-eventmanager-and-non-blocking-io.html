@@ -175,7 +175,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-8"><a href="#cb4-8"></a>        <span class="kw">else</span></span>
 <span id="cb4-9"><a href="#cb4-9"></a>          throwErrno loc</span>
 <span id="cb4-10"><a href="#cb4-10"></a>      x <span class="ot">-&gt;</span> <span class="fu">pure</span> x</span></code></pre></div>
-<p>I don’t think this code compiles. I expanded some function and simplified the actual function from <code>network</code> (and if it does it is not production ready look at <a href="https://github.com/haskell/network/blob/master/Network/Socket/Buffer.hsc#L114">recvBuf</a> for a real example) but I think it gives the general idea.</p>
+<p>I don’t think this code compiles. I expanded some function and simplified the actual function from <code>network</code> (and if it does it is not production ready look at <a href="https://github.com/haskell/network/blob/master/Network/Socket/Buffer.hsc#L114">recvBufFrom</a> for a real example) but I think it gives the general idea.</p>
 <p>You call <code>c_recvfrom</code> and if the result is <code>-1</code> and the <code>errno</code> value is <code>EWOULDBLOCK</code> you call <code>threadWaitRead</code> which blocks until the socket is ready. Once <code>threadWaitRead</code> returns you try again.</p>
 <p>Yay! We get non-blocking IO under the hood but can program like we are making blocking IO calls.</p>
 </article>

@@ -71,7 +71,7 @@ len <- fix $ \next -> do
       x -> pure x
 ```
 
-I don't think this code compiles. I expanded some function and simplified the actual function from `network` (and if it does it is not production ready look at [recvBuf](https://github.com/haskell/network/blob/master/Network/Socket/Buffer.hsc#L114) for a real example) but I think it gives the general idea.
+I don't think this code compiles. I expanded some function and simplified the actual function from `network` (and if it does it is not production ready look at [recvBufFrom](https://github.com/haskell/network/blob/master/Network/Socket/Buffer.hsc#L114) for a real example) but I think it gives the general idea.
 
 You call `c_recvfrom` and if the result is `-1` and the `errno` value is `EWOULDBLOCK` you call `threadWaitRead` which blocks until the socket is ready. Once `threadWaitRead` returns you try again.
 
