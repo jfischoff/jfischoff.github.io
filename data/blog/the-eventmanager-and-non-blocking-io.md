@@ -8,7 +8,7 @@ In this way Haskell programmers get the best both worlds. They can write code in
 
 The key to implementing non-blocking IO in GHC starts with the `EventManager`.
 
-The `EventManager` has a very simple API. I want to focus on the most important function.
+The [`EventManager`](https://hackage.haskell.org/package/base-4.12.0.0/docs/GHC-Event.html) has a very simple API. I want to focus on the most important function.
 
 ```haskell
 registerFd :: EventManager -> IOCallback -> Fd -> Event -> Lifetime -> IO FdKey
