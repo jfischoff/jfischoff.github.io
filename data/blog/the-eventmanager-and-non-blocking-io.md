@@ -1,5 +1,3 @@
-# How the GHC RTS Utilizes Non-Blocking IO
-
 GHC RTS utilizes non-blocking IO efficently while providing blocking IO semantics.
 
 In this way Haskell programmers get the best both worlds. They can write code in straightforward way as though the IO calls have blocking semantics while they get the performance of non-blocking IO using a pool of worker OS threads.
