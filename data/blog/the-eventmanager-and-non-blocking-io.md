@@ -1,4 +1,4 @@
-# How the GHC Utilizes Non-Blocking IO
+# How the GHC RTS Utilizes Non-Blocking IO
 
 GHC RTS utilizes non-blocking IO efficently while providing blocking IO semantics.
 
