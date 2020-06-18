@@ -37,7 +37,7 @@ Registering interest in ready events is one piece of implementing non-blocking I
 
 Luckily for the `EventManager` implementators GHC already had a preemptive scheduler utilizing lightweight green threads. The scheduler takes care of running Haskell code on OS threads.
 
-To utilize the GHC green threads we need a function like `threadWaitSTM`
+To utilize the GHC green threads we need a function like [`threadWaitSTM`](http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.Event.Thread.html#threadWaitSTM)
 
 ```haskell
 threadWaitSTM :: Event -> Fd -> IO (STM (), IO ())
