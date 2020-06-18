@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+           "GitHub HTML5 Pandoc Template" v2.1 — by Tristano Ajmone           
+==============================================================================
+Copyright © Tristano Ajmone, 2017, MIT License (MIT). Project's home:
+
+- https://github.com/tajmone/pandoc-goodies
+
+The CSS in this template reuses source code taken from the following projects:
+
+- GitHub Markdown CSS: Copyright © Sindre Sorhus, MIT License (MIT):
+  https://github.com/sindresorhus/github-markdown-css
+
+- Primer CSS: Copyright © 2016-2017 GitHub Inc., MIT License (MIT):
+  http://primercss.io/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The MIT License 
+
+Copyright (c) Tristano Ajmone, 2017 (github.com/tajmone/pandoc-goodies)
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+Copyright (c) 2017 GitHub Inc.
+
+"GitHub Pandoc HTML5 Template" is Copyright (c) Tristano Ajmone, 2017, released
+under the MIT License (MIT); it contains readaptations of substantial portions
+of the following third party softwares:
+
+(1) "GitHub Markdown CSS", Copyright (c) Sindre Sorhus, MIT License (MIT).
+(2) "Primer CSS", Copyright (c) 2016 GitHub Inc., MIT License (MIT).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+==============================================================================-->
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Non-blocking IO and the EventManager</title>
+  <style type="text/css">
+@charset "UTF-8";.markdown-body{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;color:#24292e;font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:16px;line-height:1.5;word-wrap:break-word;box-sizing:border-box;min-width:200px;max-width:980px;margin:0 auto;padding:45px}.markdown-body a{color:#0366d6;background-color:transparent;text-decoration:none;-webkit-text-decoration-skip:objects}.markdown-body a:active,.markdown-body a:hover{outline-width:0}.markdown-body a:hover{text-decoration:underline}.markdown-body a:not([href]){color:inherit;text-decoration:none}.markdown-body strong{font-weight:600}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em;margin:.67em 0;padding-bottom:.3em;border-bottom:1px solid #eaecef}.markdown-body h2{padding-bottom:.3em;font-size:1.5em;border-bottom:1px solid #eaecef}.markdown-body h3{font-size:1.25em}.markdown-body h4{font-size:1em}.markdown-body h5{font-size:.875em}.markdown-body h6{font-size:.85em;color:#6a737d}.markdown-body img{border-style:none}.markdown-body svg:not(:root){overflow:hidden}.markdown-body hr{box-sizing:content-box;height:.25em;margin:24px 0;padding:0;overflow:hidden;background-color:#e1e4e8;border:0}.markdown-body hr::before{display:table;content:""}.markdown-body hr::after{display:table;clear:both;content:""}.markdown-body input{margin:0;overflow:visible;font:inherit;font-family:inherit;font-size:inherit;line-height:inherit}.markdown-body [type=checkbox]{box-sizing:border-box;padding:0}.markdown-body *{box-sizing:border-box}.markdown-body blockquote{margin:0}.markdown-body ol,.markdown-body ul{padding-left:2em}.markdown-body ol ol,.markdown-body ul ol{list-style-type:lower-roman}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:0;margin-bottom:0}.markdown-body ol ol ol,.markdown-body ol ul ol,.markdown-body ul ol ol,.markdown-body ul ul ol{list-style-type:lower-alpha}.markdown-body li>p{margin-top:16px}.markdown-body li+li{margin-top:.25em}.markdown-body dd{margin-left:0}.markdown-body dl{padding:0}.markdown-body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:600}.markdown-body dl dd{padding:0 16px;margin-bottom:16px}.markdown-body code{font-family:SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace}.markdown-body pre{font:12px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;word-wrap:normal}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin-top:0;margin-bottom:16px}.markdown-body blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}.markdown-body blockquote>:first-child{margin-top:0}.markdown-body blockquote>:last-child{margin-bottom:0}.markdown-body table{display:block;width:100%;overflow:auto;border-spacing:0;border-collapse:collapse}.markdown-body table th{font-weight:600}.markdown-body table td,.markdown-body table th{padding:6px 13px;border:1px solid #dfe2e5}.markdown-body table tr{background-color:#fff;border-top:1px solid #c6cbd1}.markdown-body table tr:nth-child(2n){background-color:#f6f8fa}.markdown-body img{max-width:100%;box-sizing:content-box;background-color:#fff}.markdown-body code{padding:.2em 0;margin:0;font-size:85%;background-color:rgba(27,31,35,.05);border-radius:3px}.markdown-body code::after,.markdown-body code::before{letter-spacing:-.2em;content:" "}.markdown-body pre>code{padding:0;margin:0;font-size:100%;word-break:normal;white-space:pre;background:0 0;border:0}.markdown-body .highlight{margin-bottom:16px}.markdown-body .highlight pre{margin-bottom:0;word-break:normal}.markdown-body .highlight pre,.markdown-body pre{padding:16px;overflow:auto;font-size:85%;line-height:1.45;background-color:#f6f8fa;border-radius:3px}.markdown-body pre code{display:inline;max-width:auto;padding:0;margin:0;overflow:visible;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}.markdown-body pre code::after,.markdown-body pre code::before{content:normal}.markdown-body .full-commit .btn-outline:not(:disabled):hover{color:#005cc5;border-color:#005cc5}.markdown-body kbd{box-shadow:inset 0 -1px 0 #959da5;display:inline-block;padding:3px 5px;font:11px/10px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;color:#444d56;vertical-align:middle;background-color:#fcfcfc;border:1px solid #c6cbd1;border-bottom-color:#959da5;border-radius:3px;box-shadow:inset 0 -1px 0 #959da5}.markdown-body :checked+.radio-label{position:relative;z-index:1;border-color:#0366d6}.markdown-body .task-list-item{list-style-type:none}.markdown-body .task-list-item+.task-list-item{margin-top:3px}.markdown-body .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}.markdown-body::before{display:table;content:""}.markdown-body::after{display:table;clear:both;content:""}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.Alert,.Error,.Note,.Success,.Warning{padding:11px;margin-bottom:24px;border-style:solid;border-width:1px;border-radius:4px}.Alert p,.Error p,.Note p,.Success p,.Warning p{margin-top:0}.Alert p:last-child,.Error p:last-child,.Note p:last-child,.Success p:last-child,.Warning p:last-child{margin-bottom:0}.Alert{color:#246;background-color:#e2eef9;border-color:#bac6d3}.Warning{color:#4c4a42;background-color:#fff9ea;border-color:#dfd8c2}.Error{color:#911;background-color:#fcdede;border-color:#d2b2b2}.Success{color:#22662c;background-color:#e2f9e5;border-color:#bad3be}.Note{color:#2f363d;background-color:#f6f8fa;border-color:#d5d8da}.Alert h1,.Alert h2,.Alert h3,.Alert h4,.Alert h5,.Alert h6{color:#246;margin-bottom:0}.Warning h1,.Warning h2,.Warning h3,.Warning h4,.Warning h5,.Warning h6{color:#4c4a42;margin-bottom:0}.Error h1,.Error h2,.Error h3,.Error h4,.Error h5,.Error h6{color:#911;margin-bottom:0}.Success h1,.Success h2,.Success h3,.Success h4,.Success h5,.Success h6{color:#22662c;margin-bottom:0}.Note h1,.Note h2,.Note h3,.Note h4,.Note h5,.Note h6{color:#2f363d;margin-bottom:0}.Alert h1:first-child,.Alert h2:first-child,.Alert h3:first-child,.Alert h4:first-child,.Alert h5:first-child,.Alert h6:first-child,.Error h1:first-child,.Error h2:first-child,.Error h3:first-child,.Error h4:first-child,.Error h5:first-child,.Error h6:first-child,.Note h1:first-child,.Note h2:first-child,.Note h3:first-child,.Note h4:first-child,.Note h5:first-child,.Note h6:first-child,.Success h1:first-child,.Success h2:first-child,.Success h3:first-child,.Success h4:first-child,.Success h5:first-child,.Success h6:first-child,.Warning h1:first-child,.Warning h2:first-child,.Warning h3:first-child,.Warning h4:first-child,.Warning h5:first-child,.Warning h6:first-child{margin-top:0}h1.title,p.subtitle{text-align:center}h1.title.followed-by-subtitle{margin-bottom:0}p.subtitle{font-size:1.5em;font-weight:600;line-height:1.25;margin-top:0;margin-bottom:16px;padding-bottom:.3em}div.line-block{white-space:pre-line}
+  </style>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<article class="markdown-body">
+<header>
+<h1 class="title">Non-blocking IO and the EventManager</h1>
+</header>
+<h1 id="how-the-ghc-utilizes-non-blocking-io">How the GHC Utilizes Non-Blocking IO</h1>
+<p>GHC RTS utilizes non-blocking IO efficently while providing blocking IO semantics.</p>
+<p>In this way Haskell programmers get the best both worlds. They can write code in straight forward way as though the IO calls have blocking semantics while they get the performance of non-blocking IO using a pool of worker OS threads.</p>
+<h2 id="a-quick-tour-of-the-eventmanager">A Quick Tour of the <code>EventManager</code></h2>
+<p>The key to implementing non-blocking IO in GHC starts with the <code>EventManager</code>.</p>
+<p>The <code>EventManager</code> has a very simple API. I want to focus on the most important function.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">registerFd ::</span> <span class="dt">EventManager</span> <span class="ot">-&gt;</span> <span class="dt">IOCallback</span> <span class="ot">-&gt;</span> <span class="dt">Fd</span> <span class="ot">-&gt;</span> <span class="dt">Event</span> <span class="ot">-&gt;</span> <span class="dt">Lifetime</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">FdKey</span></span></code></pre></div>
+<p>This function lets one express interest in file descriptor ready events. For instance one can register a callback that will get called when a file descriptor is ready for reading:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a>registerRead fd <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="dt">Just</span> ev <span class="ot">&lt;-</span> getSystemEventManager</span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">let</span> callback fdKey event <span class="ot">=</span> when (event <span class="op">==</span> evtRead) <span class="op">$</span> <span class="fu">putStrLn</span> <span class="st">&quot;Read Callback&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>  registerFd ev callback fd evtRead <span class="dt">OneShot</span></span></code></pre></div>
+<p>Using the function above “Read Callback” will get printed when there is data to read on a file descriptor. You can ignore the <code>OneShot</code> part. The event manager only supports <code>OneShot</code> callback semantics.</p>
+<p>This is a neat trick but is critically important when working with non-blocking file descriptors. Consider the POSIX function <code>recvfrom</code> which is to used to recieve bytes on a socket.</p>
+<p>In typical blocking IO usage, a call to <code>recvfrom</code> on an empty socket with block the thread until data arrives in the socket recieve buffer. This not a problem by itself. However if one naively tried to make a server which used a separate thread for every connection it would be an inefficent use of OS threads.</p>
+<p>Non-blocking IO is useful because it faciliates a pattern of servicing a large number of sockets using a much smaller pool of threads. When one calls <code>recvfrom</code> on a non-blocking empty socket it returns <code>-1</code> and sets the <code>errno</code> to <code>EWOULDBLOCK</code>.</p>
+<p>The OS is essentially telling us the socket is empty and we should call <code>recvfrom</code> later. We have a few options to call it again. We can poll the socket but doing so is inefficent or introduces unnecessary latency or both. A much better option is to register a callback to call when the socket is ready for reading.</p>
+<p>Registering interest in ready events is one piece of implementing non-blocking IO efficently but we still need a way to schedule the work on our pool of worker threads.</p>
+<p>Luckily for the <code>EventManager</code> implementators GHC already had a preemptive scheduler utilizing lightweight green threads. The scheduler takes care of running Haskell code on OS threads.</p>
+<p>To utilize the GHC green threads we need a function like <code>threadWaitSTM</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1"></a><span class="ot">threadWaitSTM ::</span> <span class="dt">Event</span> <span class="ot">-&gt;</span> <span class="dt">Fd</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">STM</span> (), <span class="dt">IO</span> ())</span>
+<span id="cb3-2"><a href="#cb3-2"></a>threadWaitSTM evt fd <span class="ot">=</span> mask_ <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>  m <span class="ot">&lt;-</span> newTVarIO <span class="dt">Nothing</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>  mgr <span class="ot">&lt;-</span> getSystemEventManager_</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  reg <span class="ot">&lt;-</span> registerFd mgr (\_ e <span class="ot">-&gt;</span> atomically (writeTVar m (<span class="dt">Just</span> e))) fd evt <span class="dt">M.OneShot</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="kw">let</span> waitAction <span class="ot">=</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>        <span class="kw">do</span> mevt <span class="ot">&lt;-</span> readTVar m</span>
+<span id="cb3-8"><a href="#cb3-8"></a>           <span class="kw">case</span> mevt <span class="kw">of</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>             <span class="dt">Nothing</span> <span class="ot">-&gt;</span> retry</span>
+<span id="cb3-10"><a href="#cb3-10"></a>             <span class="dt">Just</span> evt&#39; <span class="ot">-&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>               <span class="kw">if</span> evt&#39; <span class="ot">`eventIs`</span> evtClose</span>
+<span id="cb3-12"><a href="#cb3-12"></a>               <span class="kw">then</span> throwSTM <span class="op">$</span> errnoToIOError <span class="st">&quot;threadWaitSTM&quot;</span> eBADF <span class="dt">Nothing</span> <span class="dt">Nothing</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>               <span class="kw">else</span> <span class="fu">return</span> ()</span>
+<span id="cb3-14"><a href="#cb3-14"></a>  <span class="fu">return</span> (waitAction, unregisterFd_ mgr reg <span class="op">&gt;&gt;</span> <span class="fu">return</span> ())</span></code></pre></div>
+<p><code>threadWaitSTM</code> uses <code>registerFd</code> to register a callback for an ready event and returns a <code>STM ()</code> action that will block until the event occurs. Crucially it will block the green thread but the OS thread will return to the schedulers pool to run other Haskell code.</p>
+<p>The scheduler is designed to wake up threads when the <code>STM ()</code> will no longer block. We can then use <code>threadWaitSTM</code> and related functions to write efficent non-blocking IO code. Here is an example inspired by the <code>network</code> package:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1"></a>len <span class="ot">&lt;-</span> fix <span class="op">$</span> \next <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  lenOrError <span class="ot">&lt;-</span> c_recvfrom fd ptr cnbytes flags ptr_sa ptr_len</span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="kw">case</span> lenOrError <span class="kw">of</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>      <span class="op">-</span><span class="dv">1</span> <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>        err <span class="ot">&lt;-</span> getErrno</span>
+<span id="cb4-6"><a href="#cb4-6"></a>        <span class="kw">if</span> err <span class="op">==</span> eWOULDBLOCK <span class="op">||</span> err <span class="op">==</span> eAGAIN <span class="kw">then</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>          threadWaitRead (<span class="fu">fromIntegral</span> fd) <span class="op">&gt;&gt;</span> next</span>
+<span id="cb4-8"><a href="#cb4-8"></a>        <span class="kw">else</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>          throwErrno loc</span>
+<span id="cb4-10"><a href="#cb4-10"></a>      x <span class="ot">-&gt;</span> <span class="fu">pure</span> x</span></code></pre></div>
+<p>I don’t think this code compiles. I expanded some function and simplified the actual function from <code>network</code> (and if it does it is not production ready look at <a href="https://github.com/haskell/network/blob/master/Network/Socket/Buffer.hsc#L114">recvBuf</a> for a real example) but I think it gives the general idea.</p>
+<p>You call <code>c_recvfrom</code> and if the result is <code>-1</code> and the <code>errno</code> value is <code>EWOULDBLOCK</code> you call <code>threadWaitRead</code> which blocks until the socket is ready. Once <code>threadWaitRead</code> returns you try again.</p>
+<p>Yay! We get non-blocking IO under the hood but can program like we are making blocking IO calls.</p>
+</article>
+</body>
+</html>
