@@ -132,7 +132,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 <h1 id="how-the-ghc-utilizes-non-blocking-io">How the GHC Utilizes Non-Blocking IO</h1>
 <p>GHC RTS utilizes non-blocking IO efficently while providing blocking IO semantics.</p>
-<p>In this way Haskell programmers get the best both worlds. They can write code in straight forward way as though the IO calls have blocking semantics while they get the performance of non-blocking IO using a pool of worker OS threads.</p>
+<p>In this way Haskell programmers get the best both worlds. They can write code in straightforward way as though the IO calls have blocking semantics while they get the performance of non-blocking IO using a pool of worker OS threads.</p>
 <h2 id="a-quick-tour-of-the-eventmanager">A Quick Tour of the <code>EventManager</code></h2>
 <p>The key to implementing non-blocking IO in GHC starts with the <code>EventManager</code>.</p>
 <p>The <code>EventManager</code> has a very simple API. I want to focus on the most important function.</p>
