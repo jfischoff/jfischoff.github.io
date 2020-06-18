@@ -130,7 +130,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header>
 <h1 class="title">Non-blocking IO and the EventManager</h1>
 </header>
-<h1 id="how-the-ghc-utilizes-non-blocking-io">How the GHC Utilizes Non-Blocking IO</h1>
+<h1 id="how-the-ghc-rts-utilizes-non-blocking-io">How the GHC RTS Utilizes Non-Blocking IO</h1>
 <p>GHC RTS utilizes non-blocking IO efficently while providing blocking IO semantics.</p>
 <p>In this way Haskell programmers get the best both worlds. They can write code in straightforward way as though the IO calls have blocking semantics while they get the performance of non-blocking IO using a pool of worker OS threads.</p>
 <h2 id="a-quick-tour-of-the-eventmanager">A Quick Tour of the <code>EventManager</code></h2>
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The OS is essentially telling us the socket is empty and we should call <code>recvfrom</code> later. We have a few options to call it again. We can poll the socket but doing so is inefficent or introduces unnecessary latency or both. A much better option is to register a callback to call when the socket is ready for reading.</p>
 <p>Registering interest in ready events is one piece of implementing non-blocking IO efficently but we still need a way to schedule the work on our pool of worker threads.</p>
 <p>Luckily for the <code>EventManager</code> implementators GHC already had a preemptive scheduler utilizing lightweight green threads. The scheduler takes care of running Haskell code on OS threads.</p>
-<p>To utilize the GHC green threads we need a function like <code>threadWaitSTM</code></p>
+<p>To utilize the GHC green threads we need a function like <a href="http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.Event.Thread.html#threadWaitSTM"><code>threadWaitSTM</code></a></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1"></a><span class="ot">threadWaitSTM ::</span> <span class="dt">Event</span> <span class="ot">-&gt;</span> <span class="dt">Fd</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">STM</span> (), <span class="dt">IO</span> ())</span>
 <span id="cb3-2"><a href="#cb3-2"></a>threadWaitSTM evt fd <span class="ot">=</span> mask_ <span class="op">$</span> <span class="kw">do</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a>  m <span class="ot">&lt;-</span> newTVarIO <span class="dt">Nothing</span></span>
