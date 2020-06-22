@@ -363,12 +363,13 @@ tester:w kretprobe:ep_send_events_proc tid: 5900</code></pre>
 <p>Back to the bug that started this all.</p>
 <p>Now that I understand the mechanics of the issue, can the bug be fixed?</p>
 <p>I see two ways to avoid the bug <code>hasql-notification</code> has.</p>
-<p>One is two use a simpler implementation which assumes the connection used for waiting will not be used for anything else. This is the approach I took with <a href="https://hackage.haskell.org/package/postgresql-libpq-notify"><code>libpq-postgresql-notify</code></a>.</p>
+<p>One is two use a simpler implementation which assumes the connection used for waiting will not be used for anything else. This is the approach I took with <a href="https://hackage.haskell.org/package/postgresql-libpq-notify"><code>postgresql-libpq-notify</code></a>.</p>
 <p><code>lpsmith</code>’s original notification design is very clever. It is written in a way where it, in theory, can wait for a notification while freeing the connection up for other operations.</p>
 <p>However due to the semantics of <code>threadWaitRead</code> we have to be very careful no calls to <code>recvfrom</code> are made without <code>epoll_wait</code> returning first. It might be possible to do this using a similar approach to one <code>cocreature</code> developed (which I know realize is how <code>postgresql-simple</code> works as well).</p>
 <p>Update: I think calling <code>threadWaitRead</code> between <code>sendQuery</code> and <code>getResult</code> the way <code>postgresql-simple</code> does will solve the issue, assuming connection a lock is held for the duration of both calls.</p>
 <p>The advantage of this solution is it is able to use connection resources more efficiently. This solution seems possible but easy to mess up.</p>
 <p>Something to think about more in the future.</p>
+<p><a href="../index.html">Home</a></p>
 </article>
 </body>
 </html>

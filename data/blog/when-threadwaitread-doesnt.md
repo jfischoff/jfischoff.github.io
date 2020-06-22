@@ -353,7 +353,7 @@ Now that I understand the mechanics of the issue, can the bug be fixed?
 
 I see two ways to avoid the bug `hasql-notification` has.
 
-One is two use a simpler implementation which assumes the connection used for waiting will not be used for anything else. This is the approach I took with [`libpq-postgresql-notify`](https://hackage.haskell.org/package/postgresql-libpq-notify).
+One is two use a simpler implementation which assumes the connection used for waiting will not be used for anything else. This is the approach I took with [`postgresql-libpq-notify`](https://hackage.haskell.org/package/postgresql-libpq-notify).
 
 `lpsmith`'s original notification design is very clever. It is written in a way where it, in theory, can wait for a notification while freeing the connection up for other operations.
 
@@ -365,3 +365,5 @@ I think calling `threadWaitRead` between `sendQuery` and `getResult` the way `po
 The advantage of this solution is it is able to use connection resources more efficiently. This solution seems possible but easy to mess up.
 
 Something to think about more in the future.
+
+[Home](../index.html)
