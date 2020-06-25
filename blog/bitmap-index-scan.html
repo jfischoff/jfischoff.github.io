@@ -67,7 +67,7 @@ SOFTWARE.
 <h1 class="title">What to Think When You See a Bitmap Index Scan</h1>
 </header>
 <p>Recently I was working on moving <code>hasql-queue</code> to partitioned tables. The performance degraded and I realized the plan was different.</p>
-<p>The new partition table version used a <a href=""><code>Bitmap Index Scan</code></a> while the old version used <code>Index Scan</code>. Also the new plans estimated row count was <code>35</code> while the old faster plan had an estimated row count of <code>1</code>.</p>
+<p>The new partition table version used a <code>Bitmap Index Scan</code> while the old version used <code>Index Scan</code>. Also the new plans estimated row count was <code>35</code> while the old faster plan had an estimated row count of <code>1</code>.</p>
 <p>I knew the <code>Bitmap Index Scan</code> was the problem but what about partitions would cause it to get used?</p>
 <p>I tried to channel my coworker Travis Staton. How would he reason about this?</p>
 <p>The <code>Bitmap Index Scan</code> occurs when the estimated row count is higher than a typical <code>Index Scan</code>. This means the index selectivity was lower.</p>

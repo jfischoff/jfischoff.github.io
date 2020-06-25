@@ -1,6 +1,6 @@
 Recently I was working on moving `hasql-queue` to partitioned tables. The performance degraded and I realized the plan was different.
 
-The new partition table version used a [`Bitmap Index Scan`]() while the old version used `Index Scan`. Also the new plans estimated row count was `35` while the old faster plan had an estimated row count of `1`.
+The new partition table version used a `Bitmap Index Scan` while the old version used `Index Scan`. Also the new plans estimated row count was `35` while the old faster plan had an estimated row count of `1`.
 
 I knew the `Bitmap Index Scan` was the problem but what about partitions would cause it to get used?
 
