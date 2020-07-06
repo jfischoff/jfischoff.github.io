@@ -26,13 +26,13 @@ enqueue :: E.Value a -> [a] -> Session ()
 dequeue :: D.Value a -> Int -> Session [a]
 ```
 
-The API has an [`enqueue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue) and a [`dequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue) function. Both `enqueue` and `dequeue` can operate on batches of elements. Additionally as is customary with `hasql` one must pass in the `Value a` for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the `postgresql-simple-queue` which used `jsonb` to store all payloads.
+The API has an [`enqueue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue) and a [`dequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue) function. Both `enqueue` and `dequeue` can operate on batches of elements. Additionally as is customary with `hasql` one must pass in the `Value a` for encoding and decoding the payloads. The ability to store arbitrary types is a performance improvement from the `postgresql-simple-queue` which used `jsonb` to store all payloads.
 
-Crucially the API's functions are in the `Session` monad. This is valuable because we can `dequeue` and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.
+Crucially, the API's functions are in the `Session` monad. This is valuable because we can `dequeue` and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message moved from one table to another table in the same database can be delivered exactly once.
 
 ### Schema
 
-For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the [`Hasql.Queue.Migrate`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html) module is provided.
+For the API to be useable, a compatible schema must exist in the database. To help create the necessary tables, the [`Hasql.Queue.Migrate`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html) module is provided.
 
 Here is the schema [`migrate`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html#v:migrate) creates:
 
@@ -53,15 +53,15 @@ Here is the schema [`migrate`](https://hackage.haskell.org/package/hasql-queue-1
     WHERE (state = 'enqueued');
 ```
 
-Notice the `valueType` must be passed in and match the `Value a` that is used in the API above. For instance for `Value Text` a `text` type should be used for `valueType`.
+Notice the `valueType` must be passed in and match the `Value a` that is used in the API above. For instance, for `Value Text` a `text` type should be used for `valueType`.
 
-For the high throughput API only the `enqueued` state is used (We will come back to `failed`).
+For the high throughput API, only the `enqueued` state is used (We will come back to `failed`).
 
-`postgresql-simple-queue` used to use a `timestamptz` to determine the oldest element to dequeue. However the performance of timestamps are slower to generate sequeuences of `int8`.
+`postgresql-simple-queue` used to use a `timestamptz` to determine the oldest element to dequeue. However, the performance of timestamps are slower to generate sequences of `int8`.
 
-Like `postgresql-simple-queue`, `hasql-queue` uses a partial index to track the `enqueued` elements. Unlike `postgresql-simple-queue` it creates the partial index correctly ... sigh.
+Like `postgresql-simple-queue`, `hasql-queue` uses a partial index to track the `enqueued` elements. Unlike `postgresql-simple-queue` it creates the partial index correctly...sigh.
 
-This is the minimal recommended schema. The actual `payloads` table one uses could have more columns in it but it needs these columns and related DDL statements at a minimum. For instance one could add a `created_at` timestamp or other columns.
+This is the minimal recommended schema. The actual `payloads` table one uses could have more columns in it, but it needs these columns and related DDL statements at a minimum. For instance, one could add a `created_at` timestamp or other columns.
 
 ### `enqueue`
 
@@ -71,14 +71,14 @@ Under the hood `enqueue` has seperate SQL statements for enqueing a batch and en
 INSERT INTO payloads (attempts, value)
 SELECT 0, * FROM unnest($1)
 ```
-where the argument `$1` is a an array of elements. However for a single element the following is used because it is faster:
+where the argument `$1` is a an array of elements. However, for a single element, the following is used because it is faster:
 
 ```sql
 INSERT INTO payloads (attempts, value)
 VALUES (0, $1)
 ```
 
-I have no idea why passing in `0` instead of using the default value is faster. Barely faster, like a few percent, but appears to be measurable.
+I have no idea why passing in `0` instead of using the default value is faster. It is barely faster, like a few percent, but appears to be measurable.
 
 ### `dequeue`
 
@@ -123,7 +123,7 @@ An alternative implementation I explored was to mark entries as `dequeued` and d
 
 The sql for the single element version is identical but instead of `$1` uses `1`. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the `1` and using a specialized version is slightly faster.
 
-Also we can get a simplier plan for the single element `dequeue`:
+Also we can get a simpler plan for the single element `dequeue`:
 
 ```
 Delete on payloads
@@ -154,7 +154,7 @@ Compare file sync methods using one 8kB write:
 
 This is on MacBook running Ubuntu in VM. These are way better numbers than what you'll see on most network drives, e.g. "the cloud".
 
-In otherwords if you have very cheap hardware on AWS you will not see numbers this high.
+In other words, if you have very cheap hardware on AWS you will not see numbers this high.
 
 The DB was seeded with 20,000 entries.
 
@@ -171,15 +171,15 @@ When looking at `atop` we can see the benchmark is IO bound. One would assume th
 
 ![atop](./introducing-hasql-queue/atop.png)
 
-These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I'm too lazy to make the batch benchmarks at the moment.
+These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficient but not always possible. I'm too lazy to make the batch benchmarks at the moment.
 
 # Low Throughput At Least Once API
 
-When the throughput of enqueuing is high it is most efficent to continously poll the database for more data. However if the throughput is low, polling is wasteful.
+When the throughput of enqueuing is high it is most efficient to continuously poll the database for more data. However if the throughput is low, polling is wasteful.
 
 The low throughput APIs utilize PostgreSQL notifications to allow for low latency responses without the resource usage of polling.
 
-Lets look at the "at least once" low through put API:
+Let's look at the "at least once" low throughput API:
 
 ```haskell
 enqueue :: Text
@@ -227,7 +227,7 @@ Instead of `dequeue` we have [`withDequeue`](https://hackage.haskell.org/package
 
 The reason `hasql-queue` gives up after some number of attempts is to prevent an error inducing entry from stopping dequeue progress.
 
-The `failed` payloads can be retrieved with `failures` function and permanently removed with the `delete` function.
+The `failed` payloads can be retrieved with the `failures` function and permanently removed with the `delete` function.
 
 # Benchmarks
 
@@ -242,14 +242,14 @@ The notification based APIs are based on the high throughput APIs and thus inher
 | 3| 3| 2117 | 1280 |
 | 2| 4| 1514 | 1758 |
 
-At some future point I should show what the CPU and IO load is of a small number of payloads using the low throughput API. This is real value of the low through put API: minimal load under moderate usage.
+At some future point I should show what the CPU and IO load is of a small number of payloads using the low throughput API. This is the real value of the low throughput API: minimal load under moderate usage.
 
 # Final Words and Future Work
 
-If you are using a `TQueue` in a webserver you might want to look at `hasql-queue`. Designing webservers so they are stateless and relying on a durable persistent state (a database) is great way improve the reliablity of your platform.
+If you are using a `TQueue` in a webserver you might want to look at `hasql-queue`. Designing webservers so they are stateless and relying on a durable persistent state (a database) is great way improve the reliability of your platform.
 
 `hasql-queue` might not be a fit for your use case, but I would not hesitate to look at the SQL and schema that is used and copy what works for your situtation.
 
-In the future I would like to provide an adaptive API that can choose between polling and notifications based on the level of traffic. Additionally including the notification in the payload could make the low throughput "at most once" a lot faster.
+In the future I would like to provide an adaptive API that can choose between polling and notifications based on the level of traffic. Additionally, including the notification in the payload could make the low throughput "at most once" a lot faster.
 
 [Home](../index.html)

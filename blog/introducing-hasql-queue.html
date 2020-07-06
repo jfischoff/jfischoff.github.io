@@ -144,10 +144,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">enqueue ::</span> <span class="dt">E.Value</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Session</span> ()</span>
 <span id="cb1-2"><a href="#cb1-2"></a></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="ot">dequeue ::</span> <span class="dt">D.Value</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Session</span> [a]</span></code></pre></div>
-<p>The API has an <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue"><code>enqueue</code></a> and a <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue"><code>dequeue</code></a> function. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
-<p>Crucially the API’s functions are in the <code>Session</code> monad. This is valuable because we can <code>dequeue</code> and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.</p>
+<p>The API has an <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue"><code>enqueue</code></a> and a <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue"><code>dequeue</code></a> function. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is a performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
+<p>Crucially, the API’s functions are in the <code>Session</code> monad. This is valuable because we can <code>dequeue</code> and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message moved from one table to another table in the same database can be delivered exactly once.</p>
 <h3 id="schema">Schema</h3>
-<p>For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html"><code>Hasql.Queue.Migrate</code></a> module is provided.</p>
+<p>For the API to be useable, a compatible schema must exist in the database. To help create the necessary tables, the <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html"><code>Hasql.Queue.Migrate</code></a> module is provided.</p>
 <p>Here is the schema <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html#v:migrate"><code>migrate</code></a> creates:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1"></a>  <span class="kw">CREATE</span> <span class="kw">TYPE</span> state_t <span class="kw">AS</span> ENUM (<span class="st">&#39;enqueued&#39;</span>, <span class="st">&#39;failed&#39;</span>);</span>
 <span id="cb2-2"><a href="#cb2-2"></a></span>
@@ -163,19 +163,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-12"><a href="#cb2-12"></a></span>
 <span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">CREATE</span> <span class="kw">INDEX</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> active_modified_at_idx <span class="kw">ON</span> payloads <span class="kw">USING</span> btree (modified_at, state)</span>
 <span id="cb2-14"><a href="#cb2-14"></a>    <span class="kw">WHERE</span> (state <span class="op">=</span> <span class="st">&#39;enqueued&#39;</span>);</span></code></pre></div>
-<p>Notice the <code>valueType</code> must be passed in and match the <code>Value a</code> that is used in the API above. For instance for <code>Value Text</code> a <code>text</code> type should be used for <code>valueType</code>.</p>
-<p>For the high throughput API only the <code>enqueued</code> state is used (We will come back to <code>failed</code>).</p>
-<p><code>postgresql-simple-queue</code> used to use a <code>timestamptz</code> to determine the oldest element to dequeue. However the performance of timestamps are slower to generate sequeuences of <code>int8</code>.</p>
-<p>Like <code>postgresql-simple-queue</code>, <code>hasql-queue</code> uses a partial index to track the <code>enqueued</code> elements. Unlike <code>postgresql-simple-queue</code> it creates the partial index correctly … sigh.</p>
-<p>This is the minimal recommended schema. The actual <code>payloads</code> table one uses could have more columns in it but it needs these columns and related DDL statements at a minimum. For instance one could add a <code>created_at</code> timestamp or other columns.</p>
+<p>Notice the <code>valueType</code> must be passed in and match the <code>Value a</code> that is used in the API above. For instance, for <code>Value Text</code> a <code>text</code> type should be used for <code>valueType</code>.</p>
+<p>For the high throughput API, only the <code>enqueued</code> state is used (We will come back to <code>failed</code>).</p>
+<p><code>postgresql-simple-queue</code> used to use a <code>timestamptz</code> to determine the oldest element to dequeue. However, the performance of timestamps are slower to generate sequences of <code>int8</code>.</p>
+<p>Like <code>postgresql-simple-queue</code>, <code>hasql-queue</code> uses a partial index to track the <code>enqueued</code> elements. Unlike <code>postgresql-simple-queue</code> it creates the partial index correctly…sigh.</p>
+<p>This is the minimal recommended schema. The actual <code>payloads</code> table one uses could have more columns in it, but it needs these columns and related DDL statements at a minimum. For instance, one could add a <code>created_at</code> timestamp or other columns.</p>
 <h3 id="enqueue"><code>enqueue</code></h3>
 <p>Under the hood <code>enqueue</code> has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> payloads (attempts, <span class="fu">value</span>)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="kw">SELECT</span> <span class="dv">0</span>, <span class="op">*</span> <span class="kw">FROM</span> unnest($<span class="dv">1</span>)</span></code></pre></div>
-<p>where the argument <code>$1</code> is a an array of elements. However for a single element the following is used because it is faster:</p>
+<p>where the argument <code>$1</code> is a an array of elements. However, for a single element, the following is used because it is faster:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> payloads (attempts, <span class="fu">value</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="kw">VALUES</span> (<span class="dv">0</span>, $<span class="dv">1</span>)</span></code></pre></div>
-<p>I have no idea why passing in <code>0</code> instead of using the default value is faster. Barely faster, like a few percent, but appears to be measurable.</p>
+<p>I have no idea why passing in <code>0</code> instead of using the default value is faster. It is barely faster, like a few percent, but appears to be measurable.</p>
 <h3 id="dequeue"><code>dequeue</code></h3>
 <p><code>dequeue</code> has the following SQL for batches:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">DELETE</span> <span class="kw">FROM</span> payloads</span>
@@ -205,7 +205,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
               Index Cond: (id = &quot;ANY_subquery&quot;.id)</code></pre>
 <p>An alternative implementation I explored was to mark entries as <code>dequeued</code> and drop table partitions instead of deleting. This is slightly faster but is much more complicated to manage so I decided against using it.</p>
 <p>The sql for the single element version is identical but instead of <code>$1</code> uses <code>1</code>. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the <code>1</code> and using a specialized version is slightly faster.</p>
-<p>Also we can get a simplier plan for the single element <code>dequeue</code>:</p>
+<p>Also we can get a simpler plan for the single element <code>dequeue</code>:</p>
 <pre><code>Delete on payloads
   InitPlan 1 (returns $2)
     -&gt;  Limit
@@ -225,7 +225,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         fsync_writethrough                              n/a
         open_sync                          6611.416 ops/sec     151 usecs/op</code></pre>
 <p>This is on MacBook running Ubuntu in VM. These are way better numbers than what you’ll see on most network drives, e.g. “the cloud”.</p>
-<p>In otherwords if you have very cheap hardware on AWS you will not see numbers this high.</p>
+<p>In other words, if you have very cheap hardware on AWS you will not see numbers this high.</p>
 <p>The DB was seeded with 20,000 entries.</p>
 <table>
 <thead>
@@ -279,11 +279,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <figure>
 <img src="./introducing-hasql-queue/atop.png" alt="" /><figcaption>atop</figcaption>
 </figure>
-<p>These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I’m too lazy to make the batch benchmarks at the moment.</p>
+<p>These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficient but not always possible. I’m too lazy to make the batch benchmarks at the moment.</p>
 <h1 id="low-throughput-at-least-once-api">Low Throughput At Least Once API</h1>
-<p>When the throughput of enqueuing is high it is most efficent to continously poll the database for more data. However if the throughput is low, polling is wasteful.</p>
+<p>When the throughput of enqueuing is high it is most efficient to continuously poll the database for more data. However if the throughput is low, polling is wasteful.</p>
 <p>The low throughput APIs utilize PostgreSQL notifications to allow for low latency responses without the resource usage of polling.</p>
-<p>Lets look at the “at least once” low through put API:</p>
+<p>Let’s look at the “at least once” low throughput API:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1"></a><span class="ot">enqueue ::</span> <span class="dt">Text</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>        <span class="co">-- ^ Notification channel name. Any valid PostgreSQL identifier</span></span>
 <span id="cb9-3"><a href="#cb9-3"></a>        <span class="ot">-&gt;</span> <span class="dt">Connection</span></span>
@@ -323,7 +323,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Instead of <code>dequeue</code> we have <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Low-AtLeastOnce.html#v:withDequeue"><code>withDequeue</code></a>. <code>withDequeue</code> uses a transaction and savepoints to rollback the effect of dequeueing if the <code>IO b</code> action throws an exception. <code>withDequeue</code> will not complete the dequeue operation unless the <code>IO b</code> action finishes successfully. Instead, <code>withDequeue</code> will retry the <code>IO b</code> up to a max amount if an <code>IOError</code> exception occurs. <code>withDequeue</code> will record each attempt and if the max amount is hit will set the entry’s state to <code>failed</code>.</p>
 <p><code>withDequeue</code> could end up dequeueing the same element multiple times, so whatever system one is coordinating with must have a mechanism for dealing with duplicated payloads.</p>
 <p>The reason <code>hasql-queue</code> gives up after some number of attempts is to prevent an error inducing entry from stopping dequeue progress.</p>
-<p>The <code>failed</code> payloads can be retrieved with <code>failures</code> function and permanently removed with the <code>delete</code> function.</p>
+<p>The <code>failed</code> payloads can be retrieved with the <code>failures</code> function and permanently removed with the <code>delete</code> function.</p>
 <h1 id="benchmarks-1">Benchmarks</h1>
 <p>The notification based APIs are based on the high throughput APIs and thus inherit the same optimized plans. However using notification introduces overhead as one can see in the following benchmarks.</p>
 <table>
@@ -374,11 +374,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
-<p>At some future point I should show what the CPU and IO load is of a small number of payloads using the low throughput API. This is real value of the low through put API: minimal load under moderate usage.</p>
+<p>At some future point I should show what the CPU and IO load is of a small number of payloads using the low throughput API. This is the real value of the low throughput API: minimal load under moderate usage.</p>
 <h1 id="final-words-and-future-work">Final Words and Future Work</h1>
-<p>If you are using a <code>TQueue</code> in a webserver you might want to look at <code>hasql-queue</code>. Designing webservers so they are stateless and relying on a durable persistent state (a database) is great way improve the reliablity of your platform.</p>
+<p>If you are using a <code>TQueue</code> in a webserver you might want to look at <code>hasql-queue</code>. Designing webservers so they are stateless and relying on a durable persistent state (a database) is great way improve the reliability of your platform.</p>
 <p><code>hasql-queue</code> might not be a fit for your use case, but I would not hesitate to look at the SQL and schema that is used and copy what works for your situtation.</p>
-<p>In the future I would like to provide an adaptive API that can choose between polling and notifications based on the level of traffic. Additionally including the notification in the payload could make the low throughput “at most once” a lot faster.</p>
+<p>In the future I would like to provide an adaptive API that can choose between polling and notifications based on the level of traffic. Additionally, including the notification in the payload could make the low throughput “at most once” a lot faster.</p>
 <p><a href="../index.html">Home</a></p>
 </article>
 </body>
