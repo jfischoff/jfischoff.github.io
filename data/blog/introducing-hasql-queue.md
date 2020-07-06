@@ -14,7 +14,7 @@ You would use "at least once" semantics if you are dequeuing elements and want t
 
 `hasql-queue` "exactly once" APIs could be used to move elements from the queue's ingress table to a final collection of tables in the same database.
 
-Out of the six version the "at least once" notifications based API is probably the most useful.
+Out of the six versions the "at least once" notifications based API is probably the most useful.
 
 ## The High Throughput API
 

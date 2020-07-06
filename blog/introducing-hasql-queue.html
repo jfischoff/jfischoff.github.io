@@ -138,7 +138,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>You would use the “at most once” API if you are dequeuing items and sending them over an unreliable channel or if the messages are time sensitive and you can afford lost messages.</p>
 <p>You would use “at least once” semantics if you are dequeuing elements and want to make sure they are received by another system before they are removed from the queue.</p>
 <p><code>hasql-queue</code> “exactly once” APIs could be used to move elements from the queue’s ingress table to a final collection of tables in the same database.</p>
-<p>Out of the six version the “at least once” notifications based API is probably the most useful.</p>
+<p>Out of the six versions the “at least once” notifications based API is probably the most useful.</p>
 <h2 id="the-high-throughput-api">The High Throughput API</h2>
 <p>The high throughput “exactly once” API is the basis of all the other APIs. It has the following functions.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">enqueue ::</span> <span class="dt">E.Value</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Session</span> ()</span>
