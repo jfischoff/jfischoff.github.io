@@ -1,4 +1,5 @@
 # Blog Entries
+- [Introducing `hasql-queue`](blog/introducing-hasql-queue.html)
 - [What to Think When You See a `Bitmap Index Scan`](blog/bitmap-index-scan.html)
 - [Non-blocking IO and the EventManager](blog/the-eventmanager-and-non-blocking-io.html)
 - [When threadWaitRead Doesn't](blog/when-threadwaitread-doesnt.html)

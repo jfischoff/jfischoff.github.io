@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+           "GitHub HTML5 Pandoc Template" v2.1 — by Tristano Ajmone           
+==============================================================================
+Copyright © Tristano Ajmone, 2017, MIT License (MIT). Project's home:
+
+- https://github.com/tajmone/pandoc-goodies
+
+The CSS in this template reuses source code taken from the following projects:
+
+- GitHub Markdown CSS: Copyright © Sindre Sorhus, MIT License (MIT):
+  https://github.com/sindresorhus/github-markdown-css
+
+- Primer CSS: Copyright © 2016-2017 GitHub Inc., MIT License (MIT):
+  http://primercss.io/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The MIT License 
+
+Copyright (c) Tristano Ajmone, 2017 (github.com/tajmone/pandoc-goodies)
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+Copyright (c) 2017 GitHub Inc.
+
+"GitHub Pandoc HTML5 Template" is Copyright (c) Tristano Ajmone, 2017, released
+under the MIT License (MIT); it contains readaptations of substantial portions
+of the following third party softwares:
+
+(1) "GitHub Markdown CSS", Copyright (c) Sindre Sorhus, MIT License (MIT).
+(2) "Primer CSS", Copyright (c) 2016 GitHub Inc., MIT License (MIT).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+==============================================================================-->
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Introducing hasql-queue</title>
+  <style type="text/css">
+@charset "UTF-8";.markdown-body{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;color:#24292e;font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:16px;line-height:1.5;word-wrap:break-word;box-sizing:border-box;min-width:200px;max-width:980px;margin:0 auto;padding:45px}.markdown-body a{color:#0366d6;background-color:transparent;text-decoration:none;-webkit-text-decoration-skip:objects}.markdown-body a:active,.markdown-body a:hover{outline-width:0}.markdown-body a:hover{text-decoration:underline}.markdown-body a:not([href]){color:inherit;text-decoration:none}.markdown-body strong{font-weight:600}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em;margin:.67em 0;padding-bottom:.3em;border-bottom:1px solid #eaecef}.markdown-body h2{padding-bottom:.3em;font-size:1.5em;border-bottom:1px solid #eaecef}.markdown-body h3{font-size:1.25em}.markdown-body h4{font-size:1em}.markdown-body h5{font-size:.875em}.markdown-body h6{font-size:.85em;color:#6a737d}.markdown-body img{border-style:none}.markdown-body svg:not(:root){overflow:hidden}.markdown-body hr{box-sizing:content-box;height:.25em;margin:24px 0;padding:0;overflow:hidden;background-color:#e1e4e8;border:0}.markdown-body hr::before{display:table;content:""}.markdown-body hr::after{display:table;clear:both;content:""}.markdown-body input{margin:0;overflow:visible;font:inherit;font-family:inherit;font-size:inherit;line-height:inherit}.markdown-body [type=checkbox]{box-sizing:border-box;padding:0}.markdown-body *{box-sizing:border-box}.markdown-body blockquote{margin:0}.markdown-body ol,.markdown-body ul{padding-left:2em}.markdown-body ol ol,.markdown-body ul ol{list-style-type:lower-roman}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:0;margin-bottom:0}.markdown-body ol ol ol,.markdown-body ol ul ol,.markdown-body ul ol ol,.markdown-body ul ul ol{list-style-type:lower-alpha}.markdown-body li>p{margin-top:16px}.markdown-body li+li{margin-top:.25em}.markdown-body dd{margin-left:0}.markdown-body dl{padding:0}.markdown-body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:600}.markdown-body dl dd{padding:0 16px;margin-bottom:16px}.markdown-body code{font-family:SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace}.markdown-body pre{font:12px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;word-wrap:normal}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin-top:0;margin-bottom:16px}.markdown-body blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}.markdown-body blockquote>:first-child{margin-top:0}.markdown-body blockquote>:last-child{margin-bottom:0}.markdown-body table{display:block;width:100%;overflow:auto;border-spacing:0;border-collapse:collapse}.markdown-body table th{font-weight:600}.markdown-body table td,.markdown-body table th{padding:6px 13px;border:1px solid #dfe2e5}.markdown-body table tr{background-color:#fff;border-top:1px solid #c6cbd1}.markdown-body table tr:nth-child(2n){background-color:#f6f8fa}.markdown-body img{max-width:100%;box-sizing:content-box;background-color:#fff}.markdown-body code{padding:.2em 0;margin:0;font-size:85%;background-color:rgba(27,31,35,.05);border-radius:3px}.markdown-body code::after,.markdown-body code::before{letter-spacing:-.2em;content:" "}.markdown-body pre>code{padding:0;margin:0;font-size:100%;word-break:normal;white-space:pre;background:0 0;border:0}.markdown-body .highlight{margin-bottom:16px}.markdown-body .highlight pre{margin-bottom:0;word-break:normal}.markdown-body .highlight pre,.markdown-body pre{padding:16px;overflow:auto;font-size:85%;line-height:1.45;background-color:#f6f8fa;border-radius:3px}.markdown-body pre code{display:inline;max-width:auto;padding:0;margin:0;overflow:visible;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}.markdown-body pre code::after,.markdown-body pre code::before{content:normal}.markdown-body .full-commit .btn-outline:not(:disabled):hover{color:#005cc5;border-color:#005cc5}.markdown-body kbd{box-shadow:inset 0 -1px 0 #959da5;display:inline-block;padding:3px 5px;font:11px/10px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;color:#444d56;vertical-align:middle;background-color:#fcfcfc;border:1px solid #c6cbd1;border-bottom-color:#959da5;border-radius:3px;box-shadow:inset 0 -1px 0 #959da5}.markdown-body :checked+.radio-label{position:relative;z-index:1;border-color:#0366d6}.markdown-body .task-list-item{list-style-type:none}.markdown-body .task-list-item+.task-list-item{margin-top:3px}.markdown-body .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}.markdown-body::before{display:table;content:""}.markdown-body::after{display:table;clear:both;content:""}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.Alert,.Error,.Note,.Success,.Warning{padding:11px;margin-bottom:24px;border-style:solid;border-width:1px;border-radius:4px}.Alert p,.Error p,.Note p,.Success p,.Warning p{margin-top:0}.Alert p:last-child,.Error p:last-child,.Note p:last-child,.Success p:last-child,.Warning p:last-child{margin-bottom:0}.Alert{color:#246;background-color:#e2eef9;border-color:#bac6d3}.Warning{color:#4c4a42;background-color:#fff9ea;border-color:#dfd8c2}.Error{color:#911;background-color:#fcdede;border-color:#d2b2b2}.Success{color:#22662c;background-color:#e2f9e5;border-color:#bad3be}.Note{color:#2f363d;background-color:#f6f8fa;border-color:#d5d8da}.Alert h1,.Alert h2,.Alert h3,.Alert h4,.Alert h5,.Alert h6{color:#246;margin-bottom:0}.Warning h1,.Warning h2,.Warning h3,.Warning h4,.Warning h5,.Warning h6{color:#4c4a42;margin-bottom:0}.Error h1,.Error h2,.Error h3,.Error h4,.Error h5,.Error h6{color:#911;margin-bottom:0}.Success h1,.Success h2,.Success h3,.Success h4,.Success h5,.Success h6{color:#22662c;margin-bottom:0}.Note h1,.Note h2,.Note h3,.Note h4,.Note h5,.Note h6{color:#2f363d;margin-bottom:0}.Alert h1:first-child,.Alert h2:first-child,.Alert h3:first-child,.Alert h4:first-child,.Alert h5:first-child,.Alert h6:first-child,.Error h1:first-child,.Error h2:first-child,.Error h3:first-child,.Error h4:first-child,.Error h5:first-child,.Error h6:first-child,.Note h1:first-child,.Note h2:first-child,.Note h3:first-child,.Note h4:first-child,.Note h5:first-child,.Note h6:first-child,.Success h1:first-child,.Success h2:first-child,.Success h3:first-child,.Success h4:first-child,.Success h5:first-child,.Success h6:first-child,.Warning h1:first-child,.Warning h2:first-child,.Warning h3:first-child,.Warning h4:first-child,.Warning h5:first-child,.Warning h6:first-child{margin-top:0}h1.title,p.subtitle{text-align:center}h1.title.followed-by-subtitle{margin-bottom:0}p.subtitle{font-size:1.5em;font-weight:600;line-height:1.25;margin-top:0;margin-bottom:16px;padding-bottom:.3em}div.line-block{white-space:pre-line}
+  </style>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<article class="markdown-body">
+<header>
+<h1 class="title">Introducing hasql-queue</h1>
+</header>
+<h1 id="introducing-hasql-queue">Introducing <code>hasql-queue</code></h1>
+<p>I’ve recently released <a href="https://hackage.haskell.org/package/hasql-queue"><code>hasql-queue</code></a>, a PostgreSQL backed queue for the <code>hasql</code> ecosystem.</p>
+<p><code>hasql-queue</code> began as a port of <code>postgresql-simple-queue</code> but has evolved a new interface and many performance improvements.</p>
+<h1 id="an-overview">An Overview</h1>
+<p><code>hasql-queue</code> is a high performance PostgreSQL backed queue library. It has 6 variations of a similar API. It has two modes of operations: a high throughput polling based API and low throughput notifications based API.</p>
+<p>Each mode, high throughput or low throughput, has three related APIs: “at most once”, “at least once” and “exactly once” versions.</p>
+<p>You would use the “at most once” API if you are dequeuing items and sending them over an unreliable channel or if the messages are time sensitive and you can afford lost messages.</p>
+<p>You would use “at least once” semantics if you are dequeuing elements and want to make sure they are received by another system before they are removed from the queue.</p>
+<p><code>hasql-queue</code> “exactly once” APIs could be used to move elements from the queue’s ingress table to a final collection of tables in the same database.</p>
+<p>Out of the six version the “at least once” notifications based API is probably the most useful.</p>
+<h2 id="the-high-throughput-api">The High Throughput API</h2>
+<p>The high throughput APIs “exactly once api” is the basis of all the other APIs. It has the following functions.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">enqueue ::</span> <span class="dt">E.Value</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Session</span> ()</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="ot">dequeue ::</span> <span class="dt">D.Value</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Session</span> [a]</span></code></pre></div>
+<p>The API has an <code>enqueue</code> and <code>dequeue</code> functions. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
+<p>Crucially the API’s functions are in the <code>Session</code> monad. This is valuable because we can <code>dequeue</code> and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.</p>
+<h3 id="schema">Schema</h3>
+<p>For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the <code>Hasql.Queue.Migrate</code> module is provided.</p>
+<p>Here is the schema <code>migrate</code> creates:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1"></a>  <span class="kw">CREATE</span> <span class="kw">TYPE</span> state_t <span class="kw">AS</span> ENUM (<span class="st">&#39;enqueued&#39;</span>, <span class="st">&#39;failed&#39;</span>);</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">CREATE</span> <span class="kw">SEQUENCE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> modified_index <span class="kw">START</span> <span class="dv">1</span>;</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="kw">CREATE</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> payloads</span>
+<span id="cb2-6"><a href="#cb2-6"></a>  ( <span class="kw">id</span> BIGSERIAL <span class="kw">PRIMARY</span> <span class="kw">KEY</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  , attempts <span class="dt">int</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="dv">0</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>  , state state_t <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#39;enqueued&#39;</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>  , modified_at int8 <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> nextval(<span class="st">&#39;modified_index&#39;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a>  , <span class="fu">value</span> ${valueType} <span class="kw">NOT</span> <span class="kw">NULL</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>  );</span>
+<span id="cb2-12"><a href="#cb2-12"></a></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">CREATE</span> <span class="kw">INDEX</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> active_modified_at_idx <span class="kw">ON</span> payloads <span class="kw">USING</span> btree (modified_at, state)</span>
+<span id="cb2-14"><a href="#cb2-14"></a>    <span class="kw">WHERE</span> (state <span class="op">=</span> <span class="st">&#39;enqueued&#39;</span>);</span></code></pre></div>
+<p>Notice the <code>valueType</code> must be passed in and match the <code>Value a</code> that is used in the API above. For instance for <code>Value Text</code> a <code>text</code> type should be used for <code>valueType</code>.</p>
+<p>For the high throughput API only the <code>enqueued</code> state is used (We will come back to <code>failed</code>).</p>
+<p><code>postgresql-simple-queue</code> used to use a <code>timestamptz</code> to determine the oldest element to dequeue. However the performance of timestamps are slower to generate sequeuences of <code>int8</code>.</p>
+<p>Like <code>postgresql-simple-queue</code>, <code>hasql-queue</code> uses a partial index to track the <code>enqueued</code> elements. Unlike <code>postgresql-simple-queue</code> it creates the partial index correctly … sigh.</p>
+<p>This is the minimal recommended schema. The actual <code>payloads</code> table one uses could have more columns in it but it needs these columns and related DDL statements at a minimum. For instance one could add a <code>created_at</code> timestamp or other columns.</p>
+<h3 id="enque"><code>enque</code></h3>
+<p>Under the hood <code>enque</code> has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> payloads (attempts, <span class="fu">value</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">SELECT</span> <span class="dv">0</span>, <span class="op">*</span> <span class="kw">FROM</span> unnest($<span class="dv">1</span>)</span></code></pre></div>
+<p>where the argument <code>$1</code> is a an array of elements. However for a single element the following is used because it is faster:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> payloads (attempts, <span class="fu">value</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">VALUES</span> (<span class="dv">0</span>, $<span class="dv">1</span>)</span></code></pre></div>
+<p>I have no idea why passing in <code>0</code> instead of using the default value is faster. Barely faster, like a few percent, but appears to be measurable.</p>
+<h3 id="dequeue"><code>dequeue</code></h3>
+<p><code>dequeue</code> has the following SQL for batches:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">DELETE</span> <span class="kw">FROM</span> payloads</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="kw">in</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  ( <span class="kw">SELECT</span> p1.<span class="kw">id</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>    <span class="kw">FROM</span> payloads <span class="kw">AS</span> p1</span>
+<span id="cb5-5"><a href="#cb5-5"></a>    <span class="kw">WHERE</span> p1.state<span class="op">=</span><span class="st">&#39;enqueued&#39;</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> p1.modified_at <span class="kw">ASC</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>    <span class="cf">FOR</span> <span class="kw">UPDATE</span> <span class="kw">SKIP</span> <span class="kw">LOCKED</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="kw">LIMIT</span> $<span class="dv">1</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>  )</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="kw">RETURNING</span> <span class="fu">value</span></span></code></pre></div>
+<p>This is not the most straightforward way to write <code>dequeue</code>. However this is a fast way to write <code>dequeue</code>. It utilizes <code>UPDATE SKIP LOCKED</code> a PostgreSQL feature added to support work queues like <code>hasql-queue</code>.</p>
+<p><code>UPDATE SKIP LOCKED</code> takes row level locks, but as the name suggests, skips rows that are already locked by other sessions.</p>
+<p>While the locks are held we delete the row and return it.</p>
+<p>It has the following plan</p>
+<pre><code>Delete on payloads
+  -&gt;  Nested Loop
+        -&gt;  HashAggregate
+              Group Key: &quot;ANY_subquery&quot;.id
+              -&gt;  Subquery Scan on &quot;ANY_subquery&quot;
+                    -&gt;  Limit
+                          -&gt;  LockRows
+                                -&gt;  Index Scan using active_modified_at_idx on payloads p1
+                                      Index Cond: (state = &#39;enqueued&#39;::state_t)
+        -&gt;  Index Scan using payloads_pkey on payloads
+              Index Cond: (id = &quot;ANY_subquery&quot;.id)</code></pre>
+<p>An alternative implementation I explored was to mark entries as <code>dequeued</code> and drop table partitions instead of deleting. This is slightly faster but is much more complicated manage so I decided against using it.</p>
+<p>The sql for the single element version is identical but instead of <code>$1</code> uses <code>1</code>. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the <code>1</code> and using a specialized version is slightly faster.</p>
+<p>Also we can get a simplier plan for the single element <code>dequeue</code></p>
+<pre><code>Delete on payloads
+  InitPlan 1 (returns $2)
+    -&gt;  Limit
+          -&gt;  LockRows
+                -&gt;  Index Scan using active_modified_at_idx on payloads p1
+                      Index Cond: (state = &#39;enqueued&#39;::state_t)
+  -&gt;  Index Scan using payloads_pkey on payloads
+        Index Cond: (id = $2)</code></pre>
+<h1 id="benchmarks">Benchmarks</h1>
+<p>The performance of <code>hasql-queue</code> is dependent on the hardware and the PostgreSQL server settings.</p>
+<p>For inserts, the speed of <code>fsync</code> is very important. Running <code>pg_test_fsync</code> gives:</p>
+<pre><code>Compare file sync methods using one 8kB write:
+(in wal_sync_method preference order, except fdatasync is Linux&#39;s default)
+        open_datasync                      7403.941 ops/sec     135 usecs/op
+        fdatasync                          7146.863 ops/sec     140 usecs/op
+        fsync                              6269.116 ops/sec     160 usecs/op
+        fsync_writethrough                              n/a
+        open_sync                          6611.416 ops/sec     151 usecs/op</code></pre>
+<p>This is on MacBook running Ubuntu in VM. These are way better than what you’ll see on most network drives, e.g. “the cloud”.</p>
+<p>In otherwords if have a have very cheap hardware on AWS you will not see numbers this high.</p>
+<p>The DB was seeded with 20,000 entries.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Enqueuers</th>
+<th>Dequeuers</th>
+<th>Enqueues Per Second</th>
+<th>Dequeues Per Second</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>1800</td>
+<td>1710</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+<td>1784</td>
+<td>2117</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>2916</td>
+<td>2298</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>2619</td>
+<td>2652</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3</td>
+<td>1402</td>
+<td>1275</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>1765</td>
+<td>2098</td>
+</tr>
+</tbody>
+</table>
+<p>The looking at <code>atop</code> we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.</p>
+<figure>
+<img src="./blog/introducing-hasql-queue/atop.png" alt="" /><figcaption>atop</figcaption>
+</figure>
+<p>These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I’m too lazy to make the benchmarks at the moment.</p>
+<h1 id="low-throughput-at-least-once-api">Low Throughput At Least Once API</h1>
+<p>When the throughput of enqueuing is high it is most efficent to continously poll the database for more data. However if the throughput is low, polling is wasteful.</p>
+<p>The low throughput APIs utilize PostgreSQL notifications to allow for low latency responses without the resource usage of polling.</p>
+<p>Lets look at the “at least once” low through put API:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1"></a><span class="ot">enqueue ::</span> <span class="dt">Text</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>        <span class="co">-- ^ Notification channel name. Any valid PostgreSQL identifier</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>        <span class="ot">-&gt;</span> <span class="dt">Connection</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>        <span class="co">-- ^ Connection</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>        <span class="ot">-&gt;</span> <span class="dt">E.Value</span> a</span>
+<span id="cb9-6"><a href="#cb9-6"></a>        <span class="co">-- ^ Payload encoder</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>        <span class="ot">-&gt;</span> [a]</span>
+<span id="cb9-8"><a href="#cb9-8"></a>        <span class="co">-- ^ List of payloads to enqueue</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a>        <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-10"><a href="#cb9-10"></a></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="ot">withDequeue ::</span> <span class="dt">Text</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a>            <span class="co">-- ^ Notification channel name. Any valid PostgreSQL identifier</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a>            <span class="ot">-&gt;</span> <span class="dt">Connection</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a>            <span class="co">-- ^ Connection</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a>            <span class="ot">-&gt;</span> <span class="dt">D.Value</span> a</span>
+<span id="cb9-16"><a href="#cb9-16"></a>            <span class="co">-- ^ Payload decoder</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a>            <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a>            <span class="co">-- ^ Retry count</span></span>
+<span id="cb9-19"><a href="#cb9-19"></a>            <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-20"><a href="#cb9-20"></a>            <span class="co">-- ^ Element count</span></span>
+<span id="cb9-21"><a href="#cb9-21"></a>            <span class="ot">-&gt;</span> ([a] <span class="ot">-&gt;</span> <span class="dt">IO</span> b)</span>
+<span id="cb9-22"><a href="#cb9-22"></a>            <span class="co">-- ^ Continuation</span></span>
+<span id="cb9-23"><a href="#cb9-23"></a>            <span class="ot">-&gt;</span> <span class="dt">IO</span> b</span>
+<span id="cb9-24"><a href="#cb9-24"></a></span>
+<span id="cb9-25"><a href="#cb9-25"></a><span class="ot">failures ::</span> <span class="dt">Connection</span></span>
+<span id="cb9-26"><a href="#cb9-26"></a>         <span class="ot">-&gt;</span> <span class="dt">D.Value</span> a</span>
+<span id="cb9-27"><a href="#cb9-27"></a>         <span class="co">-- ^ Payload decoder</span></span>
+<span id="cb9-28"><a href="#cb9-28"></a>         <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">PayloadId</span></span>
+<span id="cb9-29"><a href="#cb9-29"></a>         <span class="co">-- ^ Starting position of payloads. Pass &#39;Nothing&#39; to</span></span>
+<span id="cb9-30"><a href="#cb9-30"></a>         <span class="co">--   start at the beginning</span></span>
+<span id="cb9-31"><a href="#cb9-31"></a>         <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-32"><a href="#cb9-32"></a>         <span class="co">-- ^ Count</span></span>
+<span id="cb9-33"><a href="#cb9-33"></a>         <span class="ot">-&gt;</span> <span class="dt">IO</span> [(<span class="dt">PayloadId</span>, a)]</span>
+<span id="cb9-34"><a href="#cb9-34"></a></span>
+<span id="cb9-35"><a href="#cb9-35"></a><span class="ot">delete ::</span> [<span class="dt">PayloadId</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span></code></pre></div>
+<p>The API is a lot more complicated.</p>
+<p>Instead of <code>dequeue</code> we have <code>withDequeue</code>. <code>withDequeue</code> uses a transaction and savepoints to rollback the effect of dequeueing if the <code>IO b</code> action throws an exception when executing. <code>withDequeue</code> will not complete the dequeue operation unless the <code>IO b</code> action finishes successfully, but will retry up to a max amount if an <code>IOError</code> exception occurs. <code>withDequeue</code> will record each attempt and if the max amount is hit will record the entry as <code>failed</code>.</p>
+<p><code>withDequeue</code> could end up dequeueing the same element multiple times, so whatever system one is coordinating with must have a mechanism for dealing with duplicated payloads.</p>
+<p>The reason <code>hasql-queue</code> gives up after some number of attempts is to prevent an error inducing entry from stopping dequeue progress.</p>
+<p>The <code>failed</code> payloads can be retrieved with <code>failures</code> function and permanently removed with the <code>delete</code> function.</p>
+<h1 id="benchmarks-1">Benchmarks</h1>
+<p>The notification based APIs are based on the high throughput APIs and thus inherit the same optimized plans. However using notification introduces overhead as one can see in the following benchmarks.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Enqueuers</th>
+<th>Dequeuers</th>
+<th>Enqueues Per Second</th>
+<th>Dequeues Per Second</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>1741</td>
+<td>946</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+<td>1436</td>
+<td>1546</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>2</td>
+<td>2264</td>
+<td>1233</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>1995</td>
+<td>1656</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3</td>
+<td>2117</td>
+<td>1280</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>4</td>
+<td>1514</td>
+<td>1758</td>
+</tr>
+</tbody>
+</table>
+<p>At some future point I should show what the CPU and IO load is of a small number of payloads using the low throughput API. This is real value of the low through put API: minimal load under moderate usage.</p>
+<h1 id="final-words-and-future-work">Final Words and Future Work</h1>
+<p>If you are using a <code>TQueue</code> in a webserver you might want to look at <code>hasql-queue</code>. Designing webservers so they are stateless and relying on a durable persistent state (a database) is great way improve the reliablity of your platform.</p>
+<p><code>hasql-queue</code> might not be a fit for your use case, but I would not hesitate to look at the SQL and schema that is used and copy what works for your situtation.</p>
+<p>In the future I would like to provide an adaptive API that can choose between polling and notifications based on the level of traffic. Additionally including the notification in the payload could make the low throughput “at most once” a lot faster.</p>
+<p><a href="../index.html">Home</a></p>
+</article>
+</body>
+</html>
