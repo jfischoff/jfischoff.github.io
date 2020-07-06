@@ -161,12 +161,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-10"><a href="#cb2-10"></a>  , <span class="fu">value</span> ${valueType} <span class="kw">NOT</span> <span class="kw">NULL</span></span>
 <span id="cb2-11"><a href="#cb2-11"></a>  );</span>
 <span id="cb2-12"><a href="#cb2-12"></a></span>
-<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">CREATE</span> <span class="kw">INDEX</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> active_modified_at_idx <span class="kw">ON</span> payloads <span class="kw">USING</span> btree (modified_at, state)</span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="kw">CREATE</span> <span class="kw">INDEX</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> active_modified_at_idx <span class="kw">ON</span> payloads <span class="kw">USING</span> btree (modified_at)</span>
 <span id="cb2-14"><a href="#cb2-14"></a>    <span class="kw">WHERE</span> (state <span class="op">=</span> <span class="st">&#39;enqueued&#39;</span>);</span></code></pre></div>
 <p>Notice the <code>valueType</code> must be passed in and match the <code>Value a</code> that is used in the API above. For instance, for <code>Value Text</code> a <code>text</code> type should be used for <code>valueType</code>.</p>
 <p>For the high throughput API, only the <code>enqueued</code> state is used (We will come back to <code>failed</code>).</p>
 <p><code>postgresql-simple-queue</code> used to use a <code>timestamptz</code> to determine the oldest element to dequeue. However, the performance of timestamps are slower to generate sequences of <code>int8</code>.</p>
-<p>Like <code>postgresql-simple-queue</code>, <code>hasql-queue</code> uses a partial index to track the <code>enqueued</code> elements. Unlike <code>postgresql-simple-queue</code> it creates the partial index correctly…sigh.</p>
+<p>Like <code>postgresql-simple-queue</code>, <code>hasql-queue</code> uses a partial index to track the <code>enqueued</code> elements. Unlike <code>postgresql-simple-queue</code> it creates the partial index.</p>
 <p>This is the minimal recommended schema. The actual <code>payloads</code> table one uses could have more columns in it, but it needs these columns and related DDL statements at a minimum. For instance, one could add a <code>created_at</code> timestamp or other columns.</p>
 <h3 id="enqueue"><code>enqueue</code></h3>
 <p>Under the hood <code>enqueue</code> has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:</p>
@@ -200,7 +200,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
                     -&gt;  Limit
                           -&gt;  LockRows
                                 -&gt;  Index Scan using active_modified_at_idx on payloads p1
-                                      Index Cond: (state = &#39;enqueued&#39;::state_t)
+                                      Filter: (state = &#39;enqueued&#39;::state_t)
         -&gt;  Index Scan using payloads_pkey on payloads
               Index Cond: (id = &quot;ANY_subquery&quot;.id)</code></pre>
 <p>An alternative implementation I explored was to mark entries as <code>dequeued</code> and drop table partitions instead of deleting. This is slightly faster but is much more complicated to manage so I decided against using it.</p>
@@ -211,7 +211,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     -&gt;  Limit
           -&gt;  LockRows
                 -&gt;  Index Scan using active_modified_at_idx on payloads p1
-                      Index Cond: (state = &#39;enqueued&#39;::state_t)
+                      Filter: (state = &#39;enqueued&#39;::state_t)
   -&gt;  Index Scan using payloads_pkey on payloads
         Index Cond: (id = $2)</code></pre>
 <h1 id="benchmarks">Benchmarks</h1>
@@ -258,8 +258,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tr class="even">
 <td>2</td>
 <td>3</td>
-<td>2619</td>
-<td>2652</td>
+<td>2692</td>
+<td>3024</td>
 </tr>
 <tr class="odd">
 <td>3</td>

@@ -49,7 +49,7 @@ Here is the schema [`migrate`](https://hackage.haskell.org/package/hasql-queue-1
   , value ${valueType} NOT NULL
   );
 
-  CREATE INDEX IF NOT EXISTS active_modified_at_idx ON payloads USING btree (modified_at, state)
+  CREATE INDEX IF NOT EXISTS active_modified_at_idx ON payloads USING btree (modified_at)
     WHERE (state = 'enqueued');
 ```
 
@@ -59,7 +59,7 @@ For the high throughput API, only the `enqueued` state is used (We will come bac
 
 `postgresql-simple-queue` used to use a `timestamptz` to determine the oldest element to dequeue. However, the performance of timestamps are slower to generate sequences of `int8`.
 
-Like `postgresql-simple-queue`, `hasql-queue` uses a partial index to track the `enqueued` elements. Unlike `postgresql-simple-queue` it creates the partial index correctly...sigh.
+Like `postgresql-simple-queue`, `hasql-queue` uses a partial index to track the `enqueued` elements. Unlike `postgresql-simple-queue` it creates the partial index.
 
 This is the minimal recommended schema. The actual `payloads` table one uses could have more columns in it, but it needs these columns and related DDL statements at a minimum. For instance, one could add a `created_at` timestamp or other columns.
 
@@ -114,7 +114,7 @@ Delete on payloads
                     ->  Limit
                           ->  LockRows
                                 ->  Index Scan using active_modified_at_idx on payloads p1
-                                      Index Cond: (state = 'enqueued'::state_t)
+                                      Filter: (state = 'enqueued'::state_t)
         ->  Index Scan using payloads_pkey on payloads
               Index Cond: (id = "ANY_subquery".id)
 ```
@@ -131,7 +131,7 @@ Delete on payloads
     ->  Limit
           ->  LockRows
                 ->  Index Scan using active_modified_at_idx on payloads p1
-                      Index Cond: (state = 'enqueued'::state_t)
+                      Filter: (state = 'enqueued'::state_t)
   ->  Index Scan using payloads_pkey on payloads
         Index Cond: (id = $2)
 ```
@@ -163,7 +163,7 @@ The DB was seeded with 20,000 entries.
 | 1| 1| 1800 | 1710 |
 | 1| 2| 1784 | 2117 |
 | 2| 2| 2916 | 2298 |
-| 2| 3| 2619 | 2652 |
+| 2| 3| 2692 | 3024 |
 | 3| 3| 1402 | 1275 |
 | 2| 4| 1765 | 2098 |
 
