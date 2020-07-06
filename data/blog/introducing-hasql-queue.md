@@ -26,15 +26,15 @@ enqueue :: E.Value a -> [a] -> Session ()
 dequeue :: D.Value a -> Int -> Session [a]
 ```
 
-The API has an `enqueue` and `dequeue` functions. Both `enqueue` and `dequeue` can operate on batches of elements. Additionally as is customary with `hasql` one must pass in the `Value a` for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the `postgresql-simple-queue` which used `jsonb` to store all payloads.
+The API has an [`enqueue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue) and [`dequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue) functions. Both `enqueue` and `dequeue` can operate on batches of elements. Additionally as is customary with `hasql` one must pass in the `Value a` for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the `postgresql-simple-queue` which used `jsonb` to store all payloads.
 
 Crucially the API's functions are in the `Session` monad. This is valuable because we can `dequeue` and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.
 
 ### Schema
 
-For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the `Hasql.Queue.Migrate` module is provided.
+For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the [`Hasql.Queue.Migrate`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html) module is provided.
 
-Here is the schema `migrate` creates:
+Here is the schema [`migrate`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html#v:migrate) creates:
 
 ```sql
   CREATE TYPE state_t AS ENUM ('enqueued', 'failed');
@@ -63,9 +63,9 @@ Like `postgresql-simple-queue`, `hasql-queue` uses a partial index to track the 
 
 This is the minimal recommended schema. The actual `payloads` table one uses could have more columns in it but it needs these columns and related DDL statements at a minimum. For instance one could add a `created_at` timestamp or other columns.
 
-### `enque`
+### `enqueue`
 
-Under the hood `enque` has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:
+Under the hood `enqueue` has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:
 
 ```sql
 INSERT INTO payloads (attempts, value)
@@ -123,7 +123,7 @@ An alternative implementation I explored was to mark entries as `dequeued` and d
 
 The sql for the single element version is identical but instead of `$1` uses `1`. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the `1` and using a specialized version is slightly faster.
 
-Also we can get a simplier plan for the single element `dequeue`
+Also we can get a simplier plan for the single element `dequeue`:
 
 ```
 Delete on payloads

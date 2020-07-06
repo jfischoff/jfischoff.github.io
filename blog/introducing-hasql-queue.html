@@ -144,11 +144,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">enqueue ::</span> <span class="dt">E.Value</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Session</span> ()</span>
 <span id="cb1-2"><a href="#cb1-2"></a></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="ot">dequeue ::</span> <span class="dt">D.Value</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Session</span> [a]</span></code></pre></div>
-<p>The API has an <code>enqueue</code> and <code>dequeue</code> functions. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
+<p>The API has an <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue"><code>enqueue</code></a> and <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue"><code>dequeue</code></a> functions. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
 <p>Crucially the API’s functions are in the <code>Session</code> monad. This is valuable because we can <code>dequeue</code> and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.</p>
 <h3 id="schema">Schema</h3>
-<p>For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the <code>Hasql.Queue.Migrate</code> module is provided.</p>
-<p>Here is the schema <code>migrate</code> creates:</p>
+<p>For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html"><code>Hasql.Queue.Migrate</code></a> module is provided.</p>
+<p>Here is the schema <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html#v:migrate"><code>migrate</code></a> creates:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1"></a>  <span class="kw">CREATE</span> <span class="kw">TYPE</span> state_t <span class="kw">AS</span> ENUM (<span class="st">&#39;enqueued&#39;</span>, <span class="st">&#39;failed&#39;</span>);</span>
 <span id="cb2-2"><a href="#cb2-2"></a></span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="kw">CREATE</span> <span class="kw">SEQUENCE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> modified_index <span class="kw">START</span> <span class="dv">1</span>;</span>
@@ -168,8 +168,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><code>postgresql-simple-queue</code> used to use a <code>timestamptz</code> to determine the oldest element to dequeue. However the performance of timestamps are slower to generate sequeuences of <code>int8</code>.</p>
 <p>Like <code>postgresql-simple-queue</code>, <code>hasql-queue</code> uses a partial index to track the <code>enqueued</code> elements. Unlike <code>postgresql-simple-queue</code> it creates the partial index correctly … sigh.</p>
 <p>This is the minimal recommended schema. The actual <code>payloads</code> table one uses could have more columns in it but it needs these columns and related DDL statements at a minimum. For instance one could add a <code>created_at</code> timestamp or other columns.</p>
-<h3 id="enque"><code>enque</code></h3>
-<p>Under the hood <code>enque</code> has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:</p>
+<h3 id="enqueue"><code>enqueue</code></h3>
+<p>Under the hood <code>enqueue</code> has seperate SQL statements for enqueing a batch and enqueing a single element. The sql for enqeueing multiple elements is:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> payloads (attempts, <span class="fu">value</span>)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="kw">SELECT</span> <span class="dv">0</span>, <span class="op">*</span> <span class="kw">FROM</span> unnest($<span class="dv">1</span>)</span></code></pre></div>
 <p>where the argument <code>$1</code> is a an array of elements. However for a single element the following is used because it is faster:</p>
@@ -205,7 +205,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
               Index Cond: (id = &quot;ANY_subquery&quot;.id)</code></pre>
 <p>An alternative implementation I explored was to mark entries as <code>dequeued</code> and drop table partitions instead of deleting. This is slightly faster but is much more complicated manage so I decided against using it.</p>
 <p>The sql for the single element version is identical but instead of <code>$1</code> uses <code>1</code>. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the <code>1</code> and using a specialized version is slightly faster.</p>
-<p>Also we can get a simplier plan for the single element <code>dequeue</code></p>
+<p>Also we can get a simplier plan for the single element <code>dequeue</code>:</p>
 <pre><code>Delete on payloads
   InitPlan 1 (returns $2)
     -&gt;  Limit
