@@ -74,6 +74,7 @@ SOFTWARE.
 <p>Then I remembered I had changed the primary key to be a compound key of two columns <code>(id, modified)</code>. This meant when looking up the first value alone, <code>id</code>, there might be duplicate values.</p>
 <p>This is different from a look up with a single column primary key. There can be only one row returned in that case.</p>
 <p>The long story short is if you see a <code>Bitmap Index Scan</code> and you think it is unnecessary, see if you have compound index. You might need to give the postgres planner an index with sufficent uniqueness.</p>
+<p><a href="../index.html">Home</a></p>
 </article>
 </body>
 </html>

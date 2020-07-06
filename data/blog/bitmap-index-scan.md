@@ -13,3 +13,5 @@ Then I remembered I had changed the primary key to be a compound key of two colu
 This is different from a look up with a single column primary key. There can be only one row returned in that case.
 
 The long story short is if you see a `Bitmap Index Scan` and you think it is unnecessary, see if you have compound index. You might need to give the postgres planner an index with sufficent uniqueness.
+
+[Home](../index.html)
