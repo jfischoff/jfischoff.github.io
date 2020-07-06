@@ -140,11 +140,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><code>hasql-queue</code> “exactly once” APIs could be used to move elements from the queue’s ingress table to a final collection of tables in the same database.</p>
 <p>Out of the six version the “at least once” notifications based API is probably the most useful.</p>
 <h2 id="the-high-throughput-api">The High Throughput API</h2>
-<p>The high throughput APIs “exactly once api” is the basis of all the other APIs. It has the following functions.</p>
+<p>The high throughput “exactly once” API is the basis of all the other APIs. It has the following functions.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">enqueue ::</span> <span class="dt">E.Value</span> a <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Session</span> ()</span>
 <span id="cb1-2"><a href="#cb1-2"></a></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="ot">dequeue ::</span> <span class="dt">D.Value</span> a <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Session</span> [a]</span></code></pre></div>
-<p>The API has an <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue"><code>enqueue</code></a> and <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue"><code>dequeue</code></a> functions. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
+<p>The API has an <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue"><code>enqueue</code></a> and a <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue"><code>dequeue</code></a> function. Both <code>enqueue</code> and <code>dequeue</code> can operate on batches of elements. Additionally as is customary with <code>hasql</code> one must pass in the <code>Value a</code> for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the <code>postgresql-simple-queue</code> which used <code>jsonb</code> to store all payloads.</p>
 <p>Crucially the API’s functions are in the <code>Session</code> monad. This is valuable because we can <code>dequeue</code> and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.</p>
 <h3 id="schema">Schema</h3>
 <p>For the API to be useable a compatible schema must exist in the database. To help create the necessary tables the <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Migrate.html"><code>Hasql.Queue.Migrate</code></a> module is provided.</p>
@@ -190,7 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-10"><a href="#cb5-10"></a><span class="kw">RETURNING</span> <span class="fu">value</span></span></code></pre></div>
 <p>This is not the most straightforward way to write <code>dequeue</code>. However this is a fast way to write <code>dequeue</code>. It utilizes <code>UPDATE SKIP LOCKED</code> a PostgreSQL feature added to support work queues like <code>hasql-queue</code>.</p>
 <p><code>UPDATE SKIP LOCKED</code> takes row level locks, but as the name suggests, skips rows that are already locked by other sessions.</p>
-<p>While the locks are held we delete the row and return it.</p>
+<p>While the locks are held the row is deleted and returned.</p>
 <p>It has the following plan</p>
 <pre><code>Delete on payloads
   -&gt;  Nested Loop
@@ -203,7 +203,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
                                       Index Cond: (state = &#39;enqueued&#39;::state_t)
         -&gt;  Index Scan using payloads_pkey on payloads
               Index Cond: (id = &quot;ANY_subquery&quot;.id)</code></pre>
-<p>An alternative implementation I explored was to mark entries as <code>dequeued</code> and drop table partitions instead of deleting. This is slightly faster but is much more complicated manage so I decided against using it.</p>
+<p>An alternative implementation I explored was to mark entries as <code>dequeued</code> and drop table partitions instead of deleting. This is slightly faster but is much more complicated to manage so I decided against using it.</p>
 <p>The sql for the single element version is identical but instead of <code>$1</code> uses <code>1</code>. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the <code>1</code> and using a specialized version is slightly faster.</p>
 <p>Also we can get a simplier plan for the single element <code>dequeue</code>:</p>
 <pre><code>Delete on payloads
@@ -224,8 +224,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         fsync                              6269.116 ops/sec     160 usecs/op
         fsync_writethrough                              n/a
         open_sync                          6611.416 ops/sec     151 usecs/op</code></pre>
-<p>This is on MacBook running Ubuntu in VM. These are way better than what you’ll see on most network drives, e.g. “the cloud”.</p>
-<p>In otherwords if have a have very cheap hardware on AWS you will not see numbers this high.</p>
+<p>This is on MacBook running Ubuntu in VM. These are way better numbers than what you’ll see on most network drives, e.g. “the cloud”.</p>
+<p>In otherwords if you have very cheap hardware on AWS you will not see numbers this high.</p>
 <p>The DB was seeded with 20,000 entries.</p>
 <table>
 <thead>
@@ -275,11 +275,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
-<p>The looking at <code>atop</code> we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.</p>
+<p>When looking at <code>atop</code> we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.</p>
 <figure>
 <img src="./introducing-hasql-queue/atop.png" alt="" /><figcaption>atop</figcaption>
 </figure>
-<p>These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I’m too lazy to make the benchmarks at the moment.</p>
+<p>These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I’m too lazy to make the batch benchmarks at the moment.</p>
 <h1 id="low-throughput-at-least-once-api">Low Throughput At Least Once API</h1>
 <p>When the throughput of enqueuing is high it is most efficent to continously poll the database for more data. However if the throughput is low, polling is wasteful.</p>
 <p>The low throughput APIs utilize PostgreSQL notifications to allow for low latency responses without the resource usage of polling.</p>
@@ -320,7 +320,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-34"><a href="#cb9-34"></a></span>
 <span id="cb9-35"><a href="#cb9-35"></a><span class="ot">delete ::</span> [<span class="dt">PayloadId</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span></code></pre></div>
 <p>The API is a lot more complicated.</p>
-<p>Instead of <code>dequeue</code> we have <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Low-AtLeastOnce.html#v:withDequeue"><code>withDequeue</code></a>. <code>withDequeue</code> uses a transaction and savepoints to rollback the effect of dequeueing if the <code>IO b</code> action throws an exception when executing. <code>withDequeue</code> will not complete the dequeue operation unless the <code>IO b</code> action finishes successfully, but will retry up to a max amount if an <code>IOError</code> exception occurs. <code>withDequeue</code> will record each attempt and if the max amount is hit will record the entry as <code>failed</code>.</p>
+<p>Instead of <code>dequeue</code> we have <a href="https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Low-AtLeastOnce.html#v:withDequeue"><code>withDequeue</code></a>. <code>withDequeue</code> uses a transaction and savepoints to rollback the effect of dequeueing if the <code>IO b</code> action throws an exception. <code>withDequeue</code> will not complete the dequeue operation unless the <code>IO b</code> action finishes successfully. Instead, <code>withDequeue</code> will retry the <code>IO b</code> up to a max amount if an <code>IOError</code> exception occurs. <code>withDequeue</code> will record each attempt and if the max amount is hit will set the entry’s state to <code>failed</code>.</p>
 <p><code>withDequeue</code> could end up dequeueing the same element multiple times, so whatever system one is coordinating with must have a mechanism for dealing with duplicated payloads.</p>
 <p>The reason <code>hasql-queue</code> gives up after some number of attempts is to prevent an error inducing entry from stopping dequeue progress.</p>
 <p>The <code>failed</code> payloads can be retrieved with <code>failures</code> function and permanently removed with the <code>delete</code> function.</p>

@@ -18,7 +18,7 @@ Out of the six version the "at least once" notifications based API is probably t
 
 ## The High Throughput API
 
-The high throughput APIs "exactly once api" is the basis of all the other APIs. It has the following functions.
+The high throughput "exactly once" API is the basis of all the other APIs. It has the following functions.
 
 ```haskell
 enqueue :: E.Value a -> [a] -> Session ()
@@ -26,7 +26,7 @@ enqueue :: E.Value a -> [a] -> Session ()
 dequeue :: D.Value a -> Int -> Session [a]
 ```
 
-The API has an [`enqueue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue) and [`dequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue) functions. Both `enqueue` and `dequeue` can operate on batches of elements. Additionally as is customary with `hasql` one must pass in the `Value a` for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the `postgresql-simple-queue` which used `jsonb` to store all payloads.
+The API has an [`enqueue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:enqueue) and a [`dequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-High-ExactlyOnce.html#v:dequeue) function. Both `enqueue` and `dequeue` can operate on batches of elements. Additionally as is customary with `hasql` one must pass in the `Value a` for encoding and decoding the payloads. The ability to store arbitrary types is performance improvement from the `postgresql-simple-queue` which used `jsonb` to store all payloads.
 
 Crucially the API's functions are in the `Session` monad. This is valuable because we can `dequeue` and insert the data into the final tables in one transaction. It is in this sense that it has exactly once semantics. This is not surprising. One would expect a message from one table to another table in the same database can be delivered exactly once.
 
@@ -101,7 +101,7 @@ This is not the most straightforward way to write `dequeue`. However this is a f
 
 `UPDATE SKIP LOCKED` takes row level locks, but as the name suggests, skips rows that are already locked by other sessions.
 
-While the locks are held we delete the row and return it.
+While the locks are held the row is deleted and returned.
 
 It has the following plan
 
@@ -119,7 +119,7 @@ Delete on payloads
               Index Cond: (id = "ANY_subquery".id)
 ```
 
-An alternative implementation I explored was to mark entries as `dequeued` and drop table partitions instead of deleting. This is slightly faster but is much more complicated manage so I decided against using it.
+An alternative implementation I explored was to mark entries as `dequeued` and drop table partitions instead of deleting. This is slightly faster but is much more complicated to manage so I decided against using it.
 
 The sql for the single element version is identical but instead of `$1` uses `1`. PostgreSQL is able to reuse plans for stored procedures that take in zero arguments, so inlining the `1` and using a specialized version is slightly faster.
 
@@ -152,9 +152,9 @@ Compare file sync methods using one 8kB write:
         open_sync                          6611.416 ops/sec     151 usecs/op
 ```
 
-This is on MacBook running Ubuntu in VM. These are way better than what you'll see on most network drives, e.g. "the cloud".
+This is on MacBook running Ubuntu in VM. These are way better numbers than what you'll see on most network drives, e.g. "the cloud".
 
-In otherwords if have a have very cheap hardware on AWS you will not see numbers this high.
+In otherwords if you have very cheap hardware on AWS you will not see numbers this high.
 
 The DB was seeded with 20,000 entries.
 
@@ -167,11 +167,11 @@ The DB was seeded with 20,000 entries.
 | 3| 3| 1402 | 1275 |
 | 2| 4| 1765 | 2098 |
 
-The looking at `atop` we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.
+When looking at `atop` we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.
 
 ![atop](./introducing-hasql-queue/atop.png)
 
-These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I'm too lazy to make the benchmarks at the moment.
+These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I'm too lazy to make the batch benchmarks at the moment.
 
 # Low Throughput At Least Once API
 
@@ -221,7 +221,7 @@ delete :: [PayloadId] -> IO ()
 
 The API is a lot more complicated.
 
-Instead of `dequeue` we have [`withDequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Low-AtLeastOnce.html#v:withDequeue). `withDequeue` uses a transaction and savepoints to rollback the effect of dequeueing if the `IO b` action throws an exception when executing. `withDequeue` will not complete the dequeue operation unless the `IO b` action finishes successfully, but will retry up to a max amount if an `IOError` exception occurs. `withDequeue` will record each attempt and if the max amount is hit will record the entry as `failed`.
+Instead of `dequeue` we have [`withDequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Low-AtLeastOnce.html#v:withDequeue). `withDequeue` uses a transaction and savepoints to rollback the effect of dequeueing if the `IO b` action throws an exception. `withDequeue` will not complete the dequeue operation unless the `IO b` action finishes successfully. Instead, `withDequeue` will retry the `IO b` up to a max amount if an `IOError` exception occurs. `withDequeue` will record each attempt and if the max amount is hit will set the entry's state to `failed`.
 
 `withDequeue` could end up dequeueing the same element multiple times, so whatever system one is coordinating with must have a mechanism for dealing with duplicated payloads.
 
