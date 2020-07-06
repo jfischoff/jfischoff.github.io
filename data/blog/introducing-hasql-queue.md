@@ -1,5 +1,3 @@
-# Introducing `hasql-queue`
-
 I've recently released [`hasql-queue`](https://hackage.haskell.org/package/hasql-queue), a PostgreSQL backed queue for the `hasql` ecosystem.
 
 `hasql-queue` began as a port of `postgresql-simple-queue` but has evolved a new interface and many performance improvements.
