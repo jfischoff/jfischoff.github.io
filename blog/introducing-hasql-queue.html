@@ -277,7 +277,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>The looking at <code>atop</code> we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.</p>
 <figure>
-<img src="./blog/introducing-hasql-queue/atop.png" alt="" /><figcaption>atop</figcaption>
+<img src="./introducing-hasql-queue/atop.png" alt="" /><figcaption>atop</figcaption>
 </figure>
 <p>These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I’m too lazy to make the benchmarks at the moment.</p>
 <h1 id="low-throughput-at-least-once-api">Low Throughput At Least Once API</h1>

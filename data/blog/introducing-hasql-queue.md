@@ -169,7 +169,7 @@ The DB was seeded with 20,000 entries.
 
 The looking at `atop` we can see the benchmark is IO bound. One would assume the benchmark would be IO bound if the queries have been properly optimized.
 
-![atop](./blog/introducing-hasql-queue/atop.png)
+![atop](./introducing-hasql-queue/atop.png)
 
 These benchmarks are for enqueueing and dequeueing a single payload. Using the batch API is more efficent but not always possible. I'm too lazy to make the benchmarks at the moment.
 
