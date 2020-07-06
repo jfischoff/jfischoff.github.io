@@ -221,7 +221,7 @@ delete :: [PayloadId] -> IO ()
 
 The API is a lot more complicated.
 
-Instead of `dequeue` we have `withDequeue`. `withDequeue` uses a transaction and savepoints to rollback the effect of dequeueing if the `IO b` action throws an exception when executing. `withDequeue` will not complete the dequeue operation unless the `IO b` action finishes successfully, but will retry up to a max amount if an `IOError` exception occurs. `withDequeue` will record each attempt and if the max amount is hit will record the entry as `failed`.
+Instead of `dequeue` we have [`withDequeue`](https://hackage.haskell.org/package/hasql-queue-1.2.0.1/docs/Hasql-Queue-Low-AtLeastOnce.html#v:withDequeue). `withDequeue` uses a transaction and savepoints to rollback the effect of dequeueing if the `IO b` action throws an exception when executing. `withDequeue` will not complete the dequeue operation unless the `IO b` action finishes successfully, but will retry up to a max amount if an `IOError` exception occurs. `withDequeue` will record each attempt and if the max amount is hit will record the entry as `failed`.
 
 `withDequeue` could end up dequeueing the same element multiple times, so whatever system one is coordinating with must have a mechanism for dealing with duplicated payloads.
 
