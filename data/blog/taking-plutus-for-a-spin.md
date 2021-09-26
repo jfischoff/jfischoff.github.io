@@ -10,7 +10,7 @@ Cardano promises to do all the things Ethereum can do, but better and cheaper, a
 
 ## Buy Ada
 
-To actually deploy and interact with a Plutus smart contract, you need to create a transaction on the Cardano blockchain. This will require spending the native currency Ada. You don’t need a lot to play around with Plutus. A few bucks in Ada will be enough.
+To actually deploy and interact with a Plutus smart contract, you need to create a transaction on the Cardano blockchain. This will require spending the native currency Ada. You don’t need a lot to play around with Plutus (actually you don't need any to use the testnet ... but how is that fun?). A few bucks in Ada will be enough.
 
 The easiest way to buy Ada is with Coinbase. If you don’t have a Coinbase account yet, you’ll want to install the app and set one up. Have fun.
 
