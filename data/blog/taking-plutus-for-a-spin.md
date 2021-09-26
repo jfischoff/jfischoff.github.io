@@ -31,19 +31,19 @@ After restarting my computer, I could install Nix … yay.
 
 ### 🚨🚨🚨 VERY IMPORTANT 🚨🚨🚨
 
-You must configure the IOHK nix caches, otherwise you will end up building GHC from source. Follow the instructions here: https://github.com/input-output-hk/plutus#iohk-binary-cache
+You must configure the IOHK nix caches, otherwise you will end up building GHC from source. Follow the instructions here: [https://github.com/input-output-hk/plutus#iohk-binary-cache](https://github.com/input-output-hk/plutus#iohk-binary-cache)
 
 ## Install Daedalus
 
 Daedalus is the Cardano GUI wallet system. You could probably use cardano-node instead, but I got things to work with Daedalus so … that is direction we will go.
 
-Download it here: https://daedaluswallet.io/en/download/.
+Download it here: [https://daedaluswallet.io/en/download/](https://daedaluswallet.io/en/download/).
 
 After installing, start it and let it sync. This will take like half a day.
 
 ## Build the `cardano-cli`
 
-We are going to need the `cardano-cli` to interact with the Cardano Block chain. These instructions are based on the documentation here: https://docs.cardano.org/plutus/Plutus-transactions.
+We are going to need the `cardano-cli` to interact with the Cardano Block chain. These instructions are based on the documentation here: [https://docs.cardano.org/plutus/Plutus-transactions](https://docs.cardano.org/plutus/Plutus-transactions).
 
 Clone the repo and build the `cardano-cli`
 
@@ -101,7 +101,7 @@ Now transfer 2 Ada to this address.
 
 NFTs are a way to make unique digital assets. Cardano has had the ability to create a limited form of NFTs before Alonzo, but with Plutus, Cardano can make NFTs that rival the Ethereum-based NFTs.
 
-I’ve extracted the NFT creation code from the Lobster Challenge repo. The NFT code is located here: https://github.com/jfischoff/plutus-nft.
+I’ve extracted the NFT creation code from the Lobster Challenge repo. The NFT code is located here: [https://github.com/jfischoff/plutus-nft](https://github.com/jfischoff/plutus-nft).
 
 The NFT smart contract enforces uniqueness by requiring the transaction input is a specific UTxO on the blockchain. UTxO’s are blockchain nodes that can be used as inputs to new transactions. However, once they are used in a transaction, they cannot be used again (this would allow “double spending”).
 

@@ -146,13 +146,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>First, I had to use the Disk Utility to remove my Nix partition. Then I needed to delete the <code>/nix</code> line from the <code>/etc/exports</code> file.</p>
 <p>After restarting my computer, I could install Nix … yay.</p>
 <h3 id="very-important">🚨🚨🚨 VERY IMPORTANT 🚨🚨🚨</h3>
-<p>You must configure the IOHK nix caches, otherwise you will end up building GHC from source. Follow the instructions here: https://github.com/input-output-hk/plutus#iohk-binary-cache</p>
+<p>You must configure the IOHK nix caches, otherwise you will end up building GHC from source. Follow the instructions here: <a href="https://github.com/input-output-hk/plutus#iohk-binary-cache">https://github.com/input-output-hk/plutus#iohk-binary-cache</a></p>
 <h2 id="install-daedalus">Install Daedalus</h2>
 <p>Daedalus is the Cardano GUI wallet system. You could probably use cardano-node instead, but I got things to work with Daedalus so … that is direction we will go.</p>
-<p>Download it here: https://daedaluswallet.io/en/download/.</p>
+<p>Download it here: <a href="https://daedaluswallet.io/en/download/">https://daedaluswallet.io/en/download/</a>.</p>
 <p>After installing, start it and let it sync. This will take like half a day.</p>
 <h2 id="build-the-cardano-cli">Build the <code>cardano-cli</code></h2>
-<p>We are going to need the <code>cardano-cli</code> to interact with the Cardano Block chain. These instructions are based on the documentation here: https://docs.cardano.org/plutus/Plutus-transactions.</p>
+<p>We are going to need the <code>cardano-cli</code> to interact with the Cardano Block chain. These instructions are based on the documentation here: <a href="https://docs.cardano.org/plutus/Plutus-transactions">https://docs.cardano.org/plutus/Plutus-transactions</a>.</p>
 <p>Clone the repo and build the <code>cardano-cli</code></p>
 <pre><code>git clone https://github.com/input-output-hk/cardano-node
 cd cardano-node
@@ -188,7 +188,7 @@ in pkgs.mkShell {
 <p>Now transfer 2 Ada to this address.</p>
 <h2 id="creating-a-nft">Creating a NFT</h2>
 <p>NFTs are a way to make unique digital assets. Cardano has had the ability to create a limited form of NFTs before Alonzo, but with Plutus, Cardano can make NFTs that rival the Ethereum-based NFTs.</p>
-<p>I’ve extracted the NFT creation code from the Lobster Challenge repo. The NFT code is located here: https://github.com/jfischoff/plutus-nft.</p>
+<p>I’ve extracted the NFT creation code from the Lobster Challenge repo. The NFT code is located here: <a href="https://github.com/jfischoff/plutus-nft">https://github.com/jfischoff/plutus-nft</a>.</p>
 <p>The NFT smart contract enforces uniqueness by requiring the transaction input is a specific UTxO on the blockchain. UTxO’s are blockchain nodes that can be used as inputs to new transactions. However, once they are used in a transaction, they cannot be used again (this would allow “double spending”).</p>
 <p>What this means is the smart contract must be recompiled for every NFT. It can only be used once.</p>
 <p>To compile the smart contract, we must first get the ID for the UTxO where our Ada is stored.</p>
