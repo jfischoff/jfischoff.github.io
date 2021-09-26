@@ -130,7 +130,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header>
 <h1 class="title">Taking Plutus for a Spin</h1>
 </header>
-<h1 id="taking-plutus-for-a-spin">Taking Plutus for a Spin</h1>
 <p>Recently, the Cardano cryptocurrency project released their Alonzo version with support for smart contracts. Cardano is primarily built on Haskell and their smart contract system, Plutus, is as well.</p>
 <p>Cardano is a large cryptocurrency project, currently the third-largest by market capitalization after Bitcoin and Etherum. Beyond market capitalization, the project is possibly the most actively developed Haskell project. It is designed to compete with Etherum’s smart contract abilities, but because Cardano uses Proof of Stake, instead of Proof of Work, it is more energy efficient and requires dramatically lower fees.</p>
 <p>It is common for Ethereum smart contract transactions to cost over $60 dollars in fees. However, this has not stopped adoption of Ethereum, which has surged this year as NFTs have become more mainstream.</p>
@@ -141,7 +140,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="install-nix">Install Nix</h2>
 <p>The first thing you are going to want to do is install the Nix package manager system.</p>
 <p>You can do that with this command:</p>
-<p>sh &lt;(curl -L https://nixos.org/nix/install) –daemon If you have Nix installed already, you will see instructions on how to uninstall it.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">sh</span> <span class="op">&lt;(</span><span class="ex">curl</span> -L https://nixos.org/nix/install<span class="op">)</span> --daemon</span></code></pre></div>
+<p>If you have Nix installed already, you will see instructions on how to uninstall it.</p>
 <p>I’m on a Mac and thus required a few extra steps to uninstall that were not listed, sadly.</p>
 <p>First, I had to use the Disk Utility to remove my Nix partition. Then I needed to delete the <code>/nix</code> line from the <code>/etc/exports</code> file.</p>
 <p>After restarting my computer, I could install Nix … yay.</p>
@@ -159,32 +159,32 @@ cd cardano-node
 git fetch --all --recurse-submodules --tags
 git checkout tags/1.29.0</code></pre>
 <p>Create a <code>plutux-tutorial.nix</code> file with the following content:</p>
-<pre><code>{ version ? &quot;mainnet&quot;, pkgs ? import &lt;nixpkgs&gt; { }}:
-let
-  cardano-node-repo = import ./. { };
-
-in pkgs.mkShell {
-  buildInputs = with pkgs; [
-    libsodium
-    cabal-install
-    zlib
-    haskell.compiler.ghc8107
-    haskellPackages.haskell-language-server
-
-    cardano-node-repo.scripts.&quot;${version}&quot;.node
-    cardano-node-repo.cardano-cli
-  ];
-
-  CARDANO_NODE_SOCKET_PATH = &quot;${builtins.toString ./.}/state-node-${version}/node.socket&quot;;
-
-}</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode nix"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">{</span> <span class="ex">version</span> ? <span class="st">&quot;mainnet&quot;</span>, pkgs ? import <span class="op">&lt;</span>nixpkgs<span class="op">&gt;</span> { <span class="kw">}</span>}:</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="bu">let</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="ex">cardano-node-repo</span> = import ./. { };</span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="kw">in</span> <span class="ex">pkgs.mkShell</span> {</span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="ex">buildInputs</span> = with pkgs<span class="kw">;</span><span class="bu"> [</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>    libsodium</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    cabal-install</span>
+<span id="cb3-9"><a href="#cb3-9"></a>    zlib</span>
+<span id="cb3-10"><a href="#cb3-10"></a>    haskell.compiler.ghc8107</span>
+<span id="cb3-11"><a href="#cb3-11"></a>    haskellPackages.haskell-language-server</span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a>    cardano-node-repo.scripts.<span class="st">&quot;</span><span class="va">${version}</span><span class="st">&quot;</span>.node</span>
+<span id="cb3-14"><a href="#cb3-14"></a>    cardano-node-repo.cardano-cli</span>
+<span id="cb3-15"><a href="#cb3-15"></a>  ];</span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a>  CARDANO_NODE_SOCKET_PATH <span class="ot">=</span> <span class="st">&quot;</span><span class="va">${builtins</span><span class="er">.toString .</span><span class="va">/</span>.<span class="va">}</span><span class="st">/state-node-</span><span class="va">${version}</span><span class="st">/node.socket&quot;</span>;</span>
+<span id="cb3-18"><a href="#cb3-18"></a></span>
+<span id="cb3-19"><a href="#cb3-19"></a>}</span></code></pre></div>
 <p>Call</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">nix-shell</span> plutus-tutorial.nix</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">nix-shell</span> plutus-tutorial.nix</span></code></pre></div>
 <p>Wait ten minutes.</p>
 <p>Once everything finishes building, it’s time to create a wallet address.</p>
 <p>Run the following in the currently active nix shell.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">cardano-cli</span> address key-gen --verification-key-file ~/plutus_test.vkey --signing-key-file ~/plutus_test.skey</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="ex">cardano-cli</span> address build --payment-verification-key-file ~/plutus_test.vkey --out-file ~/plutus_test.addr</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">cardano-cli</span> address key-gen --verification-key-file ~/plutus_test.vkey --signing-key-file ~/plutus_test.skey</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="ex">cardano-cli</span> address build --payment-verification-key-file ~/plutus_test.vkey --out-file ~/plutus_test.addr</span></code></pre></div>
 <p>Now transfer 2 Ada to this address.</p>
 <h2 id="creating-a-nft">Creating a NFT</h2>
 <p>NFTs are a way to make unique digital assets. Cardano has had the ability to create a limited form of NFTs before Alonzo, but with Plutus, Cardano can make NFTs that rival the Ethereum-based NFTs.</p>
@@ -193,30 +193,31 @@ in pkgs.mkShell {
 <p>What this means is the smart contract must be recompiled for every NFT. It can only be used once.</p>
 <p>To compile the smart contract, we must first get the ID for the UTxO where our Ada is stored.</p>
 <p>First, make sure Daedalus is running, and it is synced up with the network. Then set the</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="bu">export</span> <span class="va">CARDANO_NODE_SOCKET_PATH=</span><span class="st">&quot;/Users/YOUR_USER_NAME/Library/Application Support/Daedalus Mainnet/cardano-node.socket&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="bu">export</span> <span class="va">CARDANO_NODE_SOCKET_PATH=</span><span class="st">&quot;/Users/YOUR_USER_NAME/Library/Application Support/Daedalus Mainnet/cardano-node.socket&quot;</span></span></code></pre></div>
 <p>Now we can get the UTxO associated with our wallet address.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
-<span id="cb6-2"><a href="#cb6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="ex">ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164</span>     0        4200000 lovelace + TxOutDatumHashNone</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="ex">ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164</span>     0        4200000 lovelace + TxOutDatumHashNone</span></code></pre></div>
 <p>In this example the id we need is <code>ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0</code>.</p>
 <p>We can pass this along with the “token name” of our NFT :</p>
-<pre><code>cabal run create-nft-script -- ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 AwesomeNFT</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="ex">cabal</span> run create-nft-script -- ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 AwesomeNFT</span></code></pre></div>
 <p>This will write the <code>nft-mint-policy.plutus</code> to the <code>scripts</code> directory.</p>
 <p>We can now create our NFT minting transaction.</p>
-<pre><code>scripts/mint_nft.sh ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 $(cat ~/plutus_test.addr) ~/plutus_test.skey AwesomeNFT</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="ex">scripts/mint_nft.sh</span> ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> ~/plutus_test.skey AwesomeNFT</span></code></pre></div>
 <p>After about 30 seconds query UTxO at your wallet address</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
-<span id="cb9-2"><a href="#cb9-2"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
-<span id="cb9-3"><a href="#cb9-3"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     0        2070331 lovelace + TxOutDatumHashNone</span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     1        1724100 lovelace + 1 369e5bad71475274d99a1c3c8272df1b159e677b49b86d220961e3c4.AwesomeNFT + TxOutDatumHash ScriptDataInAlonzoEra <span class="st">&quot;45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
+<span id="cb10-2"><a href="#cb10-2"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     0        2070331 lovelace + TxOutDatumHashNone</span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     1        1724100 lovelace + 1 369e5bad71475274d99a1c3c8272df1b159e677b49b86d220961e3c4.AwesomeNFT + TxOutDatumHash ScriptDataInAlonzoEra <span class="st">&quot;45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0&quot;</span></span></code></pre></div>
 <p>Which should show your NFT.</p>
 <p>Congrats!</p>
 <h2 id="closing-thoughts">Closing Thoughts</h2>
 <p>We created an NFT, but it is not that useful. The NFTs on Ethereum also store metadata, like urls to IPFS which we need to do as well if we wanted to make something more useful. I believe this would require a validator script to preserve the metadata in addition to the minting policy script.</p>
 <p>However, it is a start. I’m pretty busy building my third attempt at a consumer social app (only 10 more attempts to go before one of them might work), but I might try extending the NFT functionality. Pull requests welcome ;).</p>
+<p><a href="../index.html">Home</a></p>
 </article>
 </body>
 </html>
