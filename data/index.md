@@ -1,5 +1,5 @@
 # Blog Entries
-- [Making NFTs with Plutus](blog/taking-plutus-for-a-spin.html)
+- [Making NFTs with Plutus](blog/making-nfts-with-plutus.html)
 - [Introducing `hasql-queue`](blog/introducing-hasql-queue.html)
 - [What to Think When You See a `Bitmap Index Scan`](blog/bitmap-index-scan.html)
 - [Non-blocking IO and the EventManager](blog/the-eventmanager-and-non-blocking-io.html)
