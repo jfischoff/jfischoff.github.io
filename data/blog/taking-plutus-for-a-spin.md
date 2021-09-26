@@ -1,5 +1,3 @@
-# Taking Plutus for a Spin
-
 Recently, the Cardano cryptocurrency project released their Alonzo version with support for smart contracts. Cardano is primarily built on Haskell and their smart contract system, Plutus, is as well.
 
 Cardano is a large cryptocurrency project, currently the third-largest by market capitalization after Bitcoin and Etherum. Beyond market capitalization, the project is possibly the most actively developed Haskell project. It is designed to compete with Etherum’s smart contract abilities, but because Cardano uses Proof of Stake, instead of Proof of Work, it is more energy efficient and requires dramatically lower fees.
@@ -163,3 +161,5 @@ Congrats!
 We created an NFT, but it is not that useful. The NFTs on Ethereum also store metadata, like urls to IPFS which we need to do as well if we wanted to make something more useful. I believe this would require a validator script to preserve the metadata in addition to the minting policy script.
 
 However, it is a start. I’m pretty busy building my third attempt at a consumer social app (only 10 more attempts to go before one of them might work), but I might try extending the NFT functionality. Pull requests welcome ;).
+
+[Home](../index.html)
