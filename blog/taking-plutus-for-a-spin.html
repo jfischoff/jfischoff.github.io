@@ -131,30 +131,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 class="title">Taking Plutus for a Spin</h1>
 </header>
 <h1 id="taking-plutus-for-a-spin">Taking Plutus for a Spin</h1>
-<p>Recently the Cardano cryptocurrency project released their Alonzo version with support for smart contracts. Cardano is primarily built on Haskell and their smart contract system, Plutus, is as well.</p>
-<p>Cardano is a large cryptocurrency project, currently the third largest by market capitialization after Bitcoin and Etherum. Beyond market capitialization the project is possibly the most actively developed Haskell project. It is designed to compete with Etherum’s smart contract abilities, but because Cardano uses Proof of Stake, instead of Proof of Work, it is more energy efficent and requires dramatically lower fees.</p>
-<p>It is common for Ethereum smart contract transactions to cost over $60 dollars in fees. However, this has not stopped adoption Ethereum, which has surged this year as NFTs have become more mainstream.</p>
+<p>Recently, the Cardano cryptocurrency project released their Alonzo version with support for smart contracts. Cardano is primarily built on Haskell and their smart contract system, Plutus, is as well.</p>
+<p>Cardano is a large cryptocurrency project, currently the third-largest by market capitalization after Bitcoin and Etherum. Beyond market capitalization, the project is possibly the most actively developed Haskell project. It is designed to compete with Etherum’s smart contract abilities, but because Cardano uses Proof of Stake, instead of Proof of Work, it is more energy efficient and requires dramatically lower fees.</p>
+<p>It is common for Ethereum smart contract transactions to cost over $60 dollars in fees. However, this has not stopped adoption of Ethereum, which has surged this year as NFTs have become more mainstream.</p>
 <p>Cardano promises to do all the things Ethereum can do, but better and cheaper, and it uses Haskell. Ethereum uses Solidity, I don’t know Solidity, but with 12 years of Haskell I thought I would check it out.</p>
 <h2 id="buy-ada">Buy Ada</h2>
-<p>To actually deploy and interact with a Plutus smart contract you need to create transaction on the Cardano blockchain. This will require spending the native currency Ada. You don’t need a lot to play around with Plutus. A few bucks in Ada will be enough.</p>
+<p>To actually deploy and interact with a Plutus smart contract, you need to create a transaction on the Cardano blockchain. This will require spending the native currency Ada. You don’t need a lot to play around with Plutus. A few bucks in Ada will be enough.</p>
 <p>The easiest way to buy Ada is with Coinbase. If you don’t have a Coinbase account yet, you’ll want to install the app and set one up. Have fun.</p>
 <h2 id="install-nix">Install Nix</h2>
 <p>The first thing you are going to want to do is install the Nix package manager system.</p>
 <p>You can do that with this command:</p>
-<pre><code>sh &lt;(curl -L https://nixos.org/nix/install) --daemon</code></pre>
-<p>If you have Nix installed already you will see instructions on how to uninstall it.</p>
-<p>I’m on a Mac and thus required a few extra steps to uninstall that were not listed sadly.</p>
-<p>First I had to use the Disk Utility to remove my Nix partition. Then I needed to delete the <code>/nix</code> line from the <code>/etc/exports</code> file.</p>
-<p>After restarting my computer I could install Nix … yay.</p>
+<p>sh &lt;(curl -L https://nixos.org/nix/install) –daemon If you have Nix installed already, you will see instructions on how to uninstall it.</p>
+<p>I’m on a Mac and thus required a few extra steps to uninstall that were not listed, sadly.</p>
+<p>First, I had to use the Disk Utility to remove my Nix partition. Then I needed to delete the <code>/nix</code> line from the <code>/etc/exports</code> file.</p>
+<p>After restarting my computer, I could install Nix … yay.</p>
 <h3 id="very-important">🚨🚨🚨 VERY IMPORTANT 🚨🚨🚨</h3>
-<p>You must configure the IOHK nix caches otherwise you will end up building GHC from source. Follow the instructions here: https://github.com/input-output-hk/plutus#iohk-binary-cache</p>
+<p>You must configure the IOHK nix caches, otherwise you will end up building GHC from source. Follow the instructions here: https://github.com/input-output-hk/plutus#iohk-binary-cache</p>
 <h2 id="install-daedalus">Install Daedalus</h2>
-<p>Daedalus is the Cardano GUI wallet system. You could probably use <code>cardano-node</code> instead but I got things to work with Daedalus so … that is direction we will go.</p>
+<p>Daedalus is the Cardano GUI wallet system. You could probably use cardano-node instead, but I got things to work with Daedalus so … that is direction we will go.</p>
 <p>Download it here: https://daedaluswallet.io/en/download/.</p>
-<p>After installing it start and let it sync. This will take like half a day.</p>
+<p>After installing, start it and let it sync. This will take like half a day.</p>
 <h2 id="build-the-cardano-cli">Build the <code>cardano-cli</code></h2>
-<p>We are going to need the <code>cardano-cli</code> to interact with the Cardano Block chain. These instructions are based on the documentation here: https://docs.cardano.org/plutus/Plutus-transactions.</p>
-<p>Clone the repo and build the <code>cardano-cli</code></p>
+<p>We are going to need the <code>cardano-cli</code> to interact with the Cardano Block chain. These instructions are based on the documentation here: https://docs.cardano.org/plutus/Plutus-transactions.</p>
+<p>Clone the repo and build the <code>cardano-cli</code></p>
 <pre><code>git clone https://github.com/input-output-hk/cardano-node
 cd cardano-node
 git fetch --all --recurse-submodules --tags
@@ -180,27 +179,27 @@ in pkgs.mkShell {
 
 }</code></pre>
 <p>Call</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">nix-shell</span> plutus-tutorial.nix</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">nix-shell</span> plutus-tutorial.nix</span></code></pre></div>
 <p>Wait ten minutes.</p>
-<p>Once everything finishes building it’s time to create a wallet address.</p>
+<p>Once everything finishes building, it’s time to create a wallet address.</p>
 <p>Run the following in the currently active nix shell.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">cardano-cli</span> address key-gen --verification-key-file ~/plutus_test.vkey --signing-key-file ~/plutus_test.skey</span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="ex">cardano-cli</span> address build --payment-verification-key-file ~/plutus_test.vkey --out-file ~/plutus_test.addr</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">cardano-cli</span> address key-gen --verification-key-file ~/plutus_test.vkey --signing-key-file ~/plutus_test.skey</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="ex">cardano-cli</span> address build --payment-verification-key-file ~/plutus_test.vkey --out-file ~/plutus_test.addr</span></code></pre></div>
 <p>Now transfer 2 Ada to this address.</p>
 <h2 id="creating-a-nft">Creating a NFT</h2>
-<p>NFTs are way to make unique digital assets. Cardano has had the ability to create a limited form of NFTs before Alonzo, but with Plutus, Cardano can make NFTs that rival the Ethereum based NFTs.</p>
-<p>I’ve extracted the NFT creation code from the Lobster Challenge repo. The NFT code is located here: https://github.com/jfischoff/plutus-nft .</p>
-<p>The NFT smart contract enforces uniqueness by requiring the transaction input is a specific UTxO on the blockchain. UTxO’s are blockchain nodes that can be used as inputs to new transactions. However once they are used in a transaction, they cannot be used again (this would allow “double spending”).</p>
+<p>NFTs are a way to make unique digital assets. Cardano has had the ability to create a limited form of NFTs before Alonzo, but with Plutus, Cardano can make NFTs that rival the Ethereum-based NFTs.</p>
+<p>I’ve extracted the NFT creation code from the Lobster Challenge repo. The NFT code is located here: https://github.com/jfischoff/plutus-nft.</p>
+<p>The NFT smart contract enforces uniqueness by requiring the transaction input is a specific UTxO on the blockchain. UTxO’s are blockchain nodes that can be used as inputs to new transactions. However, once they are used in a transaction, they cannot be used again (this would allow “double spending”).</p>
 <p>What this means is the smart contract must be recompiled for every NFT. It can only be used once.</p>
-<p>To compile the smart contract we must first get the id for the UTxO where our Ada is stored.</p>
-<p>First make sure Daedalus is running and it is synced up with the network. Then set the</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="bu">export</span> <span class="va">CARDANO_NODE_SOCKET_PATH=</span><span class="st">&quot;/Users/YOUR_USER_NAME/Library/Application Support/Daedalus Mainnet/cardano-node.socket&quot;</span></span></code></pre></div>
+<p>To compile the smart contract, we must first get the ID for the UTxO where our Ada is stored.</p>
+<p>First, make sure Daedalus is running, and it is synced up with the network. Then set the</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="bu">export</span> <span class="va">CARDANO_NODE_SOCKET_PATH=</span><span class="st">&quot;/Users/YOUR_USER_NAME/Library/Application Support/Daedalus Mainnet/cardano-node.socket&quot;</span></span></code></pre></div>
 <p>Now we can get the UTxO associated with our wallet address.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
-<span id="cb7-2"><a href="#cb7-2"></a></span>
-<span id="cb7-3"><a href="#cb7-3"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="ex">ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164</span>     0        4200000 lovelace + TxOutDatumHashNone</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="ex">ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164</span>     0        4200000 lovelace + TxOutDatumHashNone</span></code></pre></div>
 <p>In this example the id we need is <code>ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0</code>.</p>
 <p>We can pass this along with the “token name” of our NFT :</p>
 <pre><code>cabal run create-nft-script -- ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 AwesomeNFT</code></pre>
@@ -208,16 +207,16 @@ in pkgs.mkShell {
 <p>We can now create our NFT minting transaction.</p>
 <pre><code>scripts/mint_nft.sh ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 $(cat ~/plutus_test.addr) ~/plutus_test.skey AwesomeNFT</code></pre>
 <p>After about 30 seconds query UTxO at your wallet address</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
-<span id="cb10-2"><a href="#cb10-2"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     0        2070331 lovelace + TxOutDatumHashNone</span>
-<span id="cb10-5"><a href="#cb10-5"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     1        1724100 lovelace + 1 369e5bad71475274d99a1c3c8272df1b159e677b49b86d220961e3c4.AwesomeNFT + TxOutDatumHash ScriptDataInAlonzoEra <span class="st">&quot;45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="ex">cardano-cli</span> query utxo --address <span class="va">$(</span><span class="fu">cat</span> ~/plutus_test.addr<span class="va">)</span> --mainnet</span>
+<span id="cb9-2"><a href="#cb9-2"></a>                           <span class="ex">TxHash</span>                                 TxIx        Amount</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="ex">--------------------------------------------------------------------------------------</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     0        2070331 lovelace + TxOutDatumHashNone</span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="ex">8579dd0a31cd1b54e5b91320ff90806e1bdd65ebe3278a93e638429b262ecd8b</span>     1        1724100 lovelace + 1 369e5bad71475274d99a1c3c8272df1b159e677b49b86d220961e3c4.AwesomeNFT + TxOutDatumHash ScriptDataInAlonzoEra <span class="st">&quot;45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0&quot;</span></span></code></pre></div>
 <p>Which should show your NFT.</p>
 <p>Congrats!</p>
 <h2 id="closing-thoughts">Closing Thoughts</h2>
-<p>We created an NFT but it is not that useful. The NFTs on Ethereum also store metadata, like urls to IPFS which we need to do as well if we wanted to make something more useful. I believe this would require a validator script to preserve the metadata in addition to the minting policy script.</p>
-<p>However, it is a start. I’m pretty busy building my third attempt at a consumer social app (only 10 more attempts to go before one of them might work), but I might try to extending the NFT functionality. Pull requests welcome ;).</p>
+<p>We created an NFT, but it is not that useful. The NFTs on Ethereum also store metadata, like urls to IPFS which we need to do as well if we wanted to make something more useful. I believe this would require a validator script to preserve the metadata in addition to the minting policy script.</p>
+<p>However, it is a start. I’m pretty busy building my third attempt at a consumer social app (only 10 more attempts to go before one of them might work), but I might try extending the NFT functionality. Pull requests welcome ;).</p>
 </article>
 </body>
 </html>
