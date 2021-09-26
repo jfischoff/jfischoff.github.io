@@ -6,6 +6,8 @@ It is common for Ethereum smart contract transactions to cost over $60 dollars i
 
 Cardano promises to do all the things Ethereum can do, but better and cheaper, and it uses Haskell. Ethereum uses Solidity, I don’t know Solidity, but with 12 years of Haskell I thought I would check it out.
 
+As quickly discovered, there was little written on how to deploy an Plutus smart contract from start to finish. Hopefully this blog post helps fill that gap.
+
 ## Buy Ada
 
 To actually deploy and interact with a Plutus smart contract, you need to create a transaction on the Cardano blockchain. This will require spending the native currency Ada. You don’t need a lot to play around with Plutus (actually you don't need any to use the testnet ... but how is that fun?). A few bucks in Ada will be enough.
