@@ -20,7 +20,10 @@ The first thing you are going to want to do is install the Nix package manager s
 
 You can do that with this command:
 
+```bash
 sh <(curl -L https://nixos.org/nix/install) --daemon
+```
+
 If you have Nix installed already, you will see instructions on how to uninstall it.
 
 I’m on a Mac and thus required a few extra steps to uninstall that were not listed, sadly.
@@ -56,7 +59,7 @@ git checkout tags/1.29.0
 
 Create a `plutux-tutorial.nix` file with the following content:
 
-```
+```nix
 { version ? "mainnet", pkgs ? import <nixpkgs> { }}:
 let
   cardano-node-repo = import ./. { };
@@ -129,7 +132,7 @@ In this example the id we need is `ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3
 
 We can pass this along with the "token name" of our NFT :
 
-```
+```bash
 cabal run create-nft-script -- ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 AwesomeNFT
 ```
 
@@ -137,7 +140,7 @@ This will write the `nft-mint-policy.plutus` to the `scripts` directory.
 
 We can now create our NFT minting transaction.
 
-```
+```bash
 scripts/mint_nft.sh ea2fe8519d45c33c21de2fc95664075c1dfd42af232f3a51809ed0ffad223164#0 $(cat ~/plutus_test.addr) ~/plutus_test.skey AwesomeNFT
 ```
 
