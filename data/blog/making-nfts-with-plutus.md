@@ -1,6 +1,6 @@
 Recently, the Cardano cryptocurrency project released their Alonzo version with support for smart contracts. Cardano is primarily built on Haskell and their smart contract system, Plutus, is as well.
 
-Cardano is a large cryptocurrency project, currently the third-largest by market capitalization after Bitcoin and Etherum. Beyond market capitalization, the project is possibly the most actively developed Haskell project. It is designed to compete with Etherum’s smart contract abilities, but because Cardano uses Proof of Stake, instead of Proof of Work, it is more energy efficient and requires dramatically lower fees.
+Cardano is a large cryptocurrency project, currently the third-largest by market capitalization after Bitcoin and Ethereum. Beyond market capitalization, the project is possibly the most actively developed Haskell project. It is designed to compete with Ethereum’s smart contract abilities, but because Cardano uses Proof of Stake, instead of Proof of Work, it is more energy efficient and requires dramatically lower fees.
 
 It is common for Ethereum smart contract transactions to cost over $60 dollars in fees. However, this has not stopped adoption of Ethereum, which has surged this year as NFTs have become more mainstream.
 
