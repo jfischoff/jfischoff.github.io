@@ -21,3 +21,4 @@ pandoc --template=GitHub.html5 data/blog/when-threadwaitread-doesnt.md -o blog/w
 pandoc --template=GitHub.html5 data/blog/the-eventmanager-and-non-blocking-io.md -o blog/the-eventmanager-and-non-blocking-io.html --metadata title="Non-blocking IO and the EventManager"
 pandoc --template=GitHub.html5 data/blog/bitmap-index-scan.md -o blog/bitmap-index-scan.html --metadata title="What to Think When You See a Bitmap Index Scan"
 pandoc --template=GitHub.html5 data/blog/introducing-hasql-queue.md -o blog/introducing-hasql-queue.html --metadata title="Introducing hasql-queue"
+pandoc --template=GitHub.html5 data/blog/neural-networks-are-for-hacking.md -o blog/neural-networks-are-for-hacking.html --metadata title="Neural Networks Are For Hacking"
