@@ -22,6 +22,6 @@ What we are seeing now, is similar to what happened in the 80s and 90s. Neural n
 
 Do you know exactly what a neural network can compute for all inputs? No, you don't, which is just like regularly programming. You have to deploy it and find out.
 
-## FAFI
+## FAFO
 
 Neural networks are less a mathematical solution to a problem, and more a fuzzy way to program. They're useful when errors are tolerable, and it is not clear how to write a direct algorithm. Just like with regular programming, there often isn't a right answer. There is merely a solution that might work for your purposes and to know for sure you have to try it out.
