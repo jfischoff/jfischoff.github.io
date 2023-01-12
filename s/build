@@ -22,3 +22,4 @@ pandoc --template=GitHub.html5 data/blog/the-eventmanager-and-non-blocking-io.md
 pandoc --template=GitHub.html5 data/blog/bitmap-index-scan.md -o blog/bitmap-index-scan.html --metadata title="What to Think When You See a Bitmap Index Scan"
 pandoc --template=GitHub.html5 data/blog/introducing-hasql-queue.md -o blog/introducing-hasql-queue.html --metadata title="Introducing hasql-queue"
 pandoc --template=GitHub.html5 data/blog/neural-networks-are-for-hacking.md -o blog/neural-networks-are-for-hacking.html --metadata title="Neural Networks Are For Hacking"
+pandoc --template=GitHub.html5 data/blog/making-nfts-with-plutus.md -o blog/making-nfts-with-plutus.html --metadata title="Making NFTs with Plutus"
