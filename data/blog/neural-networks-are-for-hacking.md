@@ -16,11 +16,7 @@ Neural network development seems like some advanced mathematics. For one, everyo
 
 Neural networks, which are differentialable pipelines of linear and simple monotonic non-linear functions, are exploding in utility, in part because programmers can try out different pipelines without having to apply difficult mathematical reasoning.
 
-Neural networks libraries, like `pytorch` make it easy to compose pipelines and get an intuitive sense for what problems they can solve, even without completely understanding the theory. Neural networks are for hacking, they're not for precise mathematical reasoning, as their academic treatments might lead one to believe.
-
-What we are seeing now, is similar to what happened in the 80s and 90s. Neural networks are escaping the Ivory Tower. You can become a good deep learning practitioner by trying things. If it appears to work, you can see if it works in a wider class of tests. Maybe it works well enough to make money.
-
-Neural networks compete in the same space as Bayesian methods, which are more limited because of how expensive the computation is. Again, we lose a deep understanding of what our programs will do, but we can solve nearly unimaginable number of problems well enough.
+What we are seeing now, is similar to what happened in the 80s and 90s and again something is being lost. We can't get the mathematical certainity we can from Bayesian, we lose a deep understanding of what our programs will do, but we can solve nearly unimaginable number of problems well enough.
 
 ## FAFO
 
