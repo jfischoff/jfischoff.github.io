@@ -20,7 +20,7 @@ Neural networks libraries, like `pytorch` make it easy to compose pipelines and 
 
 What we are seeing now, is similar to what happened in the 80s and 90s. Neural networks are escaping the Ivory Tower. You can become a good deep learning practitioner by trying things. If it appears to work, you can see if it works in a wider class of tests. Maybe it works well enough to make money.
 
-Neural networks compete in the same space as Bayesian methods, which are more limited because of how expensive the computation is. Again, we lose a deep understanding of what are programs will do, but we can solve nearly unimaginable number of problems well enough.
+Neural networks compete in the same space as Bayesian methods, which are more limited because of how expensive the computation is. Again, we lose a deep understanding of what our programs will do, but we can solve nearly unimaginable number of problems well enough.
 
 ## FAFO
 
