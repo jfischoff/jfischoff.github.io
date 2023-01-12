@@ -4,9 +4,7 @@ But in the real world, this is bullshit.
 
 In the real world, maybe there are requirements, then the software is written, maybe it is tested and only after being used for a long time do we learn what the code actually does.
 
-We understand code through its emergent runtime behavior because non-trivial systems are too complicated to statically analyze comprehensively.
-
-In the past, software development ideas were expressed through academic papers, but this changed in the 80s and 90s as software development started to explode. People become expert programmers, not by applying theory, but by doing it. It turns out you can become an expert programmer merely by writing a lot of code.
+In the past, software development ideas were expressed through academic papers, but this changed in the 80s and 90s as software development started to explode. People become expert programmers, not by applying theory, but by doing it. It turns out you can become an expert programmer primarily by writing a lot of code.
 
 Programming went from an academic discipline, to a craft. You become a good programmer by doing it. We design and test software to get a sense of what it can do, but we don't really know until it is heavily used by real users.
 
