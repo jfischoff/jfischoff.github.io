@@ -16,7 +16,7 @@ Neural network development seems like some advanced mathematics. For one, everyo
 
 Neural networks, which are differentialable pipelines of linear and simple monotonic non-linear functions, are exploding in utility, in part because programmers can try out different pipelines without having to apply difficult mathematical reasoning.
 
-What we are seeing now, is similar to what happened in the 80s and 90s and again something is being lost. We can't get the mathematical certainity we can from Bayesian, we lose a deep understanding of what our programs will do, but we can solve nearly unimaginable number of problems well enough.
+What we are seeing now, is similar to what happened in the 80s and 90s and again something is being lost. We can't get the mathematical certainity we can from Bayesian methods, we lose a deep understanding of what our programs will do, but we can solve nearly unimaginable number of problems well enough.
 
 ## FAFO
 
