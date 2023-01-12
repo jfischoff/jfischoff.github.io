@@ -1,6 +1,6 @@
 In the idealized version of software development, programmers are applied mathematicians. The development process starts with a rigorous specification. Then the software is written and there is a proof that demonstrates the code implements the specification.
 
-This conception of programmers, I'm guessing originates from the 60s, when software development practices were disseminated through academic papers and programmers were seen as PhD math geniuses.
+This conception of programmers, probably originates from the 60s, when software development practices were disseminated through academic papers and programmers were seen as PhD math geniuses.
 
 As the discipline of programming moved out of academy and was adopted by hobbyists, this view changed. Programmers were no longer mathematicians; they were builders.
 
