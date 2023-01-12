@@ -4,7 +4,7 @@ But in the real world, this is bullshit.
 
 In the real world, maybe there are requirements, then the software is written, maybe it is tested and only after being used for a long time do we learn what the code actually does.
 
-In the past, software development ideas were expressed through academic papers, but this changed in the 80s and 90s as software development started to explode. People become expert programmers, not by applying theory, but by doing it. It turns out you can become an expert programmer primarily by writing a lot of code. At some point, programmers dropped the pretense they were scientists.
+In the past, software development ideas were expressed through academic papers, but this changed in the 80s and 90s as software development started to explode. People become expert programmers, not from learning the theory of recursive functions, but by doing it. It turns out you can become an expert programmer primarily by writing a lot of code. At some point, programmers dropped the academic pretense they were scientists and embraced what they really are: builders.
 
 Programming went from an academic discipline to a craft, millions learned to programmed and software transformed the world.
 
