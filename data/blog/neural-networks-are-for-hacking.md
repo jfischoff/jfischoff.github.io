@@ -20,7 +20,7 @@ You can play with neural networks and get an intuitive sense for how to use them
 
 What we are seeing now, is similar to what happened in the 80s and 90s. Neural networks are escaping the Ivory Tower. You can become a good deep learning practitioner by trying things. If it appears to work, you can see if it works in a wider class of tests. Maybe it works well enough to make money.
 
-Do you know exactly what a neural network can compute for all inputs? No, you don't, which is just like regularly programming. You have deployed it and find out.
+Do you know exactly what a neural network can compute for all inputs? No, you don't, which is just like regularly programming. You have to deploy it and find out.
 
 ## Play First, Understand Later
 
