@@ -10,7 +10,7 @@ In the past, software development ideas were expressed through academic papers, 
 
 Programming went from an academic discipline, to a craft. You become a good programmer by doing it. We design and test software to get a sense of what it can do, but we don't really know until it is heavily used by real users.
 
-## Neural Networks are Craft
+## Neural Networks are a Craft
 
 Neural network development seems like some advanced mathematics. For one, everyone seems to hold a PhD. that makes them. They use complex math like tensors and stochastic gradient descent. New developments are published in academic papers, etc, etc.
 
