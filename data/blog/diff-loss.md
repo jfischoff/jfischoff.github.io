@@ -6,7 +6,7 @@ The simplest way to think of video is as a sequence of images. However, this is 
 
 ## A Simple Example
 
-To see why this is import let's consider a simple example. Imagine we have a three frame video with one pixel. To make things even simpler, each pixel value is 128. 
+To see why this is import let's consider a simple example. Imagine we have a three frame video with one pixel. To make things even simpler, each pixel value is 128.
 
 ```python
 [128, 128, 128]
@@ -24,9 +24,9 @@ The second model makes the following estimate for the frames.
 [127, 129, 127]
 ```
 
-The first estimate is better. The second model is flickering between the first and third frame. The first model is as smooth as our target. However even though the first esimate is better, both models will acheive the same loss using the standard per frame reconstruction loss function. 
+The first estimate is better. The second model is flickering between the first and third frame. The first model is as smooth as our target. However even though the first esimate is better, both models will acheive the same loss using the standard per frame reconstruction loss function.
 
-The problem is that the loss function looks at each frame independently. The regular per frame reconstruction loss is blind to interframe changes. Our brain is not. We are very good at detecting interframe changes and this is the key to what makes video interesting. 
+The problem is that the loss function looks at each frame independently. The regular per frame reconstruction loss is blind to interframe changes. Our brain is not. We are very good at detecting interframe changes and this is the key to what makes video interesting.
 
 In this simple example the difference between the two models might seem small, but for a realistic example we would have 32x32 pixels or 1024 pixels, each free to flicker independently.
 
@@ -34,11 +34,11 @@ It is worth pointing out that the optimizing reconstruction loss does reduce the
 
 ## A More Interesting Loss Function
 
-A more accurate loss function needs to capture two characteristics of video, the path from one frame to the next and the appearance of individual frames. 
+A more accurate loss function needs to capture two characteristics of video, the path from one frame to the next and the appearance of individual frames.
 
 The current loss function handles the latter, but what about the former?
 
-The easiest thing to do is the compare the frame to frame diffs for the predicted and target frames. 
+The easiest thing to do is the compare the frame to frame diffs for the predicted and target frames.
 
 Here is some code for computing the frame diffs of the target and predicted videos and then taking the mean squared error.
 
@@ -65,39 +65,39 @@ Unfortuantely all versions of the `diff_loss` I tried have stability issues. The
 <table>
   <tr>
     <td>
-      <img src="images/diff_loss/high_entropy_attention_map.jpg" alt="High Entropy Attention Map" style="width: 250px;"/>
+      <img src="../images/diff_loss/high_entropy_attention_map.jpg" alt="High Entropy Attention Map" style="width: 250px;"/>
       <p align="center">High entropy attention map</p>
     </td>
     <td>
-      <img src="images/diff_loss/low_entropy_attention_map" alt="Low Entropy Attention Map" style="width: 250px;"/>
+      <img src="../images/diff_loss/low_entropy_attention_map" alt="Low Entropy Attention Map" style="width: 250px;"/>
       <p align="center">Low entropy attention map</p>
     </td>
   </tr>
 </table>
 
-This same process occurs with the reconstruction loss if the learning rate is too high, it just happens with the `diff_loss` at a lower learning rate. 
+This same process occurs with the reconstruction loss if the learning rate is too high, it just happens with the `diff_loss` at a lower learning rate.
 
 This process can be amerilirated during from-scratch training by using various transformer stability approaches like ["Query-Key Normalization"](https://arxiv.org/abs/2010.04245) or ["Sigma Reparam"](https://arxiv.org/abs/2303.06296). Also U-net stability [approaches](https://arxiv.org/abs/2310.13545), which target inherient instability in the upblocks of the U-net by scaling the skip connections also help. Helping fine-tuning is trickier because we can't change the model architecture easily.
 
-My theory on why the loss is less stable, is that one, it creates a sharper loss landscape. This is consistent with attention entropy dropping during unstable training, but it is also just a typical reason why training is unstable. However, I think another reason it is unstable is that we are trying to predict diffs of the noise, not of the clean image. We want the networks to learn that there is a smooth quality to most motion, where the pixels of one frame are similar to the next. The noise doesn't have this quality, so I think it is harder to learn how to predict noise diffs. 
+My theory on why the loss is less stable, is that one, it creates a sharper loss landscape. This is consistent with attention entropy dropping during unstable training, but it is also just a typical reason why training is unstable. However, I think another reason it is unstable is that we are trying to predict diffs of the noise, not of the clean image. We want the networks to learn that there is a smooth quality to most motion, where the pixels of one frame are similar to the next. The noise doesn't have this quality, so I think it is harder to learn how to predict noise diffs.
 
-My inituitive understanding of how the U-net works when predicting the noise, is that there is a noise-free semantic representation of the video in the deeper layers of the U-net. The conversion from this clean semantic representation to the actually noise prediction happens in the upblocks. 
+My inituitive understanding of how the U-net works when predicting the noise, is that there is a noise-free semantic representation of the video in the deeper layers of the U-net. The conversion from this clean semantic representation to the actually noise prediction happens in the upblocks.
 
 So, for fine-tuning with the `diff_loss` I experimented with training only the deeper blocks of the network, e.g. the down and mid blocks. This seemed to work better. When training the whole network, the reconstruction loss produces a noticable lower `diff_loss` indirectly by itself. However, when training just the deeper blocks, the `diff_loss` and reconstruction loss are comparably, and sometimes one does better than the other. I would say it is more of toss up.
 
 ## Results
 
-Fine-tuning with the `diff_loss` produces interesting results. The animations tend to have more motion in general. Specifically more camera motion. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I'm not sure honestly, but it is interesting nonetheless. 
+Fine-tuning with the `diff_loss` produces interesting results. The animations tend to have more motion in general. Specifically more camera motion. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I'm not sure honestly, but it is interesting nonetheless.
 
 Here is an example of a fine-tuned animation with the `diff_loss`.
 
-![Diff loss example](images/diff_loss/diff_loss_1.mp4)
+![Diff loss example](../images/diff_loss/diff_loss_1.mp4)
 
 And here is the same animation with the regular reconstruction loss.
 
-![Reconstruction loss example](images/diff_loss/recon_loss_1.mp4)
+![Reconstruction loss example](../images/diff_loss/recon_loss_1.mp4)
 
-You can see how the `diff_loss` has more camera motion, and some what surprisingly, makes a more consistent cat face. 
+You can see how the `diff_loss` has more camera motion, and some what surprisingly, makes a more consistent cat face.
 
 My hope was that I could perform a per pixel FFT of the `diff_loss` and the reconstruction loss and I would see a lower average value in the highest frequency component of the FFT, e.g. less flickering. However, when doing this [analysis](https://gist.github.com/jfischoff/35fc9220816029c53c3c37f9d07a702f) I found something different. The `diff_loss` had higher values in all of the frequency components except the first. This is just another way to say the animations move more. It is hard to tell if there is more less flickering, because small details are changing indirectly from the additional large scale motion. So the jury is out on if there is actually less flickering. If you know a better way to test for this, let me know!
 
@@ -105,7 +105,6 @@ My hope was that I could perform a per pixel FFT of the `diff_loss` and the reco
 
 I think the idea of using some form of `diff_loss` is promising. Although the additional instability is a downside. However, it produces more dynamic results which is often what users want, so I think it is worth explorining further.
 
-It is possible that using a larger batch size, like 1024, instead of the 16 I used, could improve the stability as well. Maybe when I'm not so GPU poor I could try that. 
+It is possible that using a larger batch size, like 1024, instead of the 16 I used, could improve the stability as well. Maybe when I'm not so GPU poor I could try that.
 
-Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I've pushed some checkpoints here for people to play with. 
-
+Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I've pushed some checkpoints here for people to play with.

@@ -165,13 +165,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <table>
 <tr>
 <td>
-<img src="images/diff_loss/high_entropy_attention_map.jpg" alt="High Entropy Attention Map" style="width: 250px;"/>
+<img src="../images/diff_loss/high_entropy_attention_map.jpg" alt="High Entropy Attention Map" style="width: 250px;"/>
 <p align="center">
 High entropy attention map
 </p>
 </td>
 <td>
-<img src="images/diff_loss/low_entropy_attention_map" alt="Low Entropy Attention Map" style="width: 250px;"/>
+<img src="../images/diff_loss/low_entropy_attention_map" alt="Low Entropy Attention Map" style="width: 250px;"/>
 <p align="center">
 Low entropy attention map
 </p>
@@ -187,11 +187,11 @@ Low entropy attention map
 <p>Fine-tuning with the <code>diff_loss</code> produces interesting results. The animations tend to have more motion in general. Specifically more camera motion. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I’m not sure honestly, but it is interesting nonetheless.</p>
 <p>Here is an example of a fine-tuned animation with the <code>diff_loss</code>.</p>
 <figure>
-<video src="images/diff_loss/diff_loss_1.mp4" controls=""><a href="images/diff_loss/diff_loss_1.mp4"></a></video><figcaption>Diff loss example</figcaption>
+<video src="../images/diff_loss/diff_loss_1.mp4" controls=""><a href="../images/diff_loss/diff_loss_1.mp4"></a></video><figcaption>Diff loss example</figcaption>
 </figure>
 <p>And here is the same animation with the regular reconstruction loss.</p>
 <figure>
-<video src="images/diff_loss/recon_loss_1.mp4" controls=""><a href="images/diff_loss/recon_loss_1.mp4"></a></video><figcaption>Reconstruction loss example</figcaption>
+<video src="../images/diff_loss/recon_loss_1.mp4" controls=""><a href="../images/diff_loss/recon_loss_1.mp4"></a></video><figcaption>Reconstruction loss example</figcaption>
 </figure>
 <p>You can see how the <code>diff_loss</code> has more camera motion, and some what surprisingly, makes a more consistent cat face.</p>
 <p>My hope was that I could perform a per pixel FFT of the <code>diff_loss</code> and the reconstruction loss and I would see a lower average value in the highest frequency component of the FFT, e.g. less flickering. However, when doing this <a href="https://gist.github.com/jfischoff/35fc9220816029c53c3c37f9d07a702f">analysis</a> I found something different. The <code>diff_loss</code> had higher values in all of the frequency components except the first. This is just another way to say the animations move more. It is hard to tell if there is more less flickering, because small details are changing indirectly from the additional large scale motion. So the jury is out on if there is actually less flickering. If you know a better way to test for this, let me know!</p>
