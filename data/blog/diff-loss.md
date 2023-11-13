@@ -96,42 +96,42 @@ Here are some examples of `diff_loss` on the left and reconstruction loss on the
 <table>
   <tr>
     <td>
-      <img src="../images/diff_loss/diff_loss_1.mp4" alt="" style="width: 512px;"/>
+      <video src="../images/diff_loss/diff_loss_1.mp4" alt="" />
     </td>
     <td>
-      <img src="../images/diff_loss/recon_loss_1.mp4" alt="" style="width: 512px;"/>
+      <video src="../images/diff_loss/recon_loss_1.mp4" alt="" />
     </td>
   </tr>
    <tr>
     <td>
-      <img src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+      <video src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
     </td>
     <td>
-      <img src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
-    </td>
-    <td>
-      <img src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+      <video src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
+      <video src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
     </td>
     <td>
-      <img src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+      <video src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+      <video src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
     </td>
     <td>
-      <img src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+      <video src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+    </td>
+    <td>
+      <video src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
     </td>
   </tr>
 </table>
@@ -146,4 +146,4 @@ I think the idea of using some form of `diff_loss` is promising. Although the ad
 
 It is possible that using a larger batch size, like 1024, instead of the 16 I used, could improve the stability as well. Maybe when I'm not so GPU poor I could try that.
 
-Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I've pushed some checkpoints here for people to play with.
+Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I've pushed some checkpoints [here](https://huggingface.co/jfischoff/diff_loss_mid_down_blocks) for people to play with.

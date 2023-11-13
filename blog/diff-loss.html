@@ -190,42 +190,42 @@ Low entropy attention map
 <table>
 <tr>
 <td>
-<img src="../images/diff_loss/diff_loss_1.mp4" alt="" style="width: 512px;"/>
+<video src="../images/diff_loss/diff_loss_1.mp4" alt="" />
 </td>
 <td>
-<img src="../images/diff_loss/recon_loss_1.mp4" alt="" style="width: 512px;"/>
-</td>
-</tr>
-<tr>
-<td>
-<img src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
-</td>
-<td>
-<img src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
+<video src="../images/diff_loss/recon_loss_1.mp4" alt="" />
 </td>
 </tr>
 <tr>
 <td>
-<img src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
+<video src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
 </td>
 <td>
-<img src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
-</td>
-</tr>
-<tr>
-<td>
-<img src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
-</td>
-<td>
-<img src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+<video src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
 </td>
 </tr>
 <tr>
 <td>
-<img src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+<video src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
 </td>
 <td>
-<img src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+<video src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<video src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
+</td>
+<td>
+<video src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<video src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+</td>
+<td>
+<video src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
 </td>
 </tr>
 </table>
@@ -234,7 +234,7 @@ Low entropy attention map
 <h2 id="conclusion">Conclusion</h2>
 <p>I think the idea of using some form of <code>diff_loss</code> is promising. Although the additional instability is a downside. However, it produces more dynamic results which is often what users want, so I think it is worth explorining further.</p>
 <p>It is possible that using a larger batch size, like 1024, instead of the 16 I used, could improve the stability as well. Maybe when I’m not so GPU poor I could try that.</p>
-<p>Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I’ve pushed some checkpoints here for people to play with.</p>
+<p>Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I’ve pushed some checkpoints <a href="https://huggingface.co/jfischoff/diff_loss_mid_down_blocks">here</a> for people to play with.</p>
 </article>
 </body>
 </html>
