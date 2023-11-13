@@ -1,5 +1,3 @@
-# Video Generation needs to Lose More
-
 I've been training AnimdateDiff video models based on Stable Diffusion and something dawned on me. The loss function used for video generation is the same as the loss function used on image generation, but maybe this isn't optimal.
 
 The simplest way to think of video is as a sequence of images. However, this is doesn't capture an important quality, mainly that each frame is related to the other frames.
