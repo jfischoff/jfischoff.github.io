@@ -1,18 +1,18 @@
 # Video Generation needs to Lose More
 
-I've been training AnimdateDiff video models based on Stable Diffusion recently and something dawned on me. The loss function used for video generation is the same as the loss function used on image generation, but maybe this isn't optimal
+I've been training AnimdateDiff video models based on Stable Diffusion and something dawned on me. The loss function used for video generation is the same as the loss function used on image generation, but maybe this isn't optimal.
 
-The simplest way to think of video is as a sequence of images. However, this is doesn't capture an important quality, mainly that each image is related to the neighboring image.
+The simplest way to think of video is as a sequence of images. However, this is doesn't capture an important quality, mainly that each frame is related to the other frames.
 
 ## A Simple Example
 
-To see why this is import let's consider a simple example. Imagine we have a three frame video with one pixel. To make things even simpler, each pixel value is 128.
+To see why this is might be import let's consider a simple example. Imagine we have a three frame video with one pixel. To make things even simpler, each pixel value is 128.
 
 ```python
 [128, 128, 128]
 ```
 
-Say we have two video generation models we are training. The first makes the following estimate for the frames after denoising (in Stable Diffusion we estimate the noise not the image, but let's ignore that detail for now).
+We train to video generation models. The first makes the following estimate for the frames after denoising (in Stable Diffusion we estimate the noise not the image, but let's ignore that detail for now).
 
 ```python
 [129, 129, 129]
@@ -24,9 +24,9 @@ The second model makes the following estimate for the frames.
 [127, 129, 127]
 ```
 
-The first estimate is better. The second model is flickering between the first and third frame. The first model is as smooth as our target. However even though the first esimate is better, both models will acheive the same loss using the standard per frame reconstruction loss function.
+The first estimate is more like the target. It is off by one, but the interframe differences are identical. The second model's inter-frame differences are off by two, e.g. it is flickering between the first and third frame. Although each frame is only off by one as well. Altough the first esimate is better, both models will acheive the same loss using the standard per frame reconstruction loss function.
 
-The problem is that the loss function looks at each frame independently. The regular per frame reconstruction loss is blind to interframe changes. Our brain is not. We are very good at detecting interframe changes and this is the key to what makes video interesting.
+The problem is that the standard reconstruction loss function looks at each frame independently. It is blind to interframe changes, but our brains are not. We are very good at detecting interframe changes and this is the key to what makes video interesting.
 
 In this simple example the difference between the two models might seem small, but for a realistic example we would have 32x32 pixels or 1024 pixels, each free to flicker independently.
 
@@ -62,6 +62,8 @@ It is not clear to me that this loss is actually better. For a loss function to 
 
 Unfortuantely all versions of the `diff_loss` I tried have stability issues. The instability shows up primarily in the upblocks of the U-Net, specifically upblock 1. During training, the motion modules' attention matrices in upblock 1 have a tendency to loss their entropy quickly. This is another way of saying most of the entries in the attention matrix are close to one or zero, vs a smoother more uniform distribution. While this process occurs the gradients rise, and if the learning rate is too high, the model will diverge.
 
+Just for the record, during training you want to see the attention maps entropy decrease, just in a stable way.
+
 <table>
   <tr>
     <td>
@@ -79,15 +81,15 @@ This same process occurs with the reconstruction loss if the learning rate is to
 
 This process can be amerilirated during from-scratch training by using various transformer stability approaches like ["Query-Key Normalization"](https://arxiv.org/abs/2010.04245) or ["Sigma Reparam"](https://arxiv.org/abs/2303.06296). Also U-net stability [approaches](https://arxiv.org/abs/2310.13545), which target inherient instability in the upblocks of the U-net by scaling the skip connections also help. Helping fine-tuning is trickier because we can't change the model architecture easily.
 
-My theory on why the loss is less stable, is that one, it creates a sharper loss landscape. This is consistent with attention entropy dropping during unstable training, but it is also common source of training instability, probably the most common. However, I think another reason it is unstable is that we are trying to predict diffs of the noise, not of the clean image. We want the networks to learn that there is a smooth quality to most motion, where the pixels of one frame are similar to the next. The noise doesn't have this quality, so I think it is harder to learn how to predict noise diffs.
+My theory on why the loss is less stable, is that one, it creates a sharper loss landscape. This is consistent with attention entropy dropping during unstable training, but it is also common source of training instability, probably the most common. However, I think another reason it is unstable is that we are trying to predict diffs of the noise, not of the clean image. We want the network to learn that there is a smooth quality to the diffs, where the pixels of one frame are similar to the next. The noise doesn't have this quality, so I think it is harder to learn how to predict noise diffs, there is not really a pattern there.
 
-My inituitive understanding of how the U-net works when predicting the noise, is that there is a noise-free semantic representation of the video in the deeper layers of the U-net. The conversion from this clean semantic representation to the actually noise prediction happens in the upblocks.
+My inituitive understanding of how the U-net works when predicting the noise, is that there is a noise-free semantic representation of the video in the deeper layers of the U-net. The conversion from this clean semantic representation to the actually noise prediction happens in the upblocks ... I think.
 
 So, for fine-tuning with the `diff_loss` I experimented with training only the deeper blocks of the network, e.g. the down and mid blocks. This seemed to work better. When training the whole network, the reconstruction loss produces a noticable lower `diff_loss` indirectly by itself. However, when training just the deeper blocks, the `diff_loss` and reconstruction loss are comparably, and sometimes one does better than the other. I would say it is more of toss up.
 
 ## Results
 
-Fine-tuning with the `diff_loss` produces interesting results. The animations tend to have more motion in general. Specifically more camera motion. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I'm not sure honestly, but it is interesting nonetheless.
+Fine-tuning with the `diff_loss` produces interesting results. The animations tend to have more motion in general. Many end with a hand held video feel. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I'm not sure honestly, but it is interesting nonetheless.
 
 Here is an example of a fine-tuned animation with the `diff_loss`.
 
