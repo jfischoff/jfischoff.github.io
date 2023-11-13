@@ -96,10 +96,10 @@ Here are some examples of `diff_loss` on the left and reconstruction loss on the
 <table>
   <tr>
     <td>
-      <img src="../images/diff_loss/diff_loss_1.mp4" alt=""/>
+      <img src="../images/diff_loss/diff_loss_1.mp4" alt="" style="width: 512px;"/>
     </td>
     <td>
-      <img src="../images/diff_loss/recon_loss_1.mp4" alt=""/>
+      <img src="../images/diff_loss/recon_loss_1.mp4" alt="" style="width: 512px;"/>
     </td>
   </tr>
    <tr>
