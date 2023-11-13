@@ -91,7 +91,50 @@ So, for fine-tuning with the `diff_loss` I experimented with training only the d
 
 Fine-tuning with the `diff_loss` produces interesting results. The animations tend to have more motion in general. Many end with a hand held video feel. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I'm not sure honestly, but it is interesting nonetheless.
 
-Here is an example of a fine-tuned animation with the `diff_loss`.
+Here are some examples of `diff_loss` on the left and reconstruction loss on the right.
+
+<table>
+  <tr>
+    <td>
+      <img src="../images/diff_loss/diff_loss_1.mp4" alt=""/>
+    </td>
+    <td>
+      <img src="../images/diff_loss/recon_loss_1.mp4" alt=""/>
+    </td>
+  </tr>
+   <tr>
+    <td>
+      <img src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+    </td>
+    <td>
+      <img src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
+    </td>
+    <td>
+      <img src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
+    </td>
+    <td>
+      <img src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+    </td>
+    <td>
+      <img src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+    </td>
+  </tr>
+</table>
 
 ![Diff loss example](../images/diff_loss/diff_loss_1.mp4)
 

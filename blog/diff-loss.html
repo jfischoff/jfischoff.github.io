@@ -186,7 +186,49 @@ Low entropy attention map
 <p>So, for fine-tuning with the <code>diff_loss</code> I experimented with training only the deeper blocks of the network, e.g. the down and mid blocks. This seemed to work better. When training the whole network, the reconstruction loss produces a noticable lower <code>diff_loss</code> indirectly by itself. However, when training just the deeper blocks, the <code>diff_loss</code> and reconstruction loss are comparably, and sometimes one does better than the other. I would say it is more of toss up.</p>
 <h2 id="results">Results</h2>
 <p>Fine-tuning with the <code>diff_loss</code> produces interesting results. The animations tend to have more motion in general. Many end with a hand held video feel. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I’m not sure honestly, but it is interesting nonetheless.</p>
-<p>Here is an example of a fine-tuned animation with the <code>diff_loss</code>.</p>
+<p>Here are some examples of <code>diff_loss</code> on the left and reconstruction loss on the right.</p>
+<table>
+<tr>
+<td>
+<img src="../images/diff_loss/diff_loss_1.mp4" alt=""/>
+</td>
+<td>
+<img src="../images/diff_loss/recon_loss_1.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<img src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+</td>
+<td>
+<img src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<img src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
+</td>
+<td>
+<img src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<img src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
+</td>
+<td>
+<img src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<img src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+</td>
+<td>
+<img src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+</td>
+</tr>
+</table>
 <figure>
 <video src="../images/diff_loss/diff_loss_1.mp4" controls=""><a href="../images/diff_loss/diff_loss_1.mp4"></a></video><figcaption>Diff loss example</figcaption>
 </figure>
