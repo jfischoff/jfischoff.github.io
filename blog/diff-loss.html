@@ -171,7 +171,7 @@ High entropy attention map
 </p>
 </td>
 <td>
-<img src="../images/diff_loss/low_entropy_attention_map" alt="Low Entropy Attention Map" style="width: 250px;"/>
+<img src="../images/diff_loss/low_entropy_attention_map.jpg" alt="Low Entropy Attention Map" style="width: 250px;"/>
 <p align="center">
 Low entropy attention map
 </p>
@@ -180,7 +180,7 @@ Low entropy attention map
 </table>
 <p>This same process occurs with the reconstruction loss if the learning rate is too high, it just happens with the <code>diff_loss</code> at a lower learning rate.</p>
 <p>This process can be amerilirated during from-scratch training by using various transformer stability approaches like <a href="https://arxiv.org/abs/2010.04245">“Query-Key Normalization”</a> or <a href="https://arxiv.org/abs/2303.06296">“Sigma Reparam”</a>. Also U-net stability <a href="https://arxiv.org/abs/2310.13545">approaches</a>, which target inherient instability in the upblocks of the U-net by scaling the skip connections also help. Helping fine-tuning is trickier because we can’t change the model architecture easily.</p>
-<p>My theory on why the loss is less stable, is that one, it creates a sharper loss landscape. This is consistent with attention entropy dropping during unstable training, but it is also just a typical reason why training is unstable. However, I think another reason it is unstable is that we are trying to predict diffs of the noise, not of the clean image. We want the networks to learn that there is a smooth quality to most motion, where the pixels of one frame are similar to the next. The noise doesn’t have this quality, so I think it is harder to learn how to predict noise diffs.</p>
+<p>My theory on why the loss is less stable, is that one, it creates a sharper loss landscape. This is consistent with attention entropy dropping during unstable training, but it is also common source of training instability, probably the most common. However, I think another reason it is unstable is that we are trying to predict diffs of the noise, not of the clean image. We want the networks to learn that there is a smooth quality to most motion, where the pixels of one frame are similar to the next. The noise doesn’t have this quality, so I think it is harder to learn how to predict noise diffs.</p>
 <p>My inituitive understanding of how the U-net works when predicting the noise, is that there is a noise-free semantic representation of the video in the deeper layers of the U-net. The conversion from this clean semantic representation to the actually noise prediction happens in the upblocks.</p>
 <p>So, for fine-tuning with the <code>diff_loss</code> I experimented with training only the deeper blocks of the network, e.g. the down and mid blocks. This seemed to work better. When training the whole network, the reconstruction loss produces a noticable lower <code>diff_loss</code> indirectly by itself. However, when training just the deeper blocks, the <code>diff_loss</code> and reconstruction loss are comparably, and sometimes one does better than the other. I would say it is more of toss up.</p>
 <h2 id="results">Results</h2>
