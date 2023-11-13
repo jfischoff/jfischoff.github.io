@@ -1,5 +1,5 @@
 # Blog Entries
-- [Videos Should Lose More](blog/diff_loss.html)
+- [Videos Should Lose More](blog/diff-loss.html)
 - [Neural Networks Are For Hacking`](blog/neural-networks-are-for-hacking.html)
 - [Making NFTs with Plutus](blog/making-nfts-with-plutus.html)
 - [Introducing `hasql-queue`](blog/introducing-hasql-queue.html)
