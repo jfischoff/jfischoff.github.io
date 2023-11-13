@@ -130,7 +130,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header>
 <h1 class="title">Making Videos Lose More</h1>
 </header>
-<h1 id="video-generation-needs-to-lose-more">Video Generation needs to Lose More</h1>
 <p>I’ve been training AnimdateDiff video models based on Stable Diffusion and something dawned on me. The loss function used for video generation is the same as the loss function used on image generation, but maybe this isn’t optimal.</p>
 <p>The simplest way to think of video is as a sequence of images. However, this is doesn’t capture an important quality, mainly that each frame is related to the other frames.</p>
 <h2 id="a-simple-example">A Simple Example</h2>
@@ -190,42 +189,42 @@ Low entropy attention map
 <table style="width: 100%; border-collapse: collapse;">
 <tr>
 <td>
-<video controls src="../images/diff_loss/diff_loss_1.mp4" alt="" />
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_4.mp4" alt="" />
 </td>
 <td>
-<video controls src="../images/diff_loss/recon_loss_1.mp4" alt="" />
-</td>
-</tr>
-<tr>
-<td>
-<video controls src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
-</td>
-<td>
-<video controls src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_4.mp4" alt="" />
 </td>
 </tr>
 <tr>
 <td>
-<video controls src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
 </td>
 <td>
-<video controls src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
-</td>
-</tr>
-<tr>
-<td>
-<video controls src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
-</td>
-<td>
-<video controls src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
 </td>
 </tr>
 <tr>
 <td>
-<video controls src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
 </td>
 <td>
-<video controls src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_1.mp4" alt=""/>
+</td>
+<td>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_1.mp4" alt=""/>
+</td>
+</tr>
+<tr>
+<td>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+</td>
+<td>
+<video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
 </td>
 </tr>
 </table>

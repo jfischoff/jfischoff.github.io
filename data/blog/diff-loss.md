@@ -94,42 +94,42 @@ Here are some examples of `diff_loss` on the left and reconstruction loss on the
 <table style="width: 100%; border-collapse: collapse;">
   <tr>
     <td>
-      <video controls src="../images/diff_loss/diff_loss_1.mp4" alt="" />
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_4.mp4" alt="" />
     </td>
     <td>
-      <video controls src="../images/diff_loss/recon_loss_1.mp4" alt="" />
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_4.mp4" alt="" />
     </td>
   </tr>
    <tr>
     <td>
-      <video controls src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
     </td>
     <td>
-      <video controls src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <video controls src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
-    </td>
-    <td>
-      <video controls src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
     </td>
   </tr>
   <tr>
     <td>
-      <video controls src="../images/diff_loss/diff_loss_4.mp4" alt=""/>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
     </td>
     <td>
-      <video controls src="../images/diff_loss/recon_loss_4.mp4" alt=""/>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
     </td>
   </tr>
   <tr>
     <td>
-      <video controls src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_1.mp4" alt=""/>
     </td>
     <td>
-      <video controls src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_1.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+    </td>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
     </td>
   </tr>
 </table>
