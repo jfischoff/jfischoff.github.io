@@ -136,13 +136,7 @@ Here are some examples of `diff_loss` on the left and reconstruction loss on the
   </tr>
 </table>
 
-![Diff loss example](../images/diff_loss/diff_loss_1.mp4)
-
-And here is the same animation with the regular reconstruction loss.
-
-![Reconstruction loss example](../images/diff_loss/recon_loss_1.mp4)
-
-You can see how the `diff_loss` has more camera motion, and some what surprisingly, makes a more consistent cat face.
+You can see how the `diff_loss` has more camera motion. Overall I like most of the `diff_loss` generations slightly more, but they are pretty similar.
 
 My hope was that I could perform a per pixel FFT of the `diff_loss` and the reconstruction loss and I would see a lower average value in the highest frequency component of the FFT, e.g. less flickering. However, when doing this [analysis](https://gist.github.com/jfischoff/35fc9220816029c53c3c37f9d07a702f) I found something different. The `diff_loss` had higher values in all of the frequency components except the first. This is just another way to say the animations move more. It is hard to tell if there is more less flickering, because small details are changing indirectly from the additional large scale motion. So the jury is out on if there is actually less flickering. If you know a better way to test for this, let me know!
 
