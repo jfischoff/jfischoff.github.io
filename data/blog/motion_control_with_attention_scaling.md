@@ -11,15 +11,15 @@ It does. It affects the motion in a similar way to the `motion_bucket_id`, but w
 
 scale 0.5, motion_bucket_id 512, fps_id 12, 14 frames 4x interpolated
 
-![Scale 0.5](images/motion_control_with_attention_scaling/scale_0.5.mp4)
+![Scale 0.5](../images/motion_control_with_attention_scaling/scale_0.5.mp4)
 
 scale 1.0, motion_bucket_id 512, fps_id 12, 14 frames 4x interpolated
 
-![Scale 1.0](images/motion_control_with_attention_scaling/scale_1.mp4)
+![Scale 1.0](../images/motion_control_with_attention_scaling/scale_1.mp4)
 
 scale 2.0, motion_bucket_id 512, fps_id 12, 14 frames 4x interpolated
 
-![Scale 2.0](images/motion_control_with_attention_scaling/scale_2.mp4)
+![Scale 2.0](../images/motion_control_with_attention_scaling/scale_2.mp4)
 
 Is this better worse than the `motion_bucket_id` way? I don't know. I think it is just another knob that is nice to have so I thought I would mention it to a wider audience.
 
