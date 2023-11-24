@@ -21,7 +21,7 @@ scale 2.0, motion_bucket_id 512, fps_id 12, 14 frames 4x interpolated
 
 ![Scale 2.0](../images/motion_control_with_attention_scaling/scale_2.mp4)
 
-Is this better worse than the `motion_bucket_id` way? I don't know. I think it is just another knob that is nice to have so I thought I would mention it to a wider audience.
+Is this better or worse than the `motion_bucket_id` way? I don't know. I think it is just another knob that is nice to have so I thought I would mention it to a wider audience.
 
 I haven't added a great way to control the attention scale in `sgm`. I'm waiting on the diffusers code to drop, but for now you can try a very hacky change I made to `sgm` [here](https://github.com/Stability-AI/generative-models/compare/main...jfischoff:generative-models:main#diff-cfa95be7dddd86c8097a6548aa7bb2cd63ce551b4e28d1f21fd33380eb812548R417).
 
