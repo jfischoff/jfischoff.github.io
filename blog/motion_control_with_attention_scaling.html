@@ -67,8 +67,8 @@ SOFTWARE.
 <h1 class="title">Motion Control with Attention Scaling</h1>
 </header>
 <p>A trick I discovered when hacking on AnimateDiff motion modules: you can increase and decrease the amount of motion by adjusting the temporal attention “scale.”</p>
-<p>If you remember the attention formula, before taking the softmax we multiply by <code>1/sqrt(d)</code>. This often called the “scale”. If we adjust the numerator to be greater than 1, we get more motion and if we adjust it to be less than 1 we get less motion.</p>
-<p>It works okay as way scale the motion, although if you make it too high you will get artifacts and if you make it too low you will no motion at all.</p>
+<p>If you remember the attention formula, before taking the softmax we multiply by <code>sqrt(1/d)</code>. This often called the “scale”. If we adjust the numerator to be greater than 1, we get more motion and if we adjust it to be less than 1 we get less motion.</p>
+<p>It works okay as way scale the motion, although if you make it too high you will get artifacts and if you make it too low you wil get no motion at all.</p>
 <p>I wanted to see how this attention scaling affected Stable Video Diffusion (SVD).</p>
 <p>It does. It affects the motion in a similar way to the <code>motion_bucket_id</code>, but with somewhat difference results.</p>
 <p>scale 0.5, motion_bucket_id 512, fps_id 12, 14 frames 4x interpolated</p>
