@@ -1,6 +1,6 @@
 A trick I discovered when hacking on AnimateDiff motion modules: you can increase and decrease the amount of motion by adjusting the temporal attention "scale."
 
-If you remember the attention formula, before taking the softmax we multiply by `1/sqrt(d)`. This often called the "scale".
+If you remember the attention formula, before taking the softmax we multiply by `sqrt(1/d)`. This often called the "scale".
 If we adjust the numerator to be greater than 1, we get more motion and if we adjust it to be less than 1 we get less motion.
 
 It works okay as way scale the motion, although if you make it too high you will get artifacts and if you make it too low you wil get no motion at all.
