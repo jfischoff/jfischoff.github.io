@@ -66,7 +66,7 @@ SOFTWARE.
 <header>
 <h1 class="title">Motion Control with Attention Scaling</h1>
 </header>
-<p>A trick is discovered when hacking on AnimateDiff motion modules is you can increase and decrease the amount of motion by adjusting the temporal attention “scale.”</p>
+<p>A trick I discovered when hacking on AnimateDiff motion modules: you can increase and decrease the amount of motion by adjusting the temporal attention “scale.”</p>
 <p>If you remember the attention formula, before taking the softmax we multiply by <code>1/sqrt(d)</code>. This often called the “scale”. If we adjust the numerator to be greater than 1, we get more motion and if we adjust it to be less than 1 we get less motion.</p>
 <p>It works okay as way scale the motion, although if you make it too high you will get artifacts and if you make it too low you will no motion at all.</p>
 <p>I wanted to see how this attention scaling affected Stable Video Diffusion (SVD).</p>
@@ -83,6 +83,7 @@ SOFTWARE.
 <figure>
 <video src="images/motion_control_with_attention_scaling/scale_2.mp4" controls=""><a href="images/motion_control_with_attention_scaling/scale_2.mp4"></a></video><figcaption>Scale 2.0</figcaption>
 </figure>
+<p>Is this better worse than the <code>motion_bucket_id</code> way? I don’t know. I think it is just another knob that is nice to have so I thought I would mention it to a wider audience.</p>
 <p>I haven’t added a great way to control the attention scale in <code>sgm</code>. I’m waiting on the diffusers code to drop, but for now you can try a very hacky change I made to <code>sgm</code> <a href="https://github.com/Stability-AI/generative-models/compare/main...jfischoff:generative-models:main#diff-cfa95be7dddd86c8097a6548aa7bb2cd63ce551b4e28d1f21fd33380eb812548R417">here</a>.</p>
 <p>Basically I detect it is temporal attention if the sequence length is the number of frames. If so I use a different scale.</p>
 <p>When <code>diffusers</code> gets a real <code>SVD</code> implementation I will add a better way to control the attention scale.</p>
