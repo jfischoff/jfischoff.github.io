@@ -24,3 +24,4 @@ pandoc --template=GitHub.html5 data/blog/introducing-hasql-queue.md -o blog/intr
 pandoc --template=GitHub.html5 data/blog/neural-networks-are-for-hacking.md -o blog/neural-networks-are-for-hacking.html --metadata title="Neural Networks Are For Hacking"
 pandoc --template=GitHub.html5 data/blog/making-nfts-with-plutus.md -o blog/making-nfts-with-plutus.html --metadata title="Making NFTs with Plutus"
 pandoc --template=GitHub.html5 data/blog/diff-loss.md -o blog/diff-loss.html --metadata title="Making Videos Lose More"
+pandoc --template=GitHub.html5 data/blog/motion_control_with_attention_scaling.md -o blog/motion_control_with_attention_scaling.html --metadata title="Motion Control with Attention Scaling"
