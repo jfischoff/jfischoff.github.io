@@ -1,5 +1,3 @@
-# Video Generation needs to Lose More
-
 I've been training AnimdateDiff video models based on Stable Diffusion and something dawned on me. The loss function used for video generation is the same as the loss function used on image generation, but maybe this isn't optimal.
 
 The simplest way to think of video is as a sequence of images. However, this is doesn't capture an important quality, mainly that each frame is related to the other frames.
@@ -91,15 +89,52 @@ So, for fine-tuning with the `diff_loss` I experimented with training only the d
 
 Fine-tuning with the `diff_loss` produces interesting results. The animations tend to have more motion in general. Many end with a hand held video feel. This could be because it is better at predicting motion, or it could be an artifact from errors in the prediction getting turned into motion, or maybe something else. I'm not sure honestly, but it is interesting nonetheless.
 
-Here is an example of a fine-tuned animation with the `diff_loss`.
+Here are some examples of `diff_loss` on the left and reconstruction loss on the right.
 
-![Diff loss example](../images/diff_loss/diff_loss_1.mp4)
+<table style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_4.mp4" alt="" />
+    </td>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_4.mp4" alt="" />
+    </td>
+  </tr>
+   <tr>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_5.mp4" alt=""/>
+    </td>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_5.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_3.mp4" alt=""/>
+    </td>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_3.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_1.mp4" alt=""/>
+    </td>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_1.mp4" alt=""/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/diff_loss_2.mp4" alt=""/>
+    </td>
+    <td>
+      <video style="max-width: 100%; height: auto; display: block;" controls src="../images/diff_loss/recon_loss_2.mp4" alt=""/>
+    </td>
+  </tr>
+</table>
 
-And here is the same animation with the regular reconstruction loss.
-
-![Reconstruction loss example](../images/diff_loss/recon_loss_1.mp4)
-
-You can see how the `diff_loss` has more camera motion, and some what surprisingly, makes a more consistent cat face.
+You can see how the `diff_loss` has more camera motion. Overall I like most of the `diff_loss` generations slightly more, but they are pretty similar.
 
 My hope was that I could perform a per pixel FFT of the `diff_loss` and the reconstruction loss and I would see a lower average value in the highest frequency component of the FFT, e.g. less flickering. However, when doing this [analysis](https://gist.github.com/jfischoff/35fc9220816029c53c3c37f9d07a702f) I found something different. The `diff_loss` had higher values in all of the frequency components except the first. This is just another way to say the animations move more. It is hard to tell if there is more less flickering, because small details are changing indirectly from the additional large scale motion. So the jury is out on if there is actually less flickering. If you know a better way to test for this, let me know!
 
@@ -109,4 +144,4 @@ I think the idea of using some form of `diff_loss` is promising. Although the ad
 
 It is possible that using a larger batch size, like 1024, instead of the 16 I used, could improve the stability as well. Maybe when I'm not so GPU poor I could try that.
 
-Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I've pushed some checkpoints here for people to play with.
+Something I would also like to try is using it with a base image model that predicts a clean image instead of noise. For now though I've pushed some checkpoints [here](https://huggingface.co/jfischoff/diff_loss_mid_down_blocks) for people to play with.
