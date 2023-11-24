@@ -1,4 +1,5 @@
 # Blog Entries
+- [Motion Control With Attention Scaling](blog/motion_control_with_attention_scaling.html)
 - [Videos Should Lose More](blog/diff-loss.html)
 - [Neural Networks Are For Hacking`](blog/neural-networks-are-for-hacking.html)
 - [Making NFTs with Plutus](blog/making-nfts-with-plutus.html)
